@@ -15,6 +15,8 @@ var playerAmount = 2;
 var oldPlayerAmount = 0;
 
 var playerAreas = [];
+var collidableMeshList = [];
+
 
 // window.onload = function() {
 // var gui = new dat.GUI();
@@ -25,6 +27,7 @@ var playerAreas = [];
 var borderMaterial;
 var mesh;
 
+var ball;
 
 init();
 animate();
@@ -50,6 +53,9 @@ function init() {
 	gui = new dat.GUI();
 	gui.add(this, 'playerAmount').min(2).max(100).step(1).listen();
 	gui.open();
+	gui.domElement.style.position = 'absolute';
+	gui.domElement.style.right = '0px';
+	// gui.domElement.style.zIndex = 100;
 	container.appendChild(gui.domElement);
 	// RENDERER
 	if (Detector.webgl)
@@ -110,20 +116,22 @@ function init() {
 		color: 0x009999
 	});
 
-	var sphereGeometry = new THREE.SphereGeometry(5, 16, 16);
+	// var sphereGeometry = new THREE.SphereGeometry(5, 16, 16);
 
-	sphereMesh = new THREE.Mesh(sphereGeometry, material);
-	sphereMesh.position.set(0, 0, 0);
-	scene.add(sphereMesh);
-
-	var ballo = new Ball();
-	ballo.update();
-	ballo.update();
-
-	// var cubeGeometry = new THREE.CubeGeometry(100, 10, 10, 1, 1, 1);
+	// sphereMesh = new THREE.Mesh(sphereGeometry, material);
+	// sphereMesh.position.set(0, 0, 0);
+	// scene.add(sphereMesh);
 	borderMaterial = new THREE.MeshLambertMaterial({
 		color: 0x009999
 	});
+
+	ball = new Ball(borderMaterial);
+	ball.update();
+
+	scene.add(ball.sphereMesh);
+
+	// var cubeGeometry = new THREE.CubeGeometry(100, 10, 10, 1, 1, 1);
+
 	// cubeMesh = new THREE.Mesh(cubeGeometry, material);
 	// cubeMesh.position.set(-100, 50, -50);
 	// cubeMesh.rotation.y = 180 * (Math.PI / 180);
@@ -153,15 +161,20 @@ function init() {
 // }
 
 function generateScene() {
+	ball.sphereMesh.position = new THREE.Vector3(0, 0, 0);
+
 	// Camera.main.orthographicSize =  Mathf.Pow(playerAmount + cameraTweak, 1.2);
 	// ball.transform.position = Vector3.zero;
 
 	// Destroy(playerAreaParent);
 	// playerAreaParent = Instantiate(playerAreaParentPrefab, new Vector3(0, 0, 0),  Quaternion.identity);
 
-	for(var i = 0; i < playerAreas.length; i++){
+	collidableMeshList = [];
+
+	for (var i = 0; i < playerAreas.length; i++) {
 		scene.remove(playerAreas[i]);
 	}
+
 
 	// Angle in radians
 	var radians = Math.PI * 2 / playerAmount;
@@ -195,6 +208,10 @@ function generateScene() {
 		var pa = new playerArea(borderMaterial, new THREE.Vector3(x, 0, z), radians);
 		playerAreas.push(pa.group);
 
+		collidableMeshList.push(pa.borderBottom);
+		collidableMeshList.push(pa.borderLeft);
+		collidableMeshList.push(pa.borderTop);
+
 		scene.add(pa.group);
 
 	}
@@ -222,6 +239,7 @@ function update() {
 	controls.update();
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
+	ball.update(collidableMeshList);
 }
 
 function render() {
