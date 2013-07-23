@@ -161,7 +161,9 @@ function init() {
 // }
 
 function generateScene() {
-	ball.sphereMesh.position = new THREE.Vector3(0, 0, 0);
+	playerAmount = Math.round(playerAmount);
+
+	ball.sphereMesh.position = new THREE.Vector3(50, 0, 0);
 
 	// Camera.main.orthographicSize =  Mathf.Pow(playerAmount + cameraTweak, 1.2);
 	// ball.transform.position = Vector3.zero;

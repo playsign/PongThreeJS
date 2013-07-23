@@ -1,6 +1,6 @@
 function Ball(material) {
-	this.speed = 30;
-	this.velocity = new THREE.Vector3(0, 0, 50);
+	this.speed = 50;
+	this.velocity = new THREE.Vector3(this.speed, 0, this.speed);
 
 	this.sphereGeometry = new THREE.SphereGeometry(5, 16, 16);
 
@@ -8,6 +8,7 @@ function Ball(material) {
 	this.sphereMesh.position.set(0, 0, 0);
 
 	this.debugThing = true;
+	this.debugThing2 = 0;
 }
 
 Ball.prototype.update = function(collidableMeshList) // Define Method
@@ -23,7 +24,14 @@ Ball.prototype.update = function(collidableMeshList) // Define Method
 
 	// MovingCube.position.x -= moveDistance;
 
-
+	if (this.debugThing == false) {
+		this.debugThing2 += delta;
+	}
+	if (this.debugThing2 > 0.1) {
+		this.debugThing = true;
+		this.debugThing2 = 0;
+		console.log("reset");
+	}
 
 	// Collision detection:
 	//   determines if any of the rays from the cube's origin to each vertex
@@ -55,21 +63,42 @@ Ball.prototype.onCollision = function(collision) {
 	if (this.debugThing) {
 
 		console.log("collision: " + collision.object.position.z);
-		var direction = new THREE.Vector3(0, 0, 0);
+		// var direction = new THREE.Vector3(0, 0, 0);
+		var direction = new THREE.Vector3();
+		direction.add(collision.object.parent.rotation);
+		direction.add(collision.object.rotation);
+
+		var borderNormal = new THREE.Vector3();
+
+		// Angle to vector3
+		borderNormal.x = Math.cos(direction.y * -1);
+		borderNormal.z = Math.sin(direction.y * -1);
+
+
+		console.log("parent.rotation.y" + collision.object.parent.rotation.y);
+		console.log("rotation.y" + collision.object.rotation.y);
+		console.log("direction.y" + direction.y);
+
+		console.log("borderNormal.x" + borderNormal.x);
+		console.log("borderNormal.z" + borderNormal.z);
 
 		//  Bottom border
 		if (collision.object.position.z == 55) {
 			console.log("bottom border");
+
+			this.velocity.reflect(borderNormal); //, collision.object.forward);
 		}
 		// Left border
 		else if (collision.object.position.z == 0) {
 			console.log("left border");
 
-			this.velocity.reflect(direction); //, collision.object.forward);
+			this.velocity.reflect(borderNormal); //, collision.object.forward);
 		}
 		// Top border
 		else if (collision.object.position.z == -55) {
 			console.log("top border");
+
+			this.velocity.reflect(borderNormal); //, collision.object.forward);
 		}
 
 		this.debugThing = false;
