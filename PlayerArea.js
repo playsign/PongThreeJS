@@ -31,10 +31,57 @@ playerArea = function(material, position, rotation) {
 	this.borderTop.position.set(41.73959, 0, -55);
 	this.borderTop.rotation.y = 180 * (Math.PI / 180);
 
+	// Player Racket
+	this.racketGeometry = new THREE.CubeGeometry(10, 10, 30, 1, 1, 1);
+	this.racketMesh = new THREE.Mesh(this.racketGeometry, material);
+	this.racketMesh.position.set(76, 0, 4);
+	this.racketMesh.rotation.y = 180 * (Math.PI / 180);
+	this.racketSpeed = 50;
+
 	this.group.add(this.borderBottom);
 	this.group.add(this.borderLeft);
 	this.group.add(this.borderTop);
+	this.group.add(this.racketMesh);
 
 	// console.log("this.position.x, : " + this.position.x);
 	// console.log("this.position.z : " + this.position.z);
+
+
+
+}
+
+playerArea.prototype.update = function(delta) {
+	
+
+	// Racket controls
+	if (keyboard.pressed("left") || keyboard.pressed("right")) {
+
+
+		// var direction = new THREE.Vector3();
+		// direction.add(collision.object.parent.rotation);
+		// direction.add(collision.object.rotation);
+
+		var racketForward = new THREE.Vector3();
+		// var rotation = this.group.rotation.y + (90 * (Math.PI / 180));
+		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
+
+		// Angle to vector3
+		racketForward.x = Math.cos(rotation * -1);
+		racketForward.z = Math.sin(rotation * -1);
+
+
+		racketForward.normalize();
+
+		racketForward.multiplyScalar(this.racketSpeed * delta);
+
+
+		// console.log("racketForward.x:" + racketForward.x);
+		// console.log("racketForward.z:" + racketForward.z);
+
+		if (keyboard.pressed("left"))
+			this.racketMesh.position.add(racketForward);
+		if (keyboard.pressed("right"))
+			this.racketMesh.position.sub(racketForward);
+
+	}
 }

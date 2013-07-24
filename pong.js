@@ -1,7 +1,7 @@
 /*
-	Three.js "tutorials by example"
-	Author: Lee Stemkoski
-	Date: July 2013 (three.js v59dev)
+	Pong
+	Author: Playsign
+	Date: 2013
  */
 
 // MAIN
@@ -16,12 +16,6 @@ var oldPlayerAmount = 0;
 
 var playerAreas = [];
 var collidableMeshList = [];
-
-
-// window.onload = function() {
-// var gui = new dat.GUI();
-// gui.add(this, 'playerAmount').min(3).max(100).step(1).listen();
-// };
 
 // custom global variables
 var borderMaterial;
@@ -116,40 +110,17 @@ function init() {
 		color: 0x009999
 	});
 
-	// var sphereGeometry = new THREE.SphereGeometry(5, 16, 16);
-
-	// sphereMesh = new THREE.Mesh(sphereGeometry, material);
-	// sphereMesh.position.set(0, 0, 0);
-	// scene.add(sphereMesh);
 	borderMaterial = new THREE.MeshLambertMaterial({
 		color: 0x009999
 	});
 
 	ball = new Ball(borderMaterial);
-	ball.update();
 
 	scene.add(ball.sphereMesh);
 
-	// var cubeGeometry = new THREE.CubeGeometry(100, 10, 10, 1, 1, 1);
-
-	// cubeMesh = new THREE.Mesh(cubeGeometry, material);
-	// cubeMesh.position.set(-100, 50, -50);
-	// cubeMesh.rotation.y = 180 * (Math.PI / 180);
-
-	// instantiateNewPlayerArea();
+	gui.add(ball, 'speed').min(0).max(100).step(0.1).listen();
 
 	generateScene();
-
-	// console.log("cubeMesh.rotation.x: "+cubeMesh.rotation.x);
-	// console.log("cubeMesh.rotation.y: "+cubeMesh.rotation.y);
-	// console.log("cubeMesh.rotation.z: "+cubeMesh.rotation.z);
-
-	// scene.add(cubeMesh);
-
-	// gui = new dat.GUI();
-	// gui.add(this, 'playerAmount').min(3).max(100).step(1).listen();
-	// gui.open();
-
 }
 
 // function instantiateNewPlayerArea(position, rotation) {
@@ -164,6 +135,8 @@ function generateScene() {
 	playerAmount = Math.round(playerAmount);
 
 	ball.sphereMesh.position = new THREE.Vector3(50, 0, 0);
+	ball.lastCollider = null;
+
 
 	// Camera.main.orthographicSize =  Mathf.Pow(playerAmount + cameraTweak, 1.2);
 	// ball.transform.position = Vector3.zero;
@@ -174,7 +147,7 @@ function generateScene() {
 	collidableMeshList = [];
 
 	for (var i = 0; i < playerAreas.length; i++) {
-		scene.remove(playerAreas[i]);
+		scene.remove(playerAreas[i].group);
 	}
 
 
@@ -182,7 +155,12 @@ function generateScene() {
 	var radians = Math.PI * 2 / playerAmount;
 
 	var radius = playerAmount; // * radiusTweak;
-	var pivotPoint = 10; // Push player area forward by width of the area
+	var pivotPoint = 9; // Push player area forward by width of the area
+
+	// Two player tweak to remove gaps between player areas
+	if (playerAmount == 2) {
+		pivotPoint -= 4;
+	}
 
 	// Calculate player are offset
 	var tHypotenuse = radius;
@@ -208,7 +186,8 @@ function generateScene() {
 		// instantiateNewPlayerArea(new THREE.Vector3(x , 0, z), radians);
 
 		var pa = new playerArea(borderMaterial, new THREE.Vector3(x, 0, z), radians);
-		playerAreas.push(pa.group);
+
+		playerAreas.push(pa);
 
 		collidableMeshList.push(pa.borderBottom);
 		collidableMeshList.push(pa.borderLeft);
@@ -229,6 +208,8 @@ function animate() {
 
 function update() {
 	// Refresh the scene if the player amount has changed
+	var delta = clock.getDelta(); // seconds.
+
 	if (playerAmount != oldPlayerAmount) {
 		generateScene();
 	}
@@ -241,7 +222,11 @@ function update() {
 	controls.update();
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
-	ball.update(collidableMeshList);
+	ball.update(collidableMeshList,delta);
+	for (var i = 0; i < playerAreas.length; i++) {
+		playerAreas[i].update(delta);
+	}
+
 }
 
 function render() {
