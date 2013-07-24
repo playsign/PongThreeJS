@@ -1,7 +1,7 @@
 function Ball(material) {
 	this.speed = 50;
 	this.radius = 5;
-	// this.speedDefault = this.speed;
+
 	this.velocity = new THREE.Vector3(1, 0, 1);
 
 	this.sphereGeometry = new THREE.SphereGeometry(this.radius, 16, 16);
@@ -17,15 +17,12 @@ function Ball(material) {
 Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 {
 
-	// console.log("update");
-	// var delta = clock.getDelta(); // seconds.
-	// var moveDistance = 200 * delta; // 200 pixels per second
+	// keep the speed of 1
+	this.velocity.normalize();
+
 	var moveDistance = new THREE.Vector3(this.velocity.x * this.speed * delta, this.velocity.y * this.speed * delta, this.velocity.z * this.speed * delta);
 
 	this.sphereMesh.position.add(moveDistance);
-
-	// console.log("this.sphereMesh.position.x: "+moveDistance.x);
-	// MovingCube.position.x -= moveDistance;
 
 	// Collision detection:
 	//   determines if any of the rays from the cube's origin to each vertex
@@ -37,6 +34,7 @@ Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 
 
 	if (collidableMeshList) {
+		loop:
 		for (var vertexIndex = 0; vertexIndex < this.sphereMesh.geometry.vertices.length; vertexIndex++) {
 			var localVertex = this.sphereMesh.geometry.vertices[vertexIndex].clone();
 			var globalVertex = localVertex.applyMatrix4(this.sphereMesh.matrix);
@@ -49,13 +47,13 @@ Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 			if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
 				if (this.lastCollider != collisionResults[0].object) {
 
-					console.log("collisionResults[0].distance :" + collisionResults[0].distance);
+					// console.log("collisionResults[0].distance :" + collisionResults[0].distance);
 
 					// console.log(" Hit ");
 					this.lastCollider = collisionResults[0].object;
 					this.onCollision(collisionResults[0]);
 					// console.log(" collisionResults[0].object " + collisionResults[0].object.rotation.y);
-					break;
+					break loop;
 				}
 			}
 		}
@@ -79,42 +77,66 @@ Ball.prototype.onCollision = function(collision) {
 	// Fix
 	this.sphereMesh.position.sub(this.velocity.normalize().multiplyScalar(this.radius - collision.distance));
 
-	console.log("collision.distance" + collision.distance);
-	console.log("this.velocity.normalize()" + this.velocity.normalize().x);
-	console.log("this.velocity.normalize()" + this.velocity.normalize().y);
-	console.log("this.velocity.normalize()" + this.velocity.normalize().z);
-	console.log("reflect");
+	// console.log("collision.distance" + collision.distance);
+	// console.log("this.velocity.normalize()" + this.velocity.normalize().x);
+	// console.log("this.velocity.normalize()" + this.velocity.normalize().y);
+	// console.log("this.velocity.normalize()" + this.velocity.normalize().z);
+	// console.log("reflect");
 
 	// console.log("parent.rotation.y" + collision.object.parent.rotation.y);
 	// console.log("rotation.y" + collision.object.rotation.y);
 	// console.log("direction.y" + direction.y);
 
-
-
 	//  Bottom border
-	if (collision.object.position.z == 55) {
+	if (collision.object.name == "bottom") {
 		// console.log("bottom border");
 
 		this.velocity.reflect(borderNormal); //, collision.object.forward);
 	}
 	// Left border
-	else if (collision.object.position.z == 0) {
+	else if (collision.object.name == "left") {
 		// console.log("left border");
 
 		this.velocity.reflect(borderNormal); //, collision.object.forward);
 	}
 	// Top border
-	else if (collision.object.position.z == -55) {
+	else if (collision.object.name == "top") {
 		// console.log("top border");
 
 		this.velocity.reflect(borderNormal); //, collision.object.forward);
 	}
-	// 	// Racket
-	// else if (collision.object.position.z == -55) {
-	// 	// console.log("top border");
+	// Racket
+	else if (collision.object.name == "racket") {
+		// console.log("racket");
 
-	// 	this.velocity.reflect(borderNormal); //, collision.object.forward);
-	// }
+		// //  left / middle / right ?
+		// var racketPos = new THREE.Vector3();
+		// racketPos.add(collision.object.parent.position);
+		// racketPos.add(collision.object.position);
+
+
+		// var difference = racketPos.sub(this.sphereMesh.position);
+
+		// console.log("differencex" + racketPos.x);
+		// console.log("differencex" + collision.object.parent.position.x);
+		// console.log("differencex" + this.sphereMesh.position.x);
+		// console.log("-------------");
+		// console.log("differencex" + difference.x);
+		// console.log("tdifferencey" + difference.y);
+		// console.log("differencez" + difference.z);
+
+
+		// difference.normalize();
+		// difference.multiplyScalar(this.speed);
+
+		this.velocity.reflect(borderNormal); //, collision.object.forward);
+		this.velocity.multiplyScalar(-1);
+
+		// this.velocity = difference.multiplyScalar(-1);
+
+
+		// this.velocity = difference;
+	}
 
 
 }

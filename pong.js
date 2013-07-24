@@ -11,6 +11,8 @@ var container, scene, camera, renderer, controls, stats, gui;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
+var cameraTweak = 0.1;
+
 var playerAmount = 2;
 var oldPlayerAmount = 0;
 
@@ -38,7 +40,8 @@ function init() {
 		ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT,
 		NEAR = 0.1,
 		FAR = 20000;
-	camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+	// camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+	camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
 	scene.add(camera);
 	camera.position.set(0, 500, 0);
 	camera.lookAt(scene.position);
@@ -76,26 +79,36 @@ function init() {
 	container.appendChild(stats.domElement);
 
 	// LIGHT
+	// var light = new THREE.AmbientLight(0x999999); // soft white light
+	// scene.add(light);
+
 	var light = new THREE.PointLight(0xffffff);
-	light.position.set(100, 250, 100);
+	light.position.set(-300, 300, -300);
 	scene.add(light);
+
+	// White directional light at half intensity shining from the top.
+	var light = new THREE.DirectionalLight(0xffffff, 1);
+	light.position.set(300, 300, 300);
+	scene.add(light);
+
+
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture('images/checkerboard.jpg');
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-	floorTexture.repeat.set(10, 10);
-	var floorMaterial = new THREE.MeshBasicMaterial({
-		map: floorTexture,
-		side: THREE.DoubleSide
-	});
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -0.5;
-	floor.rotation.x = Math.PI / 2;
-	scene.add(floor);
+	// var floorTexture = new THREE.ImageUtils.loadTexture('images/checkerboard.jpg');
+	// floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+	// floorTexture.repeat.set(10, 10);
+	// var floorMaterial = new THREE.MeshBasicMaterial({
+	// 	map: floorTexture,
+	// 	side: THREE.DoubleSide
+	// });
+	// var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	// var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	// floor.position.y = -0.5;
+	// floor.rotation.x = Math.PI / 2;
+	// scene.add(floor);
 	// SKYBOX
 	var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
 	var skyBoxMaterial = new THREE.MeshBasicMaterial({
-		color: 0x9999ff,
+		color: 0x000000,
 		side: THREE.BackSide
 	});
 	var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
@@ -107,11 +120,11 @@ function init() {
 
 
 	var material = new THREE.MeshLambertMaterial({
-		color: 0x009999
+		color: 0x999999
 	});
 
 	borderMaterial = new THREE.MeshLambertMaterial({
-		color: 0x009999
+		color: 0x999999
 	});
 
 	ball = new Ball(borderMaterial);
@@ -123,33 +136,26 @@ function init() {
 	generateScene();
 }
 
-// function instantiateNewPlayerArea(position, rotation) {
-// 	var pa = new PlayerArea.AreaObject(borderMaterial, position, rotation);
-
-// 	scene.add(pa.group);
-
-// 	// console.log("position: "+position.x+ " "+position.y+ " "+position.z);
-// }
-
 function generateScene() {
 	playerAmount = Math.round(playerAmount);
 
 	ball.sphereMesh.position = new THREE.Vector3(50, 0, 0);
 	ball.lastCollider = null;
 
-
 	// Camera.main.orthographicSize =  Mathf.Pow(playerAmount + cameraTweak, 1.2);
-	// ball.transform.position = Vector3.zero;
-
-	// Destroy(playerAreaParent);
-	// playerAreaParent = Instantiate(playerAreaParentPrefab, new Vector3(0, 0, 0),  Quaternion.identity);
+	// update the camera
+	var camFactor = Math.pow(playerAmount, 0.7) * cameraTweak;
+	camera.left = -window.innerWidth * camFactor;
+	camera.right = window.innerWidth * camFactor;
+	camera.top = window.innerHeight * camFactor;
+	camera.bottom = -window.innerHeight * camFactor;
+	camera.updateProjectionMatrix();
 
 	collidableMeshList = [];
 
 	for (var i = 0; i < playerAreas.length; i++) {
 		scene.remove(playerAreas[i].group);
 	}
-
 
 	// Angle in radians
 	var radians = Math.PI * 2 / playerAmount;
@@ -169,8 +175,6 @@ function generateScene() {
 	var playerAreaOffset = radius - tAdjacent;
 
 	radius += radius - playerAreaOffset;
-
-
 
 	for (var i = 0; i < playerAmount; i++) {
 		radians = Math.PI * 2 / playerAmount * (i + 1);
@@ -192,6 +196,7 @@ function generateScene() {
 		collidableMeshList.push(pa.borderBottom);
 		collidableMeshList.push(pa.borderLeft);
 		collidableMeshList.push(pa.borderTop);
+		collidableMeshList.push(pa.racketMesh);
 
 		scene.add(pa.group);
 
@@ -214,52 +219,16 @@ function update() {
 		generateScene();
 	}
 
-
-	if (keyboard.pressed("z")) {
-		// do something
-	}
-
 	controls.update();
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
-	ball.update(collidableMeshList,delta);
+	ball.update(collidableMeshList, delta);
 	for (var i = 0; i < playerAreas.length; i++) {
-		playerAreas[i].update(delta);
+		playerAreas[i].update(collidableMeshList, delta);
 	}
 
 }
 
 function render() {
 	renderer.render(scene, camera);
-}
-
-// Rotate an object around an arbitrary axis in object space
-var rotObjectMatrix;
-
-function rotateAroundObjectAxis(object, axis, radians) {
-	rotObjectMatrix = new THREE.Matrix4();
-	rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
-	object.matrix.multiplySelf(rotObjectMatrix); // post-multiply
-
-	// new code for Three.js r50+
-	object.rotation.setEulerFromRotationMatrix(object.matrix);
-
-	// old code for Three.js r49 and earlier:
-	// object.rotation.getRotationFromMatrix(object.matrix, object.scale);
-}
-
-var rotWorldMatrix;
-// Rotate an object around an arbitrary axis in world space       
-
-function rotateAroundWorldAxis(object, axis, radians) {
-	rotWorldMatrix = new THREE.Matrix4();
-	rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-	rotWorldMatrix.multiplySelf(object.matrix); // pre-multiply
-	object.matrix = rotWorldMatrix;
-
-	// new code for Three.js r50+ --
-	object.rotation.setEulerFromRotationMatrix(object.matrix);
-
-	// old code for Three.js r49 and earlier --
-	// object.rotation.getRotationFromMatrix(object.matrix, object.scale);
 }
