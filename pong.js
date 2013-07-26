@@ -14,7 +14,7 @@ var clock = new THREE.Clock();
 var cameraTweak = 0.1;
 
 var playerAmount = 2;
-var oldPlayerAmount = 0;
+var oldPlayerAmount = playerAmount;
 
 var playerAreas = [];
 var collidableMeshList = [];
@@ -133,7 +133,9 @@ function init() {
 
 	gui.add(ball, 'speed').min(0).max(100).step(0.1).listen();
 
-	generateScene();
+	// generateScene();
+
+	gameDirector = new director();
 }
 
 function generateScene() {
