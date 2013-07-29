@@ -1,7 +1,7 @@
 // var PlayerArea = {};
 
 // PlayerArea.AreaObject = function(material, position, rotation) {
-playerArea = function(material, position, rotation, id) {
+playerArea = function(position, rotation, pColor, id) {
 
 	this.group = new THREE.Object3D(); //create an empty container
 
@@ -13,7 +13,9 @@ playerArea = function(material, position, rotation, id) {
 	this.bottomTopGeometry = new THREE.CubeGeometry(100, 10, 10, 1, 1, 1);
 	this.leftGeometry = new THREE.CubeGeometry(120, 10, 10, 1, 1, 1);
 
-	this.material = material;
+	this.material = new THREE.MeshLambertMaterial({
+		color: pColor
+	});
 
 	this.borderBottom = new THREE.Mesh(this.bottomTopGeometry, this.material);
 	this.borderBottom.position.set(41.73959, 0, 55);
@@ -34,7 +36,7 @@ playerArea = function(material, position, rotation, id) {
 	// Player Racket
 	this.racketWidth = 30;
 	this.racketGeometry = new THREE.CubeGeometry(10, 10, this.racketWidth, 1, 1, 1);
-	this.racketMesh = new THREE.Mesh(this.racketGeometry, material);
+	this.racketMesh = new THREE.Mesh(this.racketGeometry, this.material);
 	this.racketMesh.position.set(76, 0, 4);
 	this.racketMesh.rotation.y = 180 * (Math.PI / 180);
 	this.racketMesh.name = "racket";
@@ -57,6 +59,7 @@ playerArea = function(material, position, rotation, id) {
 	this.playerID = id;
 	this.playerName = "Player";
 	this.playerBalls = 3;
+	this.playerColor = pColor;
 }
 
 playerArea.prototype.update = function(collidableMeshList, delta) {

@@ -206,7 +206,12 @@ function generateScene() {
 
 		// instantiateNewPlayerArea(new THREE.Vector3(x , 0, z), radians);
 
-		var pa = new playerArea(borderMaterial, new THREE.Vector3(x, 0, z), radians, i);
+		var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+		// var newMaterial = new THREE.MeshLambertMaterial({
+			// color: randomColor
+		// });
+
+		var pa = new playerArea(new THREE.Vector3(x, 0, z), radians, randomColor, i);
 
 		playerAreas.push(pa);
 
@@ -230,7 +235,7 @@ function refreshPlayersInfo() {
 	$("#playersInfo").empty();
 	for (var i = 0; i < playerAmount; i++) {
 
-		$("#playersInfo").append("Player" + (i + 1));
+		$("#playersInfo").append("<font color = "+playerAreas[i].playerColor+">Player" + (i + 1) +"</font>");
 		switch (playerAreas[i].playerBalls) {
 			case 0:
 				$("#playersInfo").append("<img width='¨12' height='12' src='images/ballIconRed.png'/> ");
