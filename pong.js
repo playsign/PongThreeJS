@@ -206,7 +206,7 @@ function generateScene() {
 
 		// instantiateNewPlayerArea(new THREE.Vector3(x , 0, z), radians);
 
-		var pa = new playerArea(borderMaterial, new THREE.Vector3(x, 0, z), radians);
+		var pa = new playerArea(borderMaterial, new THREE.Vector3(x, 0, z), radians, i);
 
 		playerAreas.push(pa);
 

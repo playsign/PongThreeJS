@@ -1,7 +1,7 @@
 // var PlayerArea = {};
 
 // PlayerArea.AreaObject = function(material, position, rotation) {
-playerArea = function(material, position, rotation) {
+playerArea = function(material, position, rotation, id) {
 
 	this.group = new THREE.Object3D(); //create an empty container
 
@@ -54,6 +54,7 @@ playerArea = function(material, position, rotation) {
 	this.groupMeshes.push(this.borderTop);
 
 	// Player info
+	this.playerID = id;
 	this.playerName = "Player";
 	this.playerBalls = 3;
 }
@@ -62,7 +63,7 @@ playerArea.prototype.update = function(collidableMeshList, delta) {
 
 	var lastPosition = this.racketMesh.position.clone();
 	// Racket controls
-	if (keyboard.pressed("left") || keyboard.pressed("right")) {
+	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d")) {
 		var racketForward = new THREE.Vector3();
 
 		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
@@ -76,10 +77,17 @@ playerArea.prototype.update = function(collidableMeshList, delta) {
 
 		racketForward.multiplyScalar(this.racketSpeed * delta);
 
-		if (keyboard.pressed("left"))
-			this.racketMesh.position.add(racketForward);
-		if (keyboard.pressed("right"))
-			this.racketMesh.position.sub(racketForward);
+		if (this.playerID == 1) {
+			if (keyboard.pressed("left"))
+				this.racketMesh.position.add(racketForward);
+			if (keyboard.pressed("right"))
+				this.racketMesh.position.sub(racketForward);
+		} else {
+			if (keyboard.pressed("a"))
+				this.racketMesh.position.add(racketForward);
+			if (keyboard.pressed("d"))
+				this.racketMesh.position.sub(racketForward);
+		}
 
 		if (this.racketMesh.position.z < this.racketTopStop || this.racketMesh.position.z > this.racketBottomStop) {
 			this.racketMesh.position = lastPosition;
