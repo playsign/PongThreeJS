@@ -13,7 +13,7 @@ var clock = new THREE.Clock();
 
 var cameraTweak = 0.1;
 
-var playerAmount = 2;
+var playerAmount = 6;
 var oldPlayerAmount = playerAmount;
 
 var playerAreas = [];
@@ -145,6 +145,8 @@ function deleteScene() {
 	for (var i = 0; i < playerAreas.length; i++) {
 		scene.remove(playerAreas[i].group);
 	}
+
+	playerAreas = [];
 }
 
 function generateScene() {
@@ -228,7 +230,7 @@ function refreshPlayersInfo() {
 	$("#playersInfo").empty();
 	for (var i = 0; i < playerAmount; i++) {
 
-		$("#playersInfo").append("Player" + i + 1);
+		$("#playersInfo").append("Player" + (i + 1));
 		switch (playerAreas[i].playerBalls) {
 			case 0:
 				$("#playersInfo").append("<img width='¨12' height='12' src='images/ballIconRed.png'/> ");

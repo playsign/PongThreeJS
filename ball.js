@@ -1,5 +1,5 @@
 function Ball(material) {
-	this.speed = 50;
+	this.speed = 75;
 	this.radius = 5;
 
 	this.velocity = new THREE.Vector3(1, 0, 1);
@@ -34,6 +34,7 @@ Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 
 
 	if (collidableMeshList) {
+
 		loop: for (var vertexIndex = 0; vertexIndex < this.sphereMesh.geometry.vertices.length; vertexIndex++) {
 			var localVertex = this.sphereMesh.geometry.vertices[vertexIndex].clone();
 			var globalVertex = localVertex.applyMatrix4(this.sphereMesh.matrix);
@@ -41,7 +42,7 @@ Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 
 			var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
 			var collisionResults = ray.intersectObjects(collidableMeshList);
-
+			
 
 			if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
 				if (this.lastCollider != collisionResults[0].object) {
@@ -101,11 +102,15 @@ Ball.prototype.onCollision = function(collision) {
 
 		this.sphereMesh.position.set(0, 0, 0);
 
-		var direction = new THREE.Vector3(collision.object.position.x, collision.object.position.y, collision.object.position.z);
-		direction.add(collision.object.parentNode.position);
-		direction.normalize();
+		var direction = new THREE.Vector3(0,0,0);
+		direction.getPositionFromMatrix(collision.object.matrixWorld);
+		// console.log("direction.x "+direction.x);
 
-		this.velocity.set(direction);
+		direction.normalize();
+		// console.log("direction.x "+direction.x);
+
+		this.velocity = direction;
+		this.lastCollider = null;
 
 		// this.velocity.reflect(borderNormal); //, collision.object.forward);
 	}
@@ -139,6 +144,8 @@ Ball.prototype.onCollision = function(collision) {
 		this.velocity.set(this.velocity.x * -1.0,
 			this.velocity.y,
 			this.velocity.z * -1.0);
+
+		this.lastCollider = null;
 
 	}
 
