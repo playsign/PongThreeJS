@@ -127,10 +127,9 @@ function init() {
 		color: 0x999999
 	});
 
+
+
 	ball = new Ball(borderMaterial);
-
-	scene.add(ball.sphereMesh);
-
 	gui.add(ball, 'speed').min(0).max(100).step(0.1).listen();
 
 	// generateScene();
@@ -138,7 +137,26 @@ function init() {
 	gameDirector = new director();
 }
 
+function deleteScene() {
+	scene.remove(ball.sphereMesh);
+
+	collidableMeshList = [];
+
+	for (var i = 0; i < playerAreas.length; i++) {
+		scene.remove(playerAreas[i].group);
+	}
+}
+
 function generateScene() {
+	// delete previous scene
+	deleteScene();
+
+	// Ball
+
+	scene.add(ball.sphereMesh);
+
+
+
 	playerAmount = Math.round(playerAmount);
 
 	ball.sphereMesh.position = new THREE.Vector3(50, 0, 0);
@@ -153,11 +171,7 @@ function generateScene() {
 	camera.bottom = -window.innerHeight * camFactor;
 	camera.updateProjectionMatrix();
 
-	collidableMeshList = [];
 
-	for (var i = 0; i < playerAreas.length; i++) {
-		scene.remove(playerAreas[i].group);
-	}
 
 	// Angle in radians
 	var radians = Math.PI * 2 / playerAmount;

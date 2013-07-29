@@ -8,13 +8,15 @@ $(function() {
 		"left": window.innerWidth / 2 - 50,
 		"width": "100px",
 		"height": "50px",
-		"font-size": "250%"
+		"font-size": "250%",
+		"color":"white"
 	}) // adds CSS
 	.button({
 		label: "OK"
 	})
 		.click(function() {
 		gameDirector.doNextScreen();
+		generateScene();
 	})
-		.hide()
+		// .hide()
 });

@@ -2,19 +2,20 @@ $(function() {
 	$("#playButton")
 		.css({
 		"z-index": "2",
-		"background-image": "url('images/button.png')",
+		"background-image": "url('images/smallButton.png')",	
 		"position": "absolute",
 		"bottom": "50px",
 		"left": window.innerWidth / 2 - 125,
 		"width": "250px",
-		"height": "50px",
-		"font-size": "250%"
+		"height": "48px",
+		"font-size": "250%",
+		"color":"white"
 	}) // adds CSS
 	.button({
 		label: "PLAY"
 	})
 		.click(function() {
-			gameDirector.setScreen(screens.controls);	
+		gameDirector.setScreen(screens.controls);
 	})
-		.toggle()
+		// .toggle()
 });

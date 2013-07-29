@@ -5,7 +5,7 @@ screens = {
 	lobby: 3,
 	controls: 4,
 	game: 5,
-	pause: 6,
+	gameMenu: 6,
 	gameover: 7
 }
 
@@ -16,6 +16,17 @@ director = function() {
 director.prototype.setScreen = function(newScreen) {
 	if (this.screen != newScreen) {
 		// *hide previous screen items
+		$("#playButton").hide();
+		$("#title").hide();
+		$("#okButton").hide();
+		$("#help").hide();
+		$("#gameMenuButton").hide();
+		$("#infoButton").hide();
+		$("#continueButton").hide();
+		$("#replayButton").hide();
+		$("#menuButton").hide();
+
+
 		this.currentScreen = newScreen;
 
 		switch (this.currentScreen) {
@@ -24,8 +35,9 @@ director.prototype.setScreen = function(newScreen) {
 				// *show play button*
 				// *show info button*
 				// *show volume button*
-				$("#playButton").toggle();
-				$("#title").toggle();
+				$("#playButton").show();
+				$("#title").show();
+				$("#infoButton").show();
 
 				break;
 			case 1: //  SETUP
@@ -44,30 +56,34 @@ director.prototype.setScreen = function(newScreen) {
 				// *show controls*
 				// *show ok button*
 				console.log("controls");
-				$("#playButton").hide();
-				$("#title").hide();
+
 				$("#okButton").show();
 				$("#help").show();
 				break;
 			case 5: //  GAME SCENE
 				// *generate scene*
-				// *show pause button (if not online game)*
+				// *show game menu button*
 				// *show mini chat*
 				// *show players infos
 
-				$("#okButton").hide();
-				$("#help").hide();
+				$("#gameMenuButton").show();
 
-				generateScene();
+				// generateScene();
 
 
 				break;
-			case 6: //  PAUSE
+			case 6: //  GAME MENU (pause)
 				// *show volume button*
-				// *show pause button*
+				// *show game menu button*
 				// *show menu button*
 				// *show replay button *
-				// *show play button *
+				// *show continue button *
+				$("#infoButton").show();
+				$("#continueButton").show();
+				$("#replayButton").show();
+				$("#menuButton").show();
+
+
 				break;
 			case 7: //  GAME OVER
 				// *show game over window*
