@@ -152,15 +152,14 @@ function generateScene() {
 	deleteScene();
 
 	// Ball
-
 	scene.add(ball.sphereMesh);
-
-
 
 	playerAmount = Math.round(playerAmount);
 
 	ball.sphereMesh.position = new THREE.Vector3(50, 0, 0);
 	ball.lastCollider = null;
+
+
 
 	// Camera.main.orthographicSize =  Mathf.Pow(playerAmount + cameraTweak, 1.2);
 	// update the camera
@@ -217,9 +216,43 @@ function generateScene() {
 		scene.add(pa.group);
 
 	}
+
+	// Players info
+	refreshPlayersInfo();
+
+
 	oldPlayerAmount = playerAmount;
 }
 
+function refreshPlayersInfo() {
+	$("#playersInfo").empty();
+	for (var i = 0; i < playerAmount; i++) {
+
+		$("#playersInfo").append("Player" + i + 1);
+		switch (playerAreas[i].playerBalls) {
+			case 0:
+				$("#playersInfo").append("<img width='¨12' height='12' src='images/ballIconRed.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> <br>");
+				break;
+			case 1:
+				$("#playersInfo").append("<img width='¨12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> <br>");
+				break;
+			case 2:
+				$("#playersInfo").append("<img width='¨12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> <br>");
+				break;
+			case 3:
+				$("#playersInfo").append("<img width='¨12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIcon.png'/> <br>");
+				break;
+		}
+	}
+}
 
 function animate() {
 	requestAnimationFrame(animate);

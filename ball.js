@@ -34,8 +34,7 @@ Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 
 
 	if (collidableMeshList) {
-		loop:
-		for (var vertexIndex = 0; vertexIndex < this.sphereMesh.geometry.vertices.length; vertexIndex++) {
+		loop: for (var vertexIndex = 0; vertexIndex < this.sphereMesh.geometry.vertices.length; vertexIndex++) {
 			var localVertex = this.sphereMesh.geometry.vertices[vertexIndex].clone();
 			var globalVertex = localVertex.applyMatrix4(this.sphereMesh.matrix);
 			var directionVector = globalVertex.sub(this.sphereMesh.position);
@@ -96,8 +95,19 @@ Ball.prototype.onCollision = function(collision) {
 	// Left border
 	else if (collision.object.name == "left") {
 		// console.log("left border");
+		// console.log("collision.object.parentNode.className "+collision.object.parentNode.className);
+		collision.object.parentNode.playerBalls--;
+		refreshPlayersInfo();
 
-		this.velocity.reflect(borderNormal); //, collision.object.forward);
+		this.sphereMesh.position.set(0, 0, 0);
+
+		var direction = new THREE.Vector3(collision.object.position.x, collision.object.position.y, collision.object.position.z);
+		direction.add(collision.object.parentNode.position);
+		direction.normalize();
+
+		this.velocity.set(direction);
+
+		// this.velocity.reflect(borderNormal); //, collision.object.forward);
 	}
 	// Top border
 	else if (collision.object.name == "top") {
@@ -107,35 +117,29 @@ Ball.prototype.onCollision = function(collision) {
 	}
 	// Racket
 	else if (collision.object.name == "racket") {
-		// console.log("racket");
+		//  left / middle / right ?
+		var racketPos = new THREE.Vector3();
 
-		// //  left / middle / right ?
-		// var racketPos = new THREE.Vector3();
-		// racketPos.add(collision.object.parent.position);
-		// racketPos.add(collision.object.position);
+		racketPos.getPositionFromMatrix(collision.object.matrixWorld);
 
+		var difference = racketPos.sub(this.sphereMesh.position);
 
-		// var difference = racketPos.sub(this.sphereMesh.position);
+		// console.log("racket x: " + racketPos.x);
+		// console.log("racket z: " + racketPos.z);
 
-		// console.log("differencex" + racketPos.x);
-		// console.log("differencex" + collision.object.parent.position.x);
-		// console.log("differencex" + this.sphereMesh.position.x);
+		// console.log("ball x" + this.sphereMesh.position.x);
+		// console.log("ball z" + this.sphereMesh.position.z);
+
 		// console.log("-------------");
-		// console.log("differencex" + difference.x);
-		// console.log("tdifferencey" + difference.y);
-		// console.log("differencez" + difference.z);
 
+		difference.normalize();
+		difference.multiplyScalar(this.speed);
 
-		// difference.normalize();
-		// difference.multiplyScalar(this.speed);
+		this.velocity = difference;
+		this.velocity.set(this.velocity.x * -1.0,
+			this.velocity.y,
+			this.velocity.z * -1.0);
 
-		this.velocity.reflect(borderNormal); //, collision.object.forward);
-		this.velocity.multiplyScalar(-1);
-
-		// this.velocity = difference.multiplyScalar(-1);
-
-
-		// this.velocity = difference;
 	}
 
 

@@ -24,6 +24,7 @@ playerArea = function(material, position, rotation) {
 	this.borderLeft.position.set(96.05561, 0, 0);
 	this.borderLeft.rotation.y = 90 * (Math.PI / 180);
 	this.borderLeft.name = "left";
+	this.borderLeft.parentNode = this;
 
 	this.borderTop = new THREE.Mesh(this.bottomTopGeometry, this.material);
 	this.borderTop.position.set(41.73959, 0, -55);
@@ -51,6 +52,10 @@ playerArea = function(material, position, rotation) {
 	this.groupMeshes.push(this.borderBottom);
 	this.groupMeshes.push(this.borderLeft);
 	this.groupMeshes.push(this.borderTop);
+
+	// Player info
+	this.playerName = "Player";
+	this.playerBalls = 3;
 }
 
 playerArea.prototype.update = function(collidableMeshList, delta) {

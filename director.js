@@ -25,6 +25,7 @@ director.prototype.setScreen = function(newScreen) {
 		$("#continueButton").hide();
 		$("#replayButton").hide();
 		$("#menuButton").hide();
+		$("#playersInfo").hide();
 
 
 		this.currentScreen = newScreen;
@@ -67,6 +68,11 @@ director.prototype.setScreen = function(newScreen) {
 				// *show players infos
 
 				$("#gameMenuButton").show();
+
+				// Player names and ball counts
+				$("#playersInfo").show();
+
+
 
 				// generateScene();
 
