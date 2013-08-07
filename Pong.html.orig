@@ -18,9 +18,11 @@
 <script src="js/ammo.js"></script>
 
 <script type='text/javascript' src='js/DAT.GUI.min.js'></script>
+<<<<<<< Updated upstream
 <script src="PlayerArea.js"></script>
-<script src="ball.js"></script>
+=======
 <script src="playerArea.js"></script>
+>>>>>>> Stashed changes
 <script src="ball.js"></script>
 
 <!-- Code to display an information button and box when clicked. -->

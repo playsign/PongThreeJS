@@ -13,7 +13,7 @@ var clock = new THREE.Clock();
 
 var cameraTweak = 0.1;
 
-var playerAmount = 6;
+var playerAmount = 3;
 var oldPlayerAmount = playerAmount;
 
 var playerAreas = [];
@@ -33,6 +33,15 @@ animate();
 function init() {
 	// SCENE
 	scene = new THREE.Scene();
+
+	// AMMO.JS
+	collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+	dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
+	overlappingPairCache = new Ammo.btDbvtBroadphase();
+	solver = new Ammo.btSequentialImpulseConstraintSolver();
+	scene.world = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+	scene.world.setGravity(new Ammo.btVector3(0, 0, 0));
+
 	// CAMERA
 	var SCREEN_WIDTH = window.innerWidth,
 		SCREEN_HEIGHT = window.innerHeight;
@@ -45,6 +54,7 @@ function init() {
 	scene.add(camera);
 	camera.position.set(0, 500, 0);
 	camera.lookAt(scene.position);
+
 	// DAT GUI
 	container = document.getElementById('ThreeJS');
 	gui = new dat.GUI();
@@ -54,6 +64,7 @@ function init() {
 	gui.domElement.style.right = '0px';
 	// gui.domElement.style.zIndex = 100;
 	container.appendChild(gui.domElement);
+
 	// RENDERER
 	if (Detector.webgl)
 		renderer = new THREE.WebGLRenderer({
@@ -64,13 +75,16 @@ function init() {
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	container.appendChild(renderer.domElement);
+
 	// EVENTS
 	THREEx.WindowResize(renderer, camera);
 	THREEx.FullScreen.bindKey({
 		charCode: 'm'.charCodeAt(0)
 	});
+
 	// CONTROLS
 	controls = new THREE.OrbitControls(camera, renderer.domElement);
+
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -118,7 +132,6 @@ function init() {
 	// CUSTOM //
 	////////////
 
-
 	var material = new THREE.MeshLambertMaterial({
 		color: 0x999999
 	});
@@ -127,22 +140,26 @@ function init() {
 		color: 0x999999
 	});
 
-
-
 	ball = new Ball(borderMaterial);
-	gui.add(ball, 'speed').min(0).max(100).step(0.1).listen();
+	gui.add(ball, 'speed').min(0.1).max(400).step(0.1).listen();
+	scene.add(ball.sphereMesh);
 
+	// generate scene in menu?
 	// generateScene();
 
 	gameDirector = new director();
 }
 
 function deleteScene() {
-	scene.remove(ball.sphereMesh);
-
 	collidableMeshList = [];
 
 	for (var i = 0; i < playerAreas.length; i++) {
+		// ammo.js
+		scene.world.removeRigidBody(playerAreas[i].borderBottom.collider);
+		scene.world.removeRigidBody(playerAreas[i].borderLeft.collider);
+		scene.world.removeRigidBody(playerAreas[i].borderTop.collider);
+		scene.world.removeRigidBody(playerAreas[i].racketMesh.collider);
+
 		scene.remove(playerAreas[i].group);
 	}
 
@@ -153,17 +170,15 @@ function generateScene() {
 	// delete previous scene
 	deleteScene();
 
-	// Ball
-	scene.add(ball.sphereMesh);
-
 	playerAmount = Math.round(playerAmount);
 
-	ball.sphereMesh.position = new THREE.Vector3(50, 0, 0);
 	ball.lastCollider = null;
 
+	// ammo.js . Reset positions
+	transform = ball.collider.getCenterOfMassTransform();
+	transform.setOrigin(new Ammo.btVector3(0, 0, 0));
+	ball.collider.setCenterOfMassTransform(transform);
 
-
-	// Camera.main.orthographicSize =  Mathf.Pow(playerAmount + cameraTweak, 1.2);
 	// update the camera
 	var camFactor = Math.pow(playerAmount, 0.7) * cameraTweak;
 	camera.left = -window.innerWidth * camFactor;
@@ -172,17 +187,17 @@ function generateScene() {
 	camera.bottom = -window.innerHeight * camFactor;
 	camera.updateProjectionMatrix();
 
-
-
 	// Angle in radians
 	var radians = Math.PI * 2 / playerAmount;
 
 	var radius = playerAmount; // * radiusTweak;
-	var pivotPoint = 9; // Push player area forward by width of the area
+	var pivotPoint = 9; // 10 Push player area forward by width of the area
 
 	// Two player tweak to remove gaps between player areas
 	if (playerAmount == 2) {
-		pivotPoint -= 4;
+		pivotPoint -= 4.5; //5,5
+	} else if (playerAmount == 3) {
+		pivotPoint -= 0.5; //-0,5
 	}
 
 	// Calculate player are offset
@@ -200,16 +215,7 @@ function generateScene() {
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
 
-		// console.log("x : "+x );
-		// console.log("z : "+z );
-		// console.log("radius : "+radius);
-
-		// instantiateNewPlayerArea(new THREE.Vector3(x , 0, z), radians);
-
-		var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
-		// var newMaterial = new THREE.MeshLambertMaterial({
-			// color: randomColor
-		// });
+		var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
 
 		var pa = new playerArea(new THREE.Vector3(x, 0, z), radians, randomColor, i);
 
@@ -221,12 +227,10 @@ function generateScene() {
 		collidableMeshList.push(pa.racketMesh);
 
 		scene.add(pa.group);
-
 	}
 
 	// Players info
 	refreshPlayersInfo();
-
 
 	oldPlayerAmount = playerAmount;
 }
@@ -235,7 +239,7 @@ function refreshPlayersInfo() {
 	$("#playersInfo").empty();
 	for (var i = 0; i < playerAmount; i++) {
 
-		$("#playersInfo").append("<font color = "+playerAreas[i].playerColor+">Player" + (i + 1) +"</font>");
+		$("#playersInfo").append("<font color = " + playerAreas[i].playerColor + ">Player" + (i + 1) + "</font>");
 		switch (playerAreas[i].playerBalls) {
 			case 0:
 				$("#playersInfo").append("<img width='¨12' height='12' src='images/ballIconRed.png'/> ");
@@ -279,10 +283,59 @@ function update() {
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
 	ball.update(collidableMeshList, delta);
+
 	for (var i = 0; i < playerAreas.length; i++) {
 		playerAreas[i].update(collidableMeshList, delta);
 	}
 
+	// ammo.js step simulation
+	scene.world.stepSimulation(1 / 60, 5);
+
+	// ammo.js check collisions
+	var numManifolds = scene.world.getDispatcher().getNumManifolds();
+	// if(numManifolds > 0){
+	// 	console.log("numManifolds: "+numManifolds);
+	// }
+
+	for (var i = 0; i < numManifolds; i++) {
+		var contactManifold = scene.world.getDispatcher().getManifoldByIndexInternal(i);
+		var obA = contactManifold.getBody0();
+		var obB = contactManifold.getBody1();
+
+		var numContacts = contactManifold.getNumContacts();
+		for (var j = 0; j < numContacts; j++) {
+			var pt = contactManifold.getContactPoint(j);
+
+			if (pt.getDistance() < -2) {
+				var ptA = pt.getPositionWorldOnA();
+				var ptB = pt.getPositionWorldOnB();
+				// console.log("i________________ :" + i);
+				// console.log("ptA.getZ() :" + ptA.getZ());
+				// console.log("ptB.getZ() :" + ptB.getZ());
+
+				var normalOnB = pt.m_normalWorldOnB;
+				
+				var rbA = Ammo.wrapPointer(obA, Ammo.btRigidBody);
+				var rbB = Ammo.wrapPointer(obB, Ammo.btCollisionObject);
+
+				if (rbA.mesh != null && rbB.mesh != null) {
+					// console.log("rbA " + rbA.mesh.name);
+					// console.log("rbB " + rbB.mesh.name);
+					if (rbA.mesh.name == "ball" && rbB.mesh.type == "box") {
+						// console.log("ball collides a border 1");
+
+						// rbB is a border
+						ball.onCollision(rbB.mesh,ptB);
+					} else if (rbB.mesh.name == "ball" && rbA.mesh.type == "box") {
+						// console.log("ball collides a border 2");
+
+						// rbA is a border
+						ball.onCollision(rbA.mesh,ptB);
+					}
+				}
+			}
+		}
+	}
 }
 
 function render() {
