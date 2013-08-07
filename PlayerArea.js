@@ -17,7 +17,7 @@ playerArea = function(position, rotation, pColor, id) {
 		color: pColor
 	});
 
-	// BORDER BOTTOM
+	// BORDER BOTTOM 
 	// Create mesh
 	this.borderBottom = new THREE.Mesh(this.bottomTopGeometry, this.material);
 	this.borderBottom.position.set(41.73959, 0, 55);
