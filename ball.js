@@ -80,7 +80,7 @@ Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 	this.sphereMesh.position.z = origin.z();
 }
 
-Ball.prototype.onCollision = function(border, collisionPoint) {
+Ball.prototype.onCollision = function(border, collisionPoint, hitsEnd) {
 	var distance = 9999;
 	var threeCollisionPoint = new THREE.Vector3(collisionPoint.getX(), collisionPoint.getY(), collisionPoint.getZ());
 
@@ -90,14 +90,14 @@ Ball.prototype.onCollision = function(border, collisionPoint) {
 	}
 
 	//  Do collision logic if the ball is not colliding same object as previously
-	if (this.lastCollider != border && distance > 10) {
+	if (this.lastCollider != border && distance > 10 ) {
 		this.lastCollider = border;
 
 		// Border's direction
 		var direction = new THREE.Vector3();
 		direction.add(border.parent.rotation);
 		direction.add(border.rotation);
-		
+
 		var borderNormal = new THREE.Vector3();
 		var borderNormalRotated = new THREE.Vector3();
 
@@ -117,26 +117,37 @@ Ball.prototype.onCollision = function(border, collisionPoint) {
 		var ballPos = new THREE.Vector3(collisionPoint.getX(), collisionPoint.getY(), collisionPoint.getZ());
 		var toBall = ballPos.sub(borderPos);
 
-		// Determine if the ball is colliding from wrong side of the border (if not colliding left border or a racket)
-		if (border.name != "left" && border.name != "racket") {
-			// use dot product to determine if the ball is behind a border
+		// // Determine if the ball is colliding from wrong side of the border (if not colliding left border or a racket)
+		// if (border.name != "left" && border.name != "racket") {
+		// 	// use dot product to determine if the ball is behind a border
 
-			var dotProduct = toBall.dot(borderNormalRotated);
+		// 	var dotProduct = toBall.dot(borderNormalRotated);
 
-			if (dotProduct > -4.999) {
-				// if the ball is behind the border then reverse the velocity
-				if(this.reversed){
-					console.log("already reversed the velocity");
-					return;
-				}
-				console.log("tried to collide behind the border. reverse the velocity");
-				var velo = this.collider.getLinearVelocity();
-				velo = new Ammo.btVector3(velo.getX() * -1, velo.getY(), velo.getZ() * -1);
-				this.collider.setLinearVelocity(velo);
-				this.lastCollider.direction = velo;
-				this.lastCollider.ballPosition = new THREE.Vector3(threeCollisionPoint.x, threeCollisionPoint.y, threeCollisionPoint.z);
-				this.reversed = true;
-				return;
+		// 	if (dotProduct > -4.999) {
+		// 		// if the ball is behind the border then reverse the velocity
+		// 		if(this.reversed){
+		// 			console.log("already reversed the velocity");
+		// 			return;
+		// 		}
+		// 		console.log("tried to collide behind the border. reverse the velocity");
+		// 		var velo = this.collider.getLinearVelocity();
+		// 		velo = new Ammo.btVector3(velo.getX() * -1, velo.getY(), velo.getZ() * -1);
+		// 		this.collider.setLinearVelocity(velo);
+		// 		this.lastCollider.direction = velo;
+		// 		this.lastCollider.ballPosition = new THREE.Vector3(threeCollisionPoint.x, threeCollisionPoint.y, threeCollisionPoint.z);
+		// 		this.reversed = true;
+		// 		return;
+		// 	}
+		// }
+
+		if (hitsEnd) {
+			var dotProduct = newVelocity.dot(borderNormalRotated);
+			// console.log("newVelocity: " + newVelocity.x + " " + newVelocity.z);
+			// console.log("borderNormal: " + borderNormal.x + " " + borderNormal.z);
+			// console.log("dotProduct: " + dotProduct);
+			if (dotProduct < 0) {
+				borderNormal = borderNormalRotated;
+				// console.log("rotated");
 			}
 		}
 
@@ -199,5 +210,5 @@ Ball.prototype.onCollision = function(border, collisionPoint) {
 			this.lastCollider.direction = btV3;
 			this.lastCollider.ballPosition = new THREE.Vector3(threeCollisionPoint.x, threeCollisionPoint.y, threeCollisionPoint.z);
 		}
-	} 
+	}
 }
