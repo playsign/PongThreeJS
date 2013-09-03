@@ -3,7 +3,8 @@ PongThreeJS
 
 #### What
 
-PongThreeJS is an online multiplayer pong game. This game is part of FI-WARE (http://www.fi-ware.eu/). Final purpose is to make a realXtend web client. This is a use case to support that goal.
+PongThreeJS is an online multiplayer pong game. This game is part of FI-WARE (http://www.fi-ware.eu/).  It's designed to be used as a use case for fi-ware mifi platform dev.
+You can try the game here: https://dl.dropboxusercontent.com/u/60485425/Playsign/GitHub/PongThreeJS/Pong.html
 
 * **Features**
   - ThreeJS 3D javascript library http://threejs.org/
@@ -21,4 +22,16 @@ First we created the game without additional frameworks like Bullet physics. Fin
 
 #### Conclusion
 
-?
+(TODO)
+
+#### Usage
+
+- Controls
+  - Player 1 (and players from 3 to 100): move left: A, move right: D
+  - Player 2: move left: left arrow, move right: right arrow
+  - Debug ball move: u,h,j,k
+- Use the top right sliders to change player amount and ball's speed
+- Online game
+  - Coming!
+- Development tips
+  - TODO 
