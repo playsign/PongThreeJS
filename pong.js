@@ -308,7 +308,7 @@ function update() {
 		for (var j = 0; j < numContacts; j++) {
 			var pt = contactManifold.getContactPoint(j);
 
-			console.log("pt.getDistance(): " + pt.getDistance());
+			// console.log("pt.getDistance(): " + pt.getDistance());
 
 			if (pt.getDistance() <= 2) { // If the value is too high then it looks like the ball reflects from air
 
