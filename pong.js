@@ -8,6 +8,7 @@
 
 // standard global variables
 var container, scene, camera, renderer, controls, stats, gui;
+var SCREEN_WIDTH, SCREEN_HEIGHT, VIEW_ANGLE, ASPECT, NEAR, FAR;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
@@ -18,6 +19,8 @@ var oldPlayerAmount = playerAmount;
 
 var playerAreas = [];
 var collidableMeshList = [];
+
+var playerAreaWidth = 100; // TODO duplicated in playerArea
 
 // custom global variables
 var borderMaterial;
@@ -43,12 +46,12 @@ function init() {
 	scene.world.setGravity(new Ammo.btVector3(0, 0, 0));
 
 	// CAMERA
-	var SCREEN_WIDTH = window.innerWidth,
-		SCREEN_HEIGHT = window.innerHeight;
-	var VIEW_ANGLE = 45,
-		ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT,
-		NEAR = 0.1,
-		FAR = 20000;
+	SCREEN_WIDTH = window.innerWidth,
+	SCREEN_HEIGHT = window.innerHeight;
+	VIEW_ANGLE = 45,
+	ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT,
+	NEAR = 0.1,
+	FAR = 20000;
 	// camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 	camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
 	scene.add(camera);
@@ -179,14 +182,6 @@ function generateScene() {
 	transform.setOrigin(new Ammo.btVector3(0, 0, 0));
 	ball.collider.setCenterOfMassTransform(transform);
 
-	// update the camera
-	var camFactor = Math.pow(playerAmount, 0.7) * cameraTweak;
-	camera.left = -window.innerWidth * camFactor;
-	camera.right = window.innerWidth * camFactor;
-	camera.top = window.innerHeight * camFactor;
-	camera.bottom = -window.innerHeight * camFactor;
-	camera.updateProjectionMatrix();
-
 	// Angle in radians
 	var radians = Math.PI * 2 / playerAmount;
 
@@ -200,7 +195,7 @@ function generateScene() {
 		pivotPoint -= 0.5; //-0,5
 	}
 
-	// Calculate player are offset
+	// Calculate player area offset
 	var tHypotenuse = radius;
 	var tAngle = radians / 2;
 	var tAdjacent = Math.cos(tAngle) * tHypotenuse;
@@ -228,6 +223,23 @@ function generateScene() {
 
 		scene.add(pa.group);
 	}
+
+	// update the camera
+	var gameAreaDiameter = (radius * 25 + (playerAreaWidth * 2)); // TODO 25 the magic number
+	console.log("gameAreaDiameter: " + gameAreaDiameter);
+	if (SCREEN_HEIGHT < SCREEN_WIDTH) {
+		camera.left = ASPECT * -gameAreaDiameter / 2;
+		camera.right = ASPECT * gameAreaDiameter / 2;
+		camera.top = gameAreaDiameter / 2;
+		camera.bottom = -gameAreaDiameter / 2;
+	} else {
+		camera.left = -gameAreaDiameter / 2;
+		camera.right = gameAreaDiameter / 2;
+		camera.top =  gameAreaDiameter / 2 / ASPECT;
+		camera.bottom =  -gameAreaDiameter / 2 / ASPECT;
+	}
+
+	camera.updateProjectionMatrix();
 
 	// Players info
 	refreshPlayersInfo();
