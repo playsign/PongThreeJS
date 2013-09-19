@@ -1,4 +1,6 @@
 $(function() {
+	var width = window.innerWidth * 0.05;
+
 	$("#replayButton")
 		.css({
 		"z-index": "2",
@@ -6,14 +8,13 @@ $(function() {
 		"position": "absolute",
 		"bottom": "50px",
 		"left": window.innerWidth / 2,
-		"width": "48px",
-		"height": "48px",
+		"width": width,
+		"height": width,
 	}) // adds CSS
-	.button({
-	})
+	.button({})
 		.click(function() {
 		gameDirector.setScreen(screens.game);
 		generateScene();
 	})
-		.append("<img width='48' height='48' src='images/replayIcon.png'/>")
+		.append("<img width='"+width+"' height='"+width+"' src='images/replayIcon.png'/>")
 });

@@ -1,5 +1,7 @@
 $(function() 
 {
+	var width = window.innerWidth * 0.05;
+
 	 $("#infoBox")
 	.css( 
 	{
@@ -17,7 +19,7 @@ $(function()
 	   "background-image": "url('images/smallButton.png')",
 	  "position":"absolute", "top":"4px", "left":"4px"
 	}) // adds CSS
-    .append("<img width='48' height='44' src='images/infoIcon.png'/>")
+    .append("<img width='"+width+"' height='"+width+"' src='images/infoIcon.png'/>")
     .button()
 	.click( 
 		function() 

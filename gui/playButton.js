@@ -1,15 +1,20 @@
 $(function() {
+	var width = window.innerWidth * 0.25;
+	var posX = (window.innerWidth / 2) - (width / 2);
+	var posY = window.innerHeight * 0.8;
+	var fontSize = width + "%";
+
 	$("#playButton")
 		.css({
 		"z-index": "2",
 		"background-image": "url('images/smallButton.png')",	
 		"position": "absolute",
 		// "bottom": "50px",
-		"top": window.innerHeight / 2 + 150,
-		"left": window.innerWidth / 2 - 125,
-		"width": "250px",
-		"height": "48px",
-		"font-size": "250%",
+		"top": posY,
+		"left": posX,
+		"width": width,
+		"height": "auto",
+		"font-size": fontSize,
 		"color":"white"
 	}) // adds CSS
 	.button({
