@@ -124,13 +124,17 @@ playerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	mesh.collider = boxAmmo;
 }
 
-playerArea.prototype.update = function(collidableMeshList, delta) {
+playerArea.prototype.serverUpdate = function(delta, clientKeyboard) {
 
 	var lastPosition = this.racketMesh.position.clone();
 	var cloneLastPosition = this.meshClone.position.clone();
 
+        function checkPressed(keyname) {
+                return keyboard.pressed(keyname) ||
+                        clientKeyboard.indexOf(keyname) != -1
+        }
 	// Racket controls
-	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d")) {
+	if (checkPressed("left") || checkPressed("right") || checkPressed("a") || checkPressed("d")) {
 		var racketForward = new THREE.Vector3();
 
 		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
@@ -145,20 +149,20 @@ playerArea.prototype.update = function(collidableMeshList, delta) {
 		racketForward.multiplyScalar(this.racketSpeed * delta);
 
 		if (this.playerID == 1) {
-			if (keyboard.pressed("left")) {
+			if (checkPressed("left")) {
 				this.racketMesh.position.add(racketForward);
 				this.meshClone.position.add(racketForward);
 			}
-			if (keyboard.pressed("right")) {
+			if (checkPressed("right")) {
 				this.racketMesh.position.sub(racketForward);
 				this.meshClone.position.sub(racketForward);
 			}
 		} else {
-			if (keyboard.pressed("a")) {
+			if (checkPressed("a")) {
 				this.racketMesh.position.add(racketForward);
 				this.meshClone.position.add(racketForward);
 			}
-			if (keyboard.pressed("d")) {
+			if (checkPressed("d")) {
 				this.racketMesh.position.sub(racketForward);
 				this.meshClone.position.sub(racketForward);
 			}
@@ -177,4 +181,12 @@ playerArea.prototype.update = function(collidableMeshList, delta) {
 		}
 	}
 
+}
+
+playerArea.prototype.clientUpdate = function(msg) {
+        var newpos = msg.racketspos[this.playerID];
+        if (newpos.x !== undefined)
+                this.racketMesh.position = newpos;
+        else
+                throw "undefined position for racket";
 }

@@ -1,4 +1,5 @@
-/*
+/* -*- js-indent-level: 8 -*-
+
 	Pong
 	Author: Playsign
 	Date: 2013
@@ -151,6 +152,7 @@ function init() {
 	// generateScene();
 
 	gameDirector = new director();
+	initNet(clientUpdate);
 }
 
 function deleteScene() {
@@ -295,8 +297,12 @@ function update() {
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
 
+        if (netRole !== 'server')
+                return;
+	var racketPositions = [];
 	for (var i = 0; i < playerAreas.length; i++) {
-		playerAreas[i].update(collidableMeshList, delta);
+	        playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : []);
+                racketPositions.push(playerAreas[i].racketMesh.position);
 	}
 
 	// ammo.js step simulation
@@ -370,8 +376,35 @@ function update() {
 	}
 
 	ball.update(collidableMeshList, delta);
+
+        serverNetUpdate(racketPositions, ball.sphereMesh.position, delta);
 }
 
 function render() {
 	renderer.render(scene, camera);
 }
+
+function clientUpdate(msg) {
+        // called in client mode (when we're just showing what server tells us).
+        if (msg.dt === undefined || msg.ballpos === undefined || msg.racketspos === undefined)
+                throw "update msg: missing properties";
+        ball.sphereMesh.position = msg.ballpos;
+	// ball.update(collidableMeshList, msg.dt);
+        for (var i = 0; i < playerAreas.length; i++)
+                playerAreas[i].clientUpdate(msg);
+        return readKeyboard();
+}
+
+function readKeyboard() {        
+        var pressed = [];
+        function checkPressed(keyname) {
+                if (keyboard.pressed(keyname))
+                        pressed.push(keyname);
+        }
+
+        checkPressed("left");
+        checkPressed("right");
+        checkPressed("a");
+        checkPressed("d");
+        return pressed;
+ }
