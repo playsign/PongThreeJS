@@ -406,5 +406,7 @@ function readKeyboard() {
         checkPressed("right");
         checkPressed("a");
         checkPressed("d");
+        checkPressed("o");
+        checkPressed("p");
         return pressed;
  }

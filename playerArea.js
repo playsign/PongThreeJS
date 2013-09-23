@@ -1,3 +1,5 @@
+/* -*- js-indent-level: 8 -*- */
+
 playerArea = function(position, rotation, pColor, id) {
 	this.group = new THREE.Object3D(); //create an empty container
 
@@ -130,57 +132,56 @@ playerArea.prototype.serverUpdate = function(delta, clientKeyboard) {
 	var cloneLastPosition = this.meshClone.position.clone();
 
         function checkPressed(keyname) {
+		if (keyname === null)
+			return false;
                 return keyboard.pressed(keyname) ||
                         clientKeyboard.indexOf(keyname) != -1
         }
 	// Racket controls
-	if (checkPressed("left") || checkPressed("right") || checkPressed("a") || checkPressed("d")) {
-		var racketForward = new THREE.Vector3();
+	var left_key = null, right_key = null;
+	if (this.playerID === 0) {
+		left_key = 'left'; right_key = 'right';
+	} else if (this.playerID === 1) {
+		left_key = 'a'; right_key = 'd';
+	} else if (this.playerID === 2) {
+		left_key = 'o'; right_key = 'p';
+	} else {
+		return;
+	}
+	
 
-		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
+	var racketForward = new THREE.Vector3();
 
-		// Angle to vector3
-		racketForward.x = Math.cos(rotation * -1);
-		racketForward.z = Math.sin(rotation * -1);
+	var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
+
+	// Angle to vector3
+	racketForward.x = Math.cos(rotation * -1);
+	racketForward.z = Math.sin(rotation * -1);
 
 
-		racketForward.normalize();
+	racketForward.normalize();
 
-		racketForward.multiplyScalar(this.racketSpeed * delta);
-
-		if (this.playerID == 1) {
-			if (checkPressed("left")) {
-				this.racketMesh.position.add(racketForward);
-				this.meshClone.position.add(racketForward);
-			}
-			if (checkPressed("right")) {
-				this.racketMesh.position.sub(racketForward);
-				this.meshClone.position.sub(racketForward);
-			}
-		} else {
-			if (checkPressed("a")) {
-				this.racketMesh.position.add(racketForward);
-				this.meshClone.position.add(racketForward);
-			}
-			if (checkPressed("d")) {
-				this.racketMesh.position.sub(racketForward);
-				this.meshClone.position.sub(racketForward);
-			}
-		}
-
-		// Local to world position
-		var worldPos = new THREE.Vector3();
-		worldPos.getPositionFromMatrix(this.meshClone.matrixWorld);
-		var transform = this.racketMesh.collider.getWorldTransform();
-		transform.setOrigin(new Ammo.btVector3(worldPos.x, 0, worldPos.z));
-		this.racketMesh.collider.setWorldTransform(transform);
-
-		if (this.racketMesh.position.z < this.racketTopStop || this.racketMesh.position.z > this.racketBottomStop) {
-			this.racketMesh.position = lastPosition;
-			this.meshClone.position = cloneLastPosition;
-		}
+	racketForward.multiplyScalar(this.racketSpeed * delta);
+	
+	if (checkPressed(left_key)) {
+		this.racketMesh.position.add(racketForward);
+		this.meshClone.position.add(racketForward);
+	} else if (checkPressed(right_key)) {
+		this.racketMesh.position.sub(racketForward);
+		this.meshClone.position.sub(racketForward);
 	}
 
+	// Local to world position
+	var worldPos = new THREE.Vector3();
+	worldPos.getPositionFromMatrix(this.meshClone.matrixWorld);
+	var transform = this.racketMesh.collider.getWorldTransform();
+	transform.setOrigin(new Ammo.btVector3(worldPos.x, 0, worldPos.z));
+	this.racketMesh.collider.setWorldTransform(transform);
+
+	if (this.racketMesh.position.z < this.racketTopStop || this.racketMesh.position.z > this.racketBottomStop) {
+		this.racketMesh.position = lastPosition;
+		this.meshClone.position = cloneLastPosition;
+	}
 }
 
 playerArea.prototype.clientUpdate = function(msg) {
