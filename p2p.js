@@ -12,18 +12,19 @@ function getPeerIdFromURL() {
     return null;
 }
 
-var peerConnection = null;
+var peerConnections = [];
 var netRole = null;
 var clientUpdateCallback = null;
 var clientKeysPressed = null;
 
 function gotConnection(conn) {
-    if (peerConnection !== null) {
-        console.log("got a connection but i already have a connection");
+    if (peerConnections.length > 0 && netRole === 'client') {
+        console.log("Can't handle several connections in client mode");
+	conn.close();
         return;
     }
-    peerConnection = conn;
-    peerConnection.on('data', gotData);
+    peerConnections.push(conn);
+    conn.on('data', function(data) { gotData(conn, data); });
 }
 
 
@@ -33,7 +34,7 @@ function Vec3FromArray(a) {
     return v3;
 }
 
-function gotData(data) {
+function gotData(conn, data) {
     try {
         msg = JSON.parse(data);
     } catch (err) {
@@ -47,7 +48,7 @@ function gotData(data) {
         });
         if (clientUpdateCallback) {
             var keys = clientUpdateCallback(msg);
-            peerConnection.send(JSON.stringify({
+            conn.send(JSON.stringify({
                 pressedkeys: keys
             }))
         } else {
@@ -65,10 +66,11 @@ function initNet(updateCallback) {
     var peerid = getPeerIdFromURL();
 
     if (peerid !== null) {
-        gotConnection(pjs.connect(peerid));
+	var conn = pjs.connect(peerid);
+        gotConnection(conn);
         console.log("connecting to peer " + peerid);
-        peerConnection.on('open', function() {
-            peerConnection.send('Hello world!');
+        conn.on('open', function() {
+            conn.send('Hello world!');
             console.log("connected to " + peerid + ", hello sent");
         });
         netRole = 'client';
@@ -100,11 +102,9 @@ function serverNetUpdate(racketPositions, ballPos, timedelta) {
             racketspos: racketPositions,
             ballpos: ballPos,
         };
-        if (peerConnection !== null) {
-            peerConnection.send(JSON.stringify(update_msg));
-        } else {
-            console.log("no peer");
-        }
-
+	
+	var json_msg = JSON.stringify(update_msg);
+	for (var i = 0; i < peerConnections.length; i++)
+	    peerConnections[i].send(json_msg);
     }
 }

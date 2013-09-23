@@ -297,7 +297,7 @@ function update() {
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
 
-        if (netRole !== 'server')
+        if (netRole == 'client')
                 return;
 	var racketPositions = [];
 	for (var i = 0; i < playerAreas.length; i++) {
