@@ -128,6 +128,8 @@ function initNet(updateCallback, initCallback) {
 var connectionRetries = 0;
 
 function attemptServerConnection(peerid) {
+    if ((typeof peerid) !== "string")
+	throw("peerid must be string! got this: " + peerid);
     pjs = makePeer();
     pjs.on('open', function(myid) { ThisPeerID = myid; });
     var conn = pjs.connect(peerid);
@@ -147,7 +149,7 @@ function attemptServerConnection(peerid) {
 	    console.log("server connection timed out");
 	    if (connectionRetries++ < 10) {
 		console.log("retrying connetion, attempt #" + connectionRetries);
-		attemptServerConnection(pjs, peerid);
+		attemptServerConnection(peerid);
 	    } else {
 		console.log("giving up");
 		// can put callback here for connection failure?
