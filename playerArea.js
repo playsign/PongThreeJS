@@ -139,7 +139,8 @@ playerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 playerArea.prototype.serverUpdate = function(delta, clientKeyboard, playerID, i) {
 	var lastPosition = this.racketMesh.position.clone();
 	var cloneLastPosition = this.meshClone.position.clone();
-
+	// if (clientKeyboard.length > 0)
+	// 	console.log("playerArea: keys pressed: " + clientKeyboard + ", playerID: " + playerID + ", areaPlayerID: " + this.player.id);
         function checkPressed(keyname, areaPlayerID) {
 			if (keyname === null)
 				return false;
@@ -147,7 +148,9 @@ playerArea.prototype.serverUpdate = function(delta, clientKeyboard, playerID, i)
  				return keyboard.pressed(keyname);
 			}
 			else if(playerID == areaPlayerID){
-				return clientKeyboard.indexOf(keyname) != -1;
+				x = clientKeyboard.indexOf(keyname) != -1;
+				// console.log("area match player id, so return " + x);
+				return x;
 			}
 			return false;
         }

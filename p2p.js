@@ -1,3 +1,5 @@
+// 
+
 var peerJsApiKey = "gnyz9wskc2chaor";
 
 function getPeerIdFromURL() {
@@ -17,6 +19,7 @@ var netRole = null;
 var clientUpdateCallback = null;
 var clientKeysPressed = null;
 var id = null;
+var ThisPeerID = null;
 var clientID = null;
 var serverID = null;
 var timeOutTable = [];
@@ -72,16 +75,22 @@ function gotData(conn, data) {
         });
         if (clientUpdateCallback) {
             var keys = clientUpdateCallback(msg);
+	    // if (keys.length > 0)
+	    // 	console.log("client: sending keys pressed " + keys);
             conn.send(JSON.stringify({
                 pressedkeys: keys,
-                playerID: id,
+                playerID: ThisPeerID,
             }))
         } else {
             console.log("update msg without handler, in " + netRole + " mod");
         }
     } else if (netRole === 'server' && msg.pressedkeys !== undefined) {
         clientKeysPressed = msg.pressedkeys;
+	// if (clientKeysPressed.length > 0)
+	//     console.log("server: received keys pressed " + clientKeysPressed);
         clientID = msg.playerID;
+    } else if (netRole === 'server') {
+	console.log("undefined keys in net msg");
     }
 
 
@@ -93,54 +102,103 @@ function gotData(conn, data) {
 
 }
 
-function initNet(updateCallback, initCallBack) {
-    var pjs = new Peer({
-        key: peerJsApiKey
-    })
-    var peerid = getPeerIdFromURL();
-
-    if (peerid !== null) {
-	var conn = pjs.connect(peerid);
-        gotConnection(conn);
-        console.log("connecting to peer " + peerid);
-        conn.on('open', function() {
-            conn.send('Hello world!');
-            console.log("connected to " + peerid + ", hello sent");
-
-             initCallBack();  // it's showHelp()
-        });
-        netRole = 'client';
-        clientUpdateCallback = updateCallback;
-    } else {
-        netRole = 'server';
+function removePeerConnection(conn) {
+    for (var i = 0; i < peerConnections.length; i++) {
+	if (conn === peerConnections[i]) {
+	    peerConnections.splice(i, 1);
+	}
     }
+}
 
+
+function makePeer() {
+    return new Peer({key: peerJsApiKey})
+}
+
+function initNet(updateCallback, initCallback) {
+    var peerid = getPeerIdFromURL();
+    
+    if (peerid !== null) {
+	initClient(updateCallback, initCallback, peerid);
+    } else {
+	initServer(updateCallback, initCallback);
+    } 
+}
+
+var connectionRetries = 0;
+
+function attemptServerConnection(peerid) {
+    pjs = makePeer();
+    pjs.on('open', function(myid) { ThisPeerID = myid; });
+    var conn = pjs.connect(peerid);
+    conn.on("open", function () {
+	console.log("connection estabilished to server");
+	});
+    conn.on("error", function () {
+	console.log("connection error to server");
+	});
+    gotConnection(conn);
+    console.log("connecting to peer " + peerid);
+    connectionTimeout = function() {
+	if (conn.open === false) {
+	    removePeerConnection(conn);
+	    conn.close();
+	    pjs.disconnect();
+	    console.log("server connection timed out");
+	    if (connectionRetries++ < 10) {
+		console.log("retrying connetion, attempt #" + connectionRetries);
+		attemptServerConnection(pjs, peerid);
+	    } else {
+		console.log("giving up");
+		// can put callback here for connection failure?
+	    }
+	}
+    }
+    window.setTimeout(connectionTimeout, 15000 /*ms*/);
+    return conn;
+}
+
+function initClient(updateCallback, initCallback, peerid) {
+    openCallback = function() {
+        conn.send('Hello world!');
+        console.log("connected to " + peerid + ", hello sent");
+	
+        initCallback();  // it's showHelp()
+    }
+    var conn = attemptServerConnection(peerid, openCallback)
+    netRole = 'client';
+    clientUpdateCallback = updateCallback;
+    // console.log("client update callback registered");
+}
+
+function initServer(updateCallback, initCallback) {
+    netRole = 'server';
+    pjs = makePeer();
+    pjs.on('open', function(myid) { ThisPeerID = myid; });
     pjs.on('open', function(myid) {
-        id = myid;
-        if (peerid === null) {
-            var gamemsg = window.location.href + '?peer-id=' + myid
-            // alert(gamemsg);
-            $("#playerUrl").html(gamemsg);
-            $("#urlBox").dialog("open");
+        var gamemsg = window.location.href + '?peer-id=' + myid
+        // alert(gamemsg);
+        $("#playerUrl").html(gamemsg);
+        $("#urlBox").dialog("open");
 
-            if(netRole === 'server'){
-                // server is always the player 0
-                var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                players[0] = new player(myid, "server", randomColor);
-                playerAmount = 1;
-                serverID = myid;
-                console.log("server id:" + myid);
-            }
-
-            console.log(gamemsg);
-             initCallBack(); // it's showHelp()
+        if(netRole === 'server'){
+            // server is always the player 0
+            var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+            players[0] = new player(myid, "server", randomColor);
+            playerAmount = 1;
+            serverID = myid;
+            console.log("server id:" + myid);
         }
+
+        console.log(gamemsg);
+        initCallback(); // it's showHelp()
     });
 
     pjs.on('connection', function(conn) {
         gotConnection(conn);
     });
 }
+
 
 function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, playerlist) {
     if (netRole === 'server') {
@@ -180,7 +238,7 @@ function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, pla
             if(timeOutTable[i] !== 0){
                 timeOutTable[i] = 0;
             }
-	        peerConnections[i].send(json_msg);
+	    peerConnections[i].send(json_msg);
         }
     }
 }
