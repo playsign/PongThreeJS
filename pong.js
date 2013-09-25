@@ -214,12 +214,6 @@ function generateScene() {
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
 
-		//var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-
-		//offline
-		//var pa = new playerArea(new THREE.Vector3(x, 0, z), radians, randomColor, i);
-
-		//online
 		var pa = new playerArea(new THREE.Vector3(x, 0, z), radians, i);
 
 		playerAreas.push(pa);
@@ -404,6 +398,10 @@ function render() {
 
 function showHelp(){
 	gameDirector.setScreen(screens.controls);
+}
+
+function getRandomColor(){
+	return '#' + '000000'.concat(Math.floor(Math.random() * 16777215).toString(16)).substr(-6);
 }
 
 function clientUpdate(msg) {

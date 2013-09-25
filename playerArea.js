@@ -7,8 +7,8 @@ playerArea = function(position, rotation, id) {
 		this.player = players[id];
 	}
 	else{
-		// offlineW
-		var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+		// offline
+		var randomColor = getRandomColor();
 		this.player = new player(id, id, randomColor)
 	}
 
@@ -148,9 +148,7 @@ playerArea.prototype.serverUpdate = function(delta, clientKeyboard, playerID, i)
  				return keyboard.pressed(keyname);
 			}
 			else if(playerID == areaPlayerID){
-				x = clientKeyboard.indexOf(keyname) != -1;
-				// console.log("area match player id, so return " + x);
-				return x;
+				return clientKeyboard.indexOf(keyname) != -1;
 			}
 			return false;
         }

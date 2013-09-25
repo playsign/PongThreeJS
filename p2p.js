@@ -38,7 +38,7 @@ function gotConnection(conn) {
 
     if(netRole === 'server'){
         // Add player
-        var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        var randomColor = getRandomColor();
         var newPeerID = peerConnections[peerConnections.length-1].peer;
         players.push(new player(newPeerID, newPeerID, randomColor));
         console.log("new player, id:" + newPeerID);
@@ -75,8 +75,6 @@ function gotData(conn, data) {
         });
         if (clientUpdateCallback) {
             var keys = clientUpdateCallback(msg);
-	    // if (keys.length > 0)
-	    // 	console.log("client: sending keys pressed " + keys);
             conn.send(JSON.stringify({
                 pressedkeys: keys,
                 playerID: ThisPeerID,
@@ -86,8 +84,6 @@ function gotData(conn, data) {
         }
     } else if (netRole === 'server' && msg.pressedkeys !== undefined) {
         clientKeysPressed = msg.pressedkeys;
-	// if (clientKeysPressed.length > 0)
-	//     console.log("server: received keys pressed " + clientKeysPressed);
         clientID = msg.playerID;
     } else if (netRole === 'server') {
 	console.log("undefined keys in net msg");
@@ -183,14 +179,14 @@ function initServer(updateCallback, initCallback) {
         $("#playerUrl").html(gamemsg);
         $("#urlBox").dialog("open");
 
-        if(netRole === 'server'){
-            // server is always the player 0
-            var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-            players[0] = new player(myid, "server", randomColor);
-            playerAmount = 1;
-            serverID = myid;
-            console.log("server id:" + myid);
-        }
+            if(netRole === 'server'){
+                // server is always the player 0
+                var randomColor = getRandomColor();
+                players[0] = new player(myid, "server", randomColor);
+                playerAmount = 1;
+                serverID = myid;
+                console.log("server id:" + myid);
+            }
 
         console.log(gamemsg);
         initCallback(); // it's showHelp()
