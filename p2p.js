@@ -16,6 +16,11 @@ var peerConnections = [];
 var netRole = null;
 var clientUpdateCallback = null;
 var clientKeysPressed = null;
+var id = null;
+var clientID = null;
+var serverID = null;
+var timeOutTable = [];
+var timeout = 7; // in seconds
 
 function gotConnection(conn) {
     if (peerConnections.length > 0 && netRole === 'client') {
@@ -24,7 +29,26 @@ function gotConnection(conn) {
         return;
     }
     peerConnections.push(conn);
+    timeOutTable.push(0);
     conn.on('data', function(data) { gotData(conn, data); });
+
+
+    if(netRole === 'server'){
+        // Add player
+        var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        var newPeerID = peerConnections[peerConnections.length-1].peer;
+        players.push(new player(newPeerID, newPeerID, randomColor));
+        console.log("new player, id:" + newPeerID);
+
+        refreshScene();
+    }
+}
+
+function refreshScene(){
+    // Updated scene
+    playerAmount = players.length;
+    ball.speed = playerAmount * 70;
+    generateScene();
 }
 
 
@@ -49,17 +73,27 @@ function gotData(conn, data) {
         if (clientUpdateCallback) {
             var keys = clientUpdateCallback(msg);
             conn.send(JSON.stringify({
-                pressedkeys: keys
+                pressedkeys: keys,
+                playerID: id,
             }))
         } else {
             console.log("update msg without handler, in " + netRole + " mod");
         }
     } else if (netRole === 'server' && msg.pressedkeys !== undefined) {
         clientKeysPressed = msg.pressedkeys;
+        clientID = msg.playerID;
     }
+
+
+    // Sync scene variables
+    if(msg.playeramount !== undefined)
+        playerAmount = msg.playeramount;
+    if(msg.players !== undefined)
+        players = msg.players;
+
 }
 
-function initNet(updateCallback) {
+function initNet(updateCallback, initCallBack) {
     var pjs = new Peer({
         key: peerJsApiKey
     })
@@ -72,6 +106,8 @@ function initNet(updateCallback) {
         conn.on('open', function() {
             conn.send('Hello world!');
             console.log("connected to " + peerid + ", hello sent");
+
+             initCallBack();  // it's showHelp()
         });
         netRole = 'client';
         clientUpdateCallback = updateCallback;
@@ -80,12 +116,24 @@ function initNet(updateCallback) {
     }
 
     pjs.on('open', function(myid) {
+        id = myid;
         if (peerid === null) {
             var gamemsg = window.location.href + '?peer-id=' + myid
             // alert(gamemsg);
             $("#playerUrl").html(gamemsg);
             $("#urlBox").dialog("open");
+
+            if(netRole === 'server'){
+                // server is always the player 0
+                var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                players[0] = new player(myid, "server", randomColor);
+                playerAmount = 1;
+                serverID = myid;
+                console.log("server id:" + myid);
+            }
+
             console.log(gamemsg);
+             initCallBack(); // it's showHelp()
         }
     });
 
@@ -94,17 +142,45 @@ function initNet(updateCallback) {
     });
 }
 
-function serverNetUpdate(racketPositions, ballPos, timedelta) {
+function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, playerlist) {
     if (netRole === 'server') {
         // console.log("server net update");
         var update_msg = {
             dt: timedelta,
             racketspos: racketPositions,
             ballpos: ballPos,
+            playeramount: amountPlayers,
+            players: playerlist,
         };
 	
 	var json_msg = JSON.stringify(update_msg);
 	for (var i = 0; i < peerConnections.length; i++)
-	    peerConnections[i].send(json_msg);
+        if( peerConnections[i].open == false){
+            timeOutTable[i] += timedelta;
+
+
+            if(timeOutTable[i] >= timeout){
+                // peer disconnected
+                console.log("peer disconnected");
+                if(i === 0 ){
+                    peerConnections.shift();
+                    timeOutTable.shift();
+                    } 
+                else{ 
+                    peerConnections.splice(i,i);
+                    timeOutTable.splice(i,i);
+                }
+                
+                players.splice(i+1,i+1);
+
+                refreshScene();
+            }
+        } 
+        else {
+            if(timeOutTable[i] !== 0){
+                timeOutTable[i] = 0;
+            }
+	        peerConnections[i].send(json_msg);
+        }
     }
 }

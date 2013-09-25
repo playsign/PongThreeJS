@@ -16,10 +16,12 @@ director = function() {
 director.prototype.setScreen = function(newScreen) {
 	if (this.screen != newScreen) {
 		// *hide previous screen items
-		$("#playButton").hide();
+		$("#onlineButton").hide();
+		$("#offlineButton").hide();
 		$("#title").hide();
 		$("#okButton").hide();
-		$("#help").hide();
+		$("#helpOnline").hide();
+		$("#helpOffline").hide();
 		$("#gameMenuButton").hide();
 		$("#infoButton").hide();
 		$("#continueButton").hide();
@@ -36,7 +38,8 @@ director.prototype.setScreen = function(newScreen) {
 				// *show play button*
 				// *show info button*
 				// *show volume button*
-				$("#playButton").show();
+				$("#onlineButton").show();
+				$("#offlineButton").show();
 				$("#title").show();
 				$("#infoButton").show();
 
@@ -59,7 +62,14 @@ director.prototype.setScreen = function(newScreen) {
 				console.log("controls");
 
 				$("#okButton").show();
-				$("#help").show();
+
+				if (netRole == null) {
+					$("#helpOffline").show();
+					gui.open();
+				} else {
+					$("#helpOnline").show();
+					gui.close();
+				}
 				break;
 			case 5: //  GAME SCENE
 				// *generate scene*

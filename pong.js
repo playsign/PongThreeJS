@@ -19,6 +19,7 @@ var playerAmount = 3;
 var oldPlayerAmount = playerAmount;
 
 var playerAreas = [];
+var players = [];
 var collidableMeshList = [];
 
 var playerAreaWidth = 100; // TODO duplicated in playerArea
@@ -63,7 +64,7 @@ function init() {
 	container = document.getElementById('ThreeJS');
 	gui = new dat.GUI();
 	gui.add(this, 'playerAmount').min(2).max(100).step(1).listen();
-	gui.open();
+	gui.close();
 	gui.domElement.style.position = 'absolute';
 	gui.domElement.style.right = '0px';
 	// gui.domElement.style.zIndex = 100;
@@ -88,6 +89,7 @@ function init() {
 
 	// CONTROLS
 	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	controls.userZoom = false;
 
 	// STATS
 	stats = new Stats();
@@ -152,7 +154,7 @@ function init() {
 	// generateScene();
 
 	gameDirector = new director();
-	initNet(clientUpdate);
+	//initNet(clientUpdate);
 }
 
 function deleteScene() {
@@ -212,9 +214,13 @@ function generateScene() {
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
 
-		var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+		//var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
 
-		var pa = new playerArea(new THREE.Vector3(x, 0, z), radians, randomColor, i);
+		//offline
+		//var pa = new playerArea(new THREE.Vector3(x, 0, z), radians, randomColor, i);
+
+		//online
+		var pa = new playerArea(new THREE.Vector3(x, 0, z), radians, i);
 
 		playerAreas.push(pa);
 
@@ -253,8 +259,8 @@ function refreshPlayersInfo() {
 	$("#playersInfo").empty();
 	for (var i = 0; i < playerAmount; i++) {
 
-		$("#playersInfo").append("<font color = " + playerAreas[i].playerColor + ">Player" + (i + 1) + "</font>");
-		switch (playerAreas[i].playerBalls) {
+		$("#playersInfo").append("<font color = " + playerAreas[i].player.color + ">Player" + (i + 1) + "</font>");
+		switch (playerAreas[i].player.balls) {
 			case 0:
 				$("#playersInfo").append("<img width='Â¨12' height='12' src='images/ballIconRed.png'/> ");
 				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> ");
@@ -297,12 +303,21 @@ function update() {
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
 
-        if (netRole == 'client')
-                return;
-	var racketPositions = [];
-	for (var i = 0; i < playerAreas.length; i++) {
-	        playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : []);
-                racketPositions.push(playerAreas[i].racketMesh.position);
+    if (netRole == 'client')
+        return;
+
+    // online game mode
+	if (netRole != null){
+		var racketPositions = [];
+		for (var i = 0; i < playerAreas.length; i++) {
+		        playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientID, i);
+	                racketPositions.push(playerAreas[i].racketMesh.position);
+		}
+	} else {
+		// offline game mode
+		for (var i = 0; i < playerAreas.length; i++) {
+			playerAreas[i].offlineUpdate(collidableMeshList, delta);
+		}
 	}
 
 	// ammo.js step simulation
@@ -377,11 +392,18 @@ function update() {
 
 	ball.update(collidableMeshList, delta);
 
-        serverNetUpdate(racketPositions, ball.sphereMesh.position, delta);
+	// online game mode
+	if (netRole != null){
+    	serverNetUpdate(racketPositions, ball.sphereMesh.position, delta, playerAmount, players);
+    }
 }
 
 function render() {
 	renderer.render(scene, camera);
+}
+
+function showHelp(){
+	gameDirector.setScreen(screens.controls);
 }
 
 function clientUpdate(msg) {
@@ -408,5 +430,6 @@ function readKeyboard() {
         checkPressed("d");
         checkPressed("o");
         checkPressed("p");
+
         return pressed;
  }

@@ -1,6 +1,21 @@
 /* -*- js-indent-level: 8 -*- */
 
-playerArea = function(position, rotation, pColor, id) {
+playerArea = function(position, rotation, id) {
+	// PLAYER INFO
+	if (netRole && players[id]) {
+		// online
+		this.player = players[id];
+	}
+	else{
+		// offlineW
+		var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+		this.player = new player(id, id, randomColor)
+	}
+
+	//
+
+	this.id = id;
+
 	this.group = new THREE.Object3D(); //create an empty container
 
 	this.group.rotation.y = rotation;
@@ -16,7 +31,7 @@ playerArea = function(position, rotation, pColor, id) {
 	this.leftGeometry = new THREE.CubeGeometry(this.leftWidth, this.bottomTopHeight, this.bottomTopHeight, 1, 1, 1);
 
 	this.material = new THREE.MeshLambertMaterial({
-		color: pColor
+		color: this.player.color
 	});
 
 	// BORDER BOTTOM 
@@ -61,7 +76,7 @@ playerArea = function(position, rotation, pColor, id) {
 	this.racketMesh.rotation.y = 180 * (Math.PI / 180);
 	this.racketMesh.name = "racket";
 	this.racketMesh.type = "box";
-	this.racketSpeed = 50;
+	this.racketSpeed = 80;
 	this.racketTopStop = this.borderTop.position.z + (this.racketWidth / 2);
 	this.racketBottomStop = this.borderBottom.position.z - (this.racketWidth / 2);
 
@@ -73,12 +88,6 @@ playerArea = function(position, rotation, pColor, id) {
 	this.groupMeshes.push(this.borderBottom);
 	this.groupMeshes.push(this.borderLeft);
 	this.groupMeshes.push(this.borderTop);
-
-	// PLAYER INFO
-	this.playerID = id;
-	this.playerName = "Player";
-	this.playerBalls = 3;
-	this.playerColor = pColor;
 }
 
 playerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) {
@@ -126,29 +135,24 @@ playerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	mesh.collider = boxAmmo;
 }
 
-playerArea.prototype.serverUpdate = function(delta, clientKeyboard) {
-
+// ONLINE game mode
+playerArea.prototype.serverUpdate = function(delta, clientKeyboard, playerID, i) {
 	var lastPosition = this.racketMesh.position.clone();
 	var cloneLastPosition = this.meshClone.position.clone();
 
-        function checkPressed(keyname) {
-		if (keyname === null)
+        function checkPressed(keyname, areaPlayerID) {
+			if (keyname === null)
+				return false;
+			if(serverID == areaPlayerID){
+ 				return keyboard.pressed(keyname);
+			}
+			else if(playerID == areaPlayerID){
+				return clientKeyboard.indexOf(keyname) != -1;
+			}
 			return false;
-                return keyboard.pressed(keyname) ||
-                        clientKeyboard.indexOf(keyname) != -1
         }
 	// Racket controls
-	var left_key = null, right_key = null;
-	if (this.playerID === 0) {
-		left_key = 'left'; right_key = 'right';
-	} else if (this.playerID === 1) {
-		left_key = 'a'; right_key = 'd';
-	} else if (this.playerID === 2) {
-		left_key = 'o'; right_key = 'p';
-	} else {
-		return;
-	}
-	
+	var left_key = 'left'; right_key = 'right';	
 
 	var racketForward = new THREE.Vector3();
 
@@ -163,10 +167,10 @@ playerArea.prototype.serverUpdate = function(delta, clientKeyboard) {
 
 	racketForward.multiplyScalar(this.racketSpeed * delta);
 	
-	if (checkPressed(left_key)) {
+	if (checkPressed(left_key, this.player.id)) {
 		this.racketMesh.position.add(racketForward);
 		this.meshClone.position.add(racketForward);
-	} else if (checkPressed(right_key)) {
+	} else if (checkPressed(right_key, this.player.id)) {
 		this.racketMesh.position.sub(racketForward);
 		this.meshClone.position.sub(racketForward);
 	}
@@ -184,10 +188,67 @@ playerArea.prototype.serverUpdate = function(delta, clientKeyboard) {
 	}
 }
 
+// ONLINE game mode
 playerArea.prototype.clientUpdate = function(msg) {
-        var newpos = msg.racketspos[this.playerID];
-        if (newpos.x !== undefined)
+        var newpos = msg.racketspos[this.id];
+        if (newpos !== undefined)
                 this.racketMesh.position = newpos;
         else
-                throw "undefined position for racket";
+             console.log( "undefined position for racket");
+}
+
+// OFFLINE game mode
+playerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
+
+	var lastPosition = this.racketMesh.position.clone();
+	var cloneLastPosition = this.meshClone.position.clone();
+
+	// Racket controls
+	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d")) {
+		var racketForward = new THREE.Vector3();
+
+		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
+
+		// Angle to vector3
+		racketForward.x = Math.cos(rotation * -1);
+		racketForward.z = Math.sin(rotation * -1);
+
+
+		racketForward.normalize();
+
+		racketForward.multiplyScalar(this.racketSpeed * delta);
+
+		if (this.player.id == 1) {
+			if (keyboard.pressed("left")) {
+				this.racketMesh.position.add(racketForward);
+				this.meshClone.position.add(racketForward);
+			}
+			if (keyboard.pressed("right")) {
+				this.racketMesh.position.sub(racketForward);
+				this.meshClone.position.sub(racketForward);
+			}
+		} else {
+			if (keyboard.pressed("a")) {
+				this.racketMesh.position.add(racketForward);
+				this.meshClone.position.add(racketForward);
+			}
+			if (keyboard.pressed("d")) {
+				this.racketMesh.position.sub(racketForward);
+				this.meshClone.position.sub(racketForward);
+			}
+		}
+
+		// Local to world position
+		var worldPos = new THREE.Vector3();
+		worldPos.getPositionFromMatrix(this.meshClone.matrixWorld);
+		var transform = this.racketMesh.collider.getWorldTransform();
+		transform.setOrigin(new Ammo.btVector3(worldPos.x, 0, worldPos.z));
+		this.racketMesh.collider.setWorldTransform(transform);
+
+		if (this.racketMesh.position.z < this.racketTopStop || this.racketMesh.position.z > this.racketBottomStop) {
+			this.racketMesh.position = lastPosition;
+			this.meshClone.position = cloneLastPosition;
+		}
+	}
+
 }

@@ -1,10 +1,10 @@
 $(function() {
 	var width = window.innerWidth * 0.25;
-	var posX = (window.innerWidth / 2) - (width / 2);
+	var posX = (window.innerWidth / 2) - (width * 1.25);
 	var posY = window.innerHeight * 0.8;
 	var fontSize = width + "%";
 
-	$("#playButton")
+	$("#offlineButton")
 		.css({
 		"z-index": "2",
 		"background-image": "url('images/smallButton.png')",	
@@ -18,9 +18,10 @@ $(function() {
 		"color":"white"
 	}) // adds CSS
 	.button({
-		label: "PLAY"
+		label: "offline"
 	})
 		.click(function() {
+		netRole = null;
 		gameDirector.setScreen(screens.controls);
 	})
 		// .toggle()
