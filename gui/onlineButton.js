@@ -23,7 +23,7 @@ $(function() {
 		.click(function() {
 		// if not already connected
 		if(peerConnections.length === 0){
-			initNet(clientUpdate, showHelp);
+			initNet(clientUpdate);
 		}
 		else {
 			showHelp();

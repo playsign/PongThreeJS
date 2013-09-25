@@ -111,13 +111,13 @@ function makePeer() {
     return new Peer({key: peerJsApiKey})
 }
 
-function initNet(updateCallback, initCallback) {
+function initNet(updateCallback) {
     var peerid = getPeerIdFromURL();
     
     if (peerid !== null) {
-	initClient(updateCallback, initCallback, peerid);
+	initClient(updateCallback, peerid);
     } else {
-	initServer(updateCallback, initCallback);
+	initServer(updateCallback);
     } 
 }
 
@@ -131,6 +131,7 @@ function attemptServerConnection(peerid) {
     var conn = pjs.connect(peerid);
     conn.on("open", function () {
 	console.log("connection estabilished to server");
+    showHelp();
 	});
     conn.on("error", function () {
 	console.log("connection error to server");
@@ -156,20 +157,20 @@ function attemptServerConnection(peerid) {
     return conn;
 }
 
-function initClient(updateCallback, initCallback, peerid) {
+function initClient(updateCallback, peerid) {
     openCallback = function() {
         conn.send('Hello world!');
         console.log("connected to " + peerid + ", hello sent");
 	
-        initCallback();  // it's showHelp()
+
     }
-    var conn = attemptServerConnection(peerid, openCallback)
+    var conn = attemptServerConnection(peerid)
     netRole = 'client';
     clientUpdateCallback = updateCallback;
     // console.log("client update callback registered");
 }
 
-function initServer(updateCallback, initCallback) {
+function initServer(updateCallback) {
     netRole = 'server';
     pjs = makePeer();
     pjs.on('open', function(myid) { ThisPeerID = myid; });
@@ -189,7 +190,7 @@ function initServer(updateCallback, initCallback) {
             }
 
         console.log(gamemsg);
-        initCallback(); // it's showHelp()
+        showHelp();
     });
 
     pjs.on('connection', function(conn) {
