@@ -24,7 +24,7 @@ var timeOutTable = [];
 var timeout = 7; // in seconds
 var players = null;
 var playerAmount = null;
-var timeoutDebug = true; // first connection will fake-timeout to exercise code
+var timeoutDebug = false; // first connection will fake-timeout to exercise code
 
 function gotConnection(conn) {
     if (peerConnections.length > 0 && netRole === 'client') {
