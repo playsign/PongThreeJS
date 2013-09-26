@@ -22,6 +22,9 @@ var clientID = null;
 var serverID = null;
 var timeOutTable = [];
 var timeout = 7; // in seconds
+var players = null;
+var playerAmount = null;
+var timeoutDebug = true; // first connection will fake-timeout to exercise code
 
 function gotConnection(conn) {
     if (peerConnections.length > 0 && netRole === 'client') {
@@ -61,7 +64,7 @@ function Vec3FromArray(a) {
 
 function gotData(conn, data) {
     try {
-        msg = JSON.parse(data);
+        var msg = JSON.parse(data);
     } catch (err) {
         console.log("not JSON: " + data);
         return;
@@ -100,6 +103,7 @@ function removePeerConnection(conn) {
     for (var i = 0; i < peerConnections.length; i++) {
 	if (conn === peerConnections[i]) {
 	    peerConnections.splice(i, 1);
+	    timeOutTable.splice(i, 1);
 	}
     }
 }
@@ -124,7 +128,7 @@ var connectionRetries = 0;
 function attemptServerConnection(peerid) {
     if ((typeof peerid) !== "string")
 	throw("peerid must be string! got this: " + peerid);
-    pjs = makePeer();
+    var pjs = makePeer();
     pjs.on('open', function(myid) { ThisPeerID = myid; });
     var conn = pjs.connect(peerid);
     conn.on("open", function () {
@@ -136,12 +140,24 @@ function attemptServerConnection(peerid) {
     });
     gotConnection(conn);
     console.log("connecting to peer " + peerid);
+
     connectionTimeout = function() {
-	if (conn.open === false && netRole != null) {
+	var connectionOk = undefined;
+	var connectionFailureFaked = undefined;
+	if (timeoutDebug && conn.open === true && connectionRetries === 0) {
+	    // fake timeout on first attempt
+	    connectionOk = false;
+	    connectionFailureFaked = true;
+	} else {
+	    connectionOk = conn.open;
+	    connectionFailureFaked = false;
+	}
+
+	if (connectionOk === false && netRole != null) {
 	    removePeerConnection(conn);
 	    conn.close();
 	    pjs.disconnect();
-	    console.log("server connection timed out");
+	    console.log("server connection timed out - faked=" + connectionFailureFaked);
 	    if (connectionRetries++ < 10) {
 		console.log("retrying connetion, attempt #" + connectionRetries);
 		attemptServerConnection(peerid);
@@ -156,12 +172,6 @@ function attemptServerConnection(peerid) {
 }
 
 function initClient(updateCallback, peerid) {
-    openCallback = function() {
-        conn.send('Hello world!');
-        console.log("connected to " + peerid + ", hello sent");
-	
-
-    }
     var conn = attemptServerConnection(peerid)
     netRole = 'client';
     clientUpdateCallback = updateCallback;
@@ -217,16 +227,10 @@ function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, pla
 		if (timeOutTable[i] >= timeout) {
                     // peer disconnected
                     console.log("peer disconnected");
-                    if (i === 0 ) {
-			peerConnections.shift();
-			timeOutTable.shift();
-                    } 
-                    else{ 
-			peerConnections.splice(i,i);
-			timeOutTable.splice(i,i);
-                    }
+		    peerConnections.splice(i, 1);
+		    timeOutTable.splice(i, 1);
                     
-                    players.splice(i+1,i+1);
+                    players.splice(i+1, 1);
 
                     refreshScene();
 		}
@@ -235,7 +239,14 @@ function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, pla
             if (timeOutTable[i] !== 0) {
                 timeOutTable[i] = 0;
             }
-	    peerConnections[i].send(json_msg);
+	    var conn = peerConnections[i];
+	    try {
+		conn.send(json_msg);
+	    } catch (err) {
+		console.log("Send to peer connection " + i + " failed: " + err + " - removing that connection");
+		removePeerConnection(conn);
+		try { conn.close(); } catch (e) { }
+	    }
         }
     }
 }
