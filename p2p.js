@@ -1,5 +1,3 @@
-// 
-
 var peerJsApiKey = "gnyz9wskc2chaor";
 
 function getPeerIdFromURL() {
@@ -36,7 +34,7 @@ function gotConnection(conn) {
     conn.on('data', function(data) { gotData(conn, data); });
 
 
-    if(netRole === 'server'){
+    if (netRole === 'server') {
         // Add player
         var randomColor = getRandomColor();
         var newPeerID = peerConnections[peerConnections.length-1].peer;
@@ -47,7 +45,7 @@ function gotConnection(conn) {
     }
 }
 
-function refreshScene(){
+function refreshScene() {
     // Updated scene
     playerAmount = players.length;
     ball.speed = playerAmount * 70;
@@ -91,9 +89,9 @@ function gotData(conn, data) {
 
 
     // Sync scene variables
-    if(msg.playeramount !== undefined)
+    if (msg.playeramount !== undefined)
         playerAmount = msg.playeramount;
-    if(msg.players !== undefined)
+    if (msg.players !== undefined)
         players = msg.players;
 
 }
@@ -131,11 +129,11 @@ function attemptServerConnection(peerid) {
     var conn = pjs.connect(peerid);
     conn.on("open", function () {
 	console.log("connection estabilished to server");
-    showHelp();
-	});
+	showHelp();
+    });
     conn.on("error", function () {
 	console.log("connection error to server");
-	});
+    });
     gotConnection(conn);
     console.log("connecting to peer " + peerid);
     connectionTimeout = function() {
@@ -180,14 +178,14 @@ function initServer(updateCallback) {
         $("#playerUrl").html(gamemsg);
         $("#urlBox").dialog("open");
 
-            if(netRole === 'server'){
-                // server is always the player 0
-                var randomColor = getRandomColor();
-                players[0] = new player(myid, "server", randomColor);
-                playerAmount = 1;
-                serverID = myid;
-                console.log("server id:" + myid);
-            }
+        if (netRole === 'server') {
+            // server is always the player 0
+            var randomColor = getRandomColor();
+            players[0] = new player(myid, "server", randomColor);
+            playerAmount = 1;
+            serverID = myid;
+            console.log("server id:" + myid);
+        }
 
         console.log(gamemsg);
         showHelp();
@@ -212,29 +210,29 @@ function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, pla
 	
 	var json_msg = JSON.stringify(update_msg);
 	for (var i = 0; i < peerConnections.length; i++)
-        if( peerConnections[i].open == false){
-            timeOutTable[i] += timedelta;
+            if (peerConnections[i].open == false) {
+		timeOutTable[i] += timedelta;
 
 
-            if(timeOutTable[i] >= timeout){
-                // peer disconnected
-                console.log("peer disconnected");
-                if(i === 0 ){
-                    peerConnections.shift();
-                    timeOutTable.shift();
+		if (timeOutTable[i] >= timeout) {
+                    // peer disconnected
+                    console.log("peer disconnected");
+                    if (i === 0 ) {
+			peerConnections.shift();
+			timeOutTable.shift();
                     } 
-                else{ 
-                    peerConnections.splice(i,i);
-                    timeOutTable.splice(i,i);
-                }
-                
-                players.splice(i+1,i+1);
+                    else{ 
+			peerConnections.splice(i,i);
+			timeOutTable.splice(i,i);
+                    }
+                    
+                    players.splice(i+1,i+1);
 
-                refreshScene();
-            }
-        } 
+                    refreshScene();
+		}
+            } 
         else {
-            if(timeOutTable[i] !== 0){
+            if (timeOutTable[i] !== 0) {
                 timeOutTable[i] = 0;
             }
 	    peerConnections[i].send(json_msg);
