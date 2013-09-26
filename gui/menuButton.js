@@ -15,6 +15,28 @@ $(function() {
 		.click(function() {
 		gameDirector.setScreen(screens.menu);
 		deleteScene();
-	})
+
+		// online
+		if (netRole != null) {
+			// Close peer connections
+		    for (var i = 0; i < peerConnections.length; i++) {
+		    	peerConnections[i].close();
+			    peerConnections.splice(i, 1);
+	    	}
+		    for (var i = 0; i < players.length; i++) {
+			    players.splice(i, 1);
+	    	}
+	    	peerConnections = [];
+			netRole = null;
+			clientUpdateCallback = null;
+			clientKeysPressed = null;
+			id = null;
+			ThisPeerID = null;
+			clientID = null;
+			serverID = null;
+			timeOutTable = [];
+		}
+
+		})
 		.append("<img width='"+width+"' height='"+width+"' src='images/menuIcon.png'/>")
 });

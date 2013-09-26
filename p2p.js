@@ -139,7 +139,7 @@ function attemptServerConnection(peerid) {
     gotConnection(conn);
     console.log("connecting to peer " + peerid);
     connectionTimeout = function() {
-	if (conn.open === false) {
+	if (conn.open === false && netRole != null) {
 	    removePeerConnection(conn);
 	    conn.close();
 	    pjs.disconnect();

@@ -57,7 +57,7 @@ function init() {
 	// camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 	camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(0, 500, 0);
+	camera.position.set(0, 1000, -375);
 	camera.lookAt(scene.position);
 
 	// DAT GUI
