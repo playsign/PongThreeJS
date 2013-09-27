@@ -1,4 +1,4 @@
-player = function(id, name, color) {
+Player = function(id, name, color) {
 	// PLAYER INFO
 	this.id = id;
 	this.name = name;

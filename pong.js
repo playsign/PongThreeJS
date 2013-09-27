@@ -4,7 +4,9 @@
 	Author: Playsign
 	Date: 2013
  */
-
+// "use strict";
+/* jshint -W097, -W040 */
+/* global THREE, THREEx, Ammo, window, Director, DirectorScreens, PlayerArea */
 // MAIN
 
 // standard global variables
@@ -26,32 +28,32 @@ var playerAreaWidth = 100; // TODO duplicated in playerArea
 // custom global variables
 var borderMaterial;
 var mesh;
-
+var gameDirector;
 var ball;
 
 init();
 animate();
 
-// FUNCTIONS 		
+// FUNCTIONS
 
 function init() {
 	// SCENE
 	scene = new THREE.Scene();
 
 	// AMMO.JS
-	collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
-	dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
-	overlappingPairCache = new Ammo.btDbvtBroadphase();
-	solver = new Ammo.btSequentialImpulseConstraintSolver();
+	var collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+	var dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
+	var overlappingPairCache = new Ammo.btDbvtBroadphase();
+	var solver = new Ammo.btSequentialImpulseConstraintSolver();
 	scene.world = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 	scene.world.setGravity(new Ammo.btVector3(0, 0, 0));
 
 	// CAMERA
-	SCREEN_WIDTH = window.innerWidth,
+	SCREEN_WIDTH = window.innerWidth;
 	SCREEN_HEIGHT = window.innerHeight;
-	VIEW_ANGLE = 45,
-	ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT,
-	NEAR = 0.1,
+	VIEW_ANGLE = 45;
+	ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
+	NEAR = 0.1;
 	FAR = 20000;
 	// camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 	camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
@@ -62,6 +64,7 @@ function init() {
 	// DAT GUI
 	container = document.getElementById('ThreeJS');
 	gui = new dat.GUI();
+	/* using "this" here works only by accident? needs non-strict mode */
 	gui.add(this, 'playerAmount').min(2).max(100).step(1).listen();
 	gui.close();
 	gui.domElement.style.position = 'absolute';
@@ -97,16 +100,17 @@ function init() {
 	stats.domElement.style.zIndex = 100;
 	container.appendChild(stats.domElement);
 
+	var light;
 	// LIGHT
-	// var light = new THREE.AmbientLight(0x999999); // soft white light
+	// light = new THREE.AmbientLight(0x999999); // soft white light
 	// scene.add(light);
 
-	var light = new THREE.PointLight(0xffffff);
+	light = new THREE.PointLight(0xffffff);
 	light.position.set(-300, 300, -300);
 	scene.add(light);
 
 	// White directional light at half intensity shining from the top.
-	var light = new THREE.DirectionalLight(0xffffff, 1);
+	light = new THREE.DirectionalLight(0xffffff, 1);
 	light.position.set(300, 300, 300);
 	scene.add(light);
 
@@ -152,7 +156,7 @@ function init() {
 	// generate scene in menu?
 	// generateScene();
 
-	gameDirector = new director();
+	gameDirector = new Director();
 	//initNet(clientUpdate);
 }
 
@@ -192,9 +196,9 @@ function generateScene() {
 	var pivotPoint = 9; // 10 Push player area forward by width of the area
 
 	// Two player tweak to remove gaps between player areas
-	if (playerAmount == 2) {
+	if (playerAmount === 2) {
 		pivotPoint -= 5; // 4.5 , 5,5
-	} else if (playerAmount == 3) {
+	} else if (playerAmount === 3) {
 		pivotPoint -= 0.5; //-0,5
 	}
 
@@ -213,7 +217,7 @@ function generateScene() {
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
 
-		var pa = new playerArea(new THREE.Vector3(x, 0, z), radians, i);
+		var pa = new PlayerArea(new THREE.Vector3(x, 0, z), radians, i);
 
 		playerAreas.push(pa);
 
@@ -288,7 +292,7 @@ function update() {
 	// Refresh the scene if the player amount has changed
 	var delta = clock.getDelta(); // seconds.
 
-	if (playerAmount != oldPlayerAmount) {
+	if (playerAmount !== oldPlayerAmount) {
 		generateScene();
 	}
 
@@ -296,11 +300,11 @@ function update() {
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
 
-    if (netRole == 'client')
+    if (netRole === 'client')
         return;
 
     // online game mode
-	if (netRole != null){
+	if (netRole !== null) {
 		var racketPositions = [];
 		for (var i = 0; i < playerAreas.length; i++) {
 		        playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientID, i);
@@ -321,7 +325,7 @@ function update() {
 
 	// ammo.js check collisions
 	var numManifolds = scene.world.getDispatcher().getNumManifolds();
-	// if(numManifolds > 0){
+	// if(numManifolds > 0) {
 	// 	console.log("numManifolds: "+numManifolds);
 	// }
 
@@ -364,15 +368,15 @@ function update() {
 				var rbA = Ammo.wrapPointer(obA, Ammo.btRigidBody);
 				var rbB = Ammo.wrapPointer(obB, Ammo.btCollisionObject);
 
-				if (rbA.mesh != null && rbB.mesh != null) {
+				if (rbA.mesh !== null && rbB.mesh !== null) {
 					// console.log("rbA " + rbA.mesh.name);
 					// console.log("rbB " + rbB.mesh.name);
-					if (rbA.mesh.name == "ball" && rbB.mesh.type == "box") {
+					if (rbA.mesh.name === "ball" && rbB.mesh.type === "box") {
 						// console.log("ball collides a border 1");
 
 						// rbB is a border
 						ball.onCollision(rbB.mesh, ptB, hitsEnd);
-					} else if (rbB.mesh.name == "ball" && rbA.mesh.type == "box") {
+					} else if (rbB.mesh.name === "ball" && rbA.mesh.type === "box") {
 						// console.log("ball collides a border 2");
 
 						// rbA is a border
@@ -386,7 +390,7 @@ function update() {
 	ball.update(collidableMeshList, delta);
 
 	// online game mode
-	if (netRole != null){
+	if (netRole !== null) {
     	serverNetUpdate(racketPositions, ball.sphereMesh.position, delta, playerAmount);
     }
 }
@@ -395,11 +399,11 @@ function render() {
 	renderer.render(scene, camera);
 }
 
-function showHelp(){
-	gameDirector.setScreen(screens.controls);
+function showHelp() {
+	gameDirector.setScreen(DirectorScreens.controls);
 }
 
-function getRandomColor(){
+function getRandomColor() {
 	return '#' + '000000'.concat(Math.floor(Math.random() * 16777215).toString(16)).substr(-6);
 }
 

@@ -1,4 +1,9 @@
-screens = {
+
+Director = function() {
+	this.setScreen(DirectorScreens.menu);
+};
+
+DirectorScreens = {
 	menu: 0,
 	setup: 1,
 	roomBrowser: 2,
@@ -7,13 +12,9 @@ screens = {
 	game: 5,
 	gameMenu: 6,
 	gameover: 7
-}
+};
 
-director = function() {
-	this.setScreen(screens.menu);
-}
-
-director.prototype.setScreen = function(newScreen) {
+Director.prototype.setScreen = function(newScreen) {
 	if (this.screen != newScreen) {
 		// *hide previous screen items
 		$("#onlineButton").hide();
@@ -111,6 +112,6 @@ director.prototype.setScreen = function(newScreen) {
 	}
 }
 
-director.prototype.doNextScreen = function() {
+Director.prototype.doNextScreen = function() {
 	this.setScreen(this.currentScreen + 1);
 }

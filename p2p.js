@@ -1,3 +1,5 @@
+/* jshint -W097, -W099 */
+/* global window, THREE, console, Player, getRandomColor */
 "use strict";
 
 var peerJsApiKey = "gnyz9wskc2chaor";
@@ -42,7 +44,7 @@ function gotConnection(conn) {
         // Add player
         var randomColor = getRandomColor();
         var newPeerID = peerConnections[peerConnections.length-1].peer;
-        playerArray.push(new player(newPeerID, newPeerID, randomColor));
+        playerArray.push(new Player(newPeerID, newPeerID, randomColor));
         console.log("new player, id:" + newPeerID);
 
         refreshScene();
@@ -64,8 +66,9 @@ function Vec3FromArray(a) {
 }
 
 function gotData(conn, data) {
+    var msg;
     try {
-        var msg = JSON.parse(data);
+        msg = JSON.parse(data);
     } catch (err) {
         console.log("not JSON: " + data);
         return;
@@ -154,7 +157,7 @@ function attemptServerConnection(peerid) {
 	    connectionFailureFaked = false;
 	}
 
-	if (connectionOk === false && netRole != null) {
+	if (connectionOk === false && netRole !== null) {
 	    removePeerConnection(conn);
 	    conn.close();
 	    pjs.disconnect();
@@ -192,7 +195,7 @@ function initServer(updateCallback) {
         if (netRole === 'server') {
             // server is always the player 0
             var randomColor = getRandomColor();
-            playerArray[0] = new player(myid, "server", randomColor);
+            playerArray[0] = new Player(myid, "server", randomColor);
             playerAmount = 1;
             serverID = myid;
             console.log("server id:" + myid);
@@ -221,7 +224,7 @@ function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers) {
 	
 	var json_msg = JSON.stringify(update_msg);
 	for (var i = 0; i < peerConnections.length; i++)
-            if (peerConnections[i].open == false) {
+            if (peerConnections[i].open === false) {
 		timeOutTable[i] += timedelta;
 
 
