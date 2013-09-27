@@ -1,3 +1,5 @@
+"use strict";
+
 var peerJsApiKey = "gnyz9wskc2chaor";
 
 function getPeerIdFromURL() {
@@ -12,18 +14,17 @@ function getPeerIdFromURL() {
     return null;
 }
 
-var peerConnections = [];
-var netRole = null;
-var clientUpdateCallback = null;
-var clientKeysPressed = null;
-var id = null;
-var ThisPeerID = null;
-var clientID = null;
-var serverID = null;
-var timeOutTable = [];
+var peerConnections = []; // used only in this file
+var netRole = null; // used all over
+var clientUpdateCallback = null; // used only in this file
+var clientKeysPressed = null; // used from pong.js
+var ThisPeerID = null; // used only in this file
+var clientID = null; // used from pong.js
+var serverID = null; // used from playerArea.js
+var timeOutTable = []; 
 var timeout = 7; // in seconds
-var players = null;
-var playerAmount = null;
+var playerArray = [];
+var playerAmount = null; // used in pong.js
 var timeoutDebug = false; // first connection will fake-timeout to exercise code
 
 function gotConnection(conn) {
@@ -41,7 +42,7 @@ function gotConnection(conn) {
         // Add player
         var randomColor = getRandomColor();
         var newPeerID = peerConnections[peerConnections.length-1].peer;
-        players.push(new player(newPeerID, newPeerID, randomColor));
+        playerArray.push(new player(newPeerID, newPeerID, randomColor));
         console.log("new player, id:" + newPeerID);
 
         refreshScene();
@@ -50,7 +51,7 @@ function gotConnection(conn) {
 
 function refreshScene() {
     // Updated scene
-    playerAmount = players.length;
+    playerAmount = playerArray.length;
     ball.speed = playerAmount * 70;
     generateScene();
 }
@@ -95,7 +96,7 @@ function gotData(conn, data) {
     if (msg.playeramount !== undefined)
         playerAmount = msg.playeramount;
     if (msg.players !== undefined)
-        players = msg.players;
+        playerArray = msg.players;
 
 }
 
@@ -141,7 +142,7 @@ function attemptServerConnection(peerid) {
     gotConnection(conn);
     console.log("connecting to peer " + peerid);
 
-    connectionTimeout = function() {
+    var connectionTimeout = function() {
 	var connectionOk = undefined;
 	var connectionFailureFaked = undefined;
 	if (timeoutDebug && conn.open === true && connectionRetries === 0) {
@@ -180,7 +181,7 @@ function initClient(updateCallback, peerid) {
 
 function initServer(updateCallback) {
     netRole = 'server';
-    pjs = makePeer();
+    var pjs = makePeer();
     pjs.on('open', function(myid) { ThisPeerID = myid; });
     pjs.on('open', function(myid) {
         var gamemsg = window.location.href + '?peer-id=' + myid
@@ -191,7 +192,7 @@ function initServer(updateCallback) {
         if (netRole === 'server') {
             // server is always the player 0
             var randomColor = getRandomColor();
-            players[0] = new player(myid, "server", randomColor);
+            playerArray[0] = new player(myid, "server", randomColor);
             playerAmount = 1;
             serverID = myid;
             console.log("server id:" + myid);
@@ -207,7 +208,7 @@ function initServer(updateCallback) {
 }
 
 
-function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, playerlist) {
+function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers) {
     if (netRole === 'server') {
         // console.log("server net update");
         var update_msg = {
@@ -215,7 +216,7 @@ function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, pla
             racketspos: racketPositions,
             ballpos: ballPos,
             playeramount: amountPlayers,
-            players: playerlist,
+            players: playerArray,
         };
 	
 	var json_msg = JSON.stringify(update_msg);
@@ -230,7 +231,7 @@ function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers, pla
 		    peerConnections.splice(i, 1);
 		    timeOutTable.splice(i, 1);
                     
-                    players.splice(i+1, 1);
+                    playerArray.splice(i+1, 1);
 
                     refreshScene();
 		}

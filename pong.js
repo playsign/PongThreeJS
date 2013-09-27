@@ -19,7 +19,6 @@ var playerAmount = 3;
 var oldPlayerAmount = playerAmount;
 
 var playerAreas = [];
-var players = [];
 var collidableMeshList = [];
 
 var playerAreaWidth = 100; // TODO duplicated in playerArea
@@ -388,7 +387,7 @@ function update() {
 
 	// online game mode
 	if (netRole != null){
-    	serverNetUpdate(racketPositions, ball.sphereMesh.position, delta, playerAmount, players);
+    	serverNetUpdate(racketPositions, ball.sphereMesh.position, delta, playerAmount);
     }
 }
 

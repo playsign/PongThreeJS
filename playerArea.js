@@ -2,9 +2,9 @@
 
 playerArea = function(position, rotation, id) {
 	// PLAYER INFO
-	if (netRole && players[id]) {
+	if (netRole && playerArray[id]) {
 		// online
-		this.player = players[id];
+		this.player = playerArray[id];
 	}
 	else{
 		// offline
