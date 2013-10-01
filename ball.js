@@ -38,6 +38,10 @@ function Ball(material) {
 
 Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 {
+	if(delta <= 0){
+		return;
+	}
+
 	//  Reset position if the ball is out of the scene
 	if (playerAreas[0] != null && this.sphereMesh.position.length() > (playerAreas[0].group.position.length() + 200)) {
 		console.log(" reset ");
@@ -64,10 +68,11 @@ Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 		this.collider.setLinearVelocity(btV3);
 	}
 
-	// keep the speed of 1
+	// keep the speed of 1 (* delta)
 	var btVelo = this.collider.getLinearVelocity();
 	btVelo = btVelo.normalized();
-	var btV3 = new Ammo.btVector3(btVelo.getX() * this.speed, 0, btVelo.getZ() * this.speed);
+	var tweak = 100; // TODO remove magic number
+	var btV3 = new Ammo.btVector3(btVelo.getX() * this.speed  * tweak * delta, 0, btVelo.getZ() * this.speed * tweak * delta);
 	this.collider.setLinearVelocity(btV3);
 
 	var transform = new Ammo.btTransform();

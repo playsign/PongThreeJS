@@ -3,7 +3,7 @@ $(function() {
 
 	$("#menuButton")
 		.css({
-		"z-index": "2",
+		"z-index": "3",
 		"background-image": "url('images/smallButton.png')",
 		"position": "absolute",
 		"bottom": "50px",
@@ -13,7 +13,7 @@ $(function() {
 	}) // adds CSS
 	.button({})
 		.click(function() {
-		gameDirector.setScreen(screens.menu);
+		gameDirector.setScreen(DirectorScreens.menu);
 		deleteScene();
 
 		// online
@@ -30,6 +30,7 @@ $(function() {
 			netRole = null;
 			clientUpdateCallback = null;
 			clientKeysPressed = null;
+			clientTouch = null;
 			id = null;
 			ThisPeerID = null;
 			clientID = null;

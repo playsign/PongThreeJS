@@ -14,8 +14,7 @@ function PlayerArea(position, rotation, id) {
 		this.player = new Player(id, id, randomColor);
 	}
 
-	//
-
+	// PLAYER AREA
 	this.id = id;
 
 	this.group = new THREE.Object3D(); //create an empty container
@@ -90,6 +89,18 @@ function PlayerArea(position, rotation, id) {
 	this.groupMeshes.push(this.borderBottom);
 	this.groupMeshes.push(this.borderLeft);
 	this.groupMeshes.push(this.borderTop);
+
+	// CAMERA POSITION (online)
+	if (netRole && playerArray[id] && serverID == this.player.id ) {
+		var worldPos = new THREE.Vector3();
+		worldPos.getPositionFromMatrix(this.borderLeft.matrixWorld);
+		// console.log("set camera position");
+		// console.log("position.x: " + worldPos.x);
+		// console.log("position.z: " + worldPos.z);
+		camera.position.x = worldPos.x;
+		camera.position.z = worldPos.z;
+		camera.lookAt(position);
+	}
 }
 
 PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) {
@@ -99,7 +110,9 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	var h = height / 2;
 	// quickfix. The collider needs to be slightly bigger(makes ball aiming less hard) than the mesh so we need to copy the visible mesh and tweak it's x-position +5 . TODO
 	this.meshClone = mesh.clone();
-	this.meshClone.material = new THREE.MeshBasicMaterial( { visible: false } );
+	this.meshClone.material = new THREE.MeshBasicMaterial({
+		visible: false
+	});
 
 	var boxShape = null;
 	if (racket) {
@@ -138,7 +151,7 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 };
 
 // ONLINE game mode
-PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, playerID, i) {
+PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch, playerID, i) {
 	var lastPosition = this.racketMesh.position.clone();
 	var cloneLastPosition = this.meshClone.position.clone();
 	// if (clientKeyboard.length > 0)
@@ -153,7 +166,18 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, playerID, i)
 				return clientKeyboard.indexOf(keyname) != -1;
 			}
 			return false;
-        }
+	}
+
+	function checkTouch(areaPlayerID) {
+		if (serverID == areaPlayerID) {
+			return deltaPosition.x * swipeSpeed;
+		} else if (playerID == areaPlayerID) {
+			return clientTouch;
+		}
+		return false;
+	}
+
+
 	// Racket controls
 	var left_key = 'left', right_key = 'right';	
 
@@ -168,14 +192,25 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, playerID, i)
 
 	racketForward.normalize();
 
+	// Racket's speed
 	racketForward.multiplyScalar(this.racketSpeed * delta);
-	
+
 	if (checkPressed(left_key, this.player.id)) {
 		this.racketMesh.position.add(racketForward);
 		this.meshClone.position.add(racketForward);
 	} else if (checkPressed(right_key, this.player.id)) {
 		this.racketMesh.position.sub(racketForward);
 		this.meshClone.position.sub(racketForward);
+	}
+	// Touch / Mouse
+	else {
+		var touchSpeedModifier = checkTouch(this.player.id);
+		if (touchSpeedModifier != 0) {
+			racketForward.multiplyScalar(touchSpeedModifier);
+
+			this.racketMesh.position.add(racketForward);
+			this.meshClone.position.add(racketForward);
+		}
 	}
 
 	// Local to world position
@@ -193,11 +228,11 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, playerID, i)
 
 // ONLINE game mode
 PlayerArea.prototype.clientUpdate = function(msg) {
-        var newpos = msg.racketspos[this.id];
-        if (newpos !== undefined)
-                this.racketMesh.position = newpos;
-        else
-             console.log( "undefined position for racket");
+	var newpos = msg.racketspos[this.id];
+	if (newpos !== undefined)
+		this.racketMesh.position = newpos;
+	else
+		console.log("undefined position for racket");
 }
 
 // OFFLINE game mode
@@ -207,7 +242,7 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 	var cloneLastPosition = this.meshClone.position.clone();
 
 	// Racket controls
-	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d")) {
+	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d") || (swiping && delta.x != 0)) {
 		var racketForward = new THREE.Vector3();
 
 		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
@@ -219,8 +254,16 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 
 		racketForward.normalize();
 
-		racketForward.multiplyScalar(this.racketSpeed * delta);
+		// Racket's speed
+		if (swiping) {
+			// Touch / Mouse
+			racketForward.multiplyScalar(this.racketSpeed * deltaPosition.x * swipeSpeed * delta);
+		} else {
+			// Keyboard
+			racketForward.multiplyScalar(this.racketSpeed * delta);
+		}
 
+		// Keyboard
 		if (this.player.id == 1) {
 			if (keyboard.pressed("left")) {
 				this.racketMesh.position.add(racketForward);
@@ -229,6 +272,12 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 			if (keyboard.pressed("right")) {
 				this.racketMesh.position.sub(racketForward);
 				this.meshClone.position.sub(racketForward);
+			}
+
+			// Touch
+			if (swiping) {
+				this.racketMesh.position.add(racketForward);
+				this.meshClone.position.add(racketForward);
 			}
 		} else {
 			if (keyboard.pressed("a")) {

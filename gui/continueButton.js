@@ -3,7 +3,7 @@ $(function() {
 
 	$("#continueButton")
 		.css({
-		"z-index": "2",
+		"z-index": "3",
 		"background-image": "url('images/smallButton.png')",
 		"position": "absolute",
 		"bottom": "50px",
@@ -14,7 +14,7 @@ $(function() {
 	.button({
 	})
 		.click(function() {
-		gameDirector.setScreen(screens.game);
+		gameDirector.setScreen(DirectorScreens.game);
 	})
 		.append("<img width='"+width+"' height='"+width+"' src='images/playIcon.png'/>")
 });

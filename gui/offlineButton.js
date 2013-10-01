@@ -6,7 +6,7 @@ $(function() {
 
 	$("#offlineButton")
 		.css({
-		"z-index": "2",
+		"z-index": "3",
 		"background-image": "url('images/smallButton.png')",	
 		"position": "absolute",
 		// "bottom": "50px",
@@ -22,7 +22,7 @@ $(function() {
 	})
 		.click(function() {
 		netRole = null;
-		gameDirector.setScreen(screens.controls);
+		gameDirector.setScreen(DirectorScreens.controls);
 	})
 		// .toggle()
 });

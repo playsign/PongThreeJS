@@ -13,7 +13,7 @@ $(function() {
 	.button({
 	})
 		.click(function() {
-		gameDirector.setScreen(screens.gameMenu);
+		gameDirector.setScreen(DirectorScreens.gameMenu);
 	})
 		.append("<img width='"+width+"' height='auto' src='images/gameMenuIcon.png'/>")
 		// .toggle()

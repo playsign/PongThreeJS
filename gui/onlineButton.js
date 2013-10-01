@@ -6,7 +6,7 @@ $(function() {
 
 	$("#onlineButton")
 		.css({
-		"z-index": "2",
+		"z-index": "3",
 		"background-image": "url('images/smallButton.png')",
 		"position": "absolute",
 		// "bottom": "50px",

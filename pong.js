@@ -18,6 +18,7 @@ var clock = new THREE.Clock();
 var cameraTweak = 0.1;
 
 var playerAmount = 3;
+var clientPlayerAmount = 0;
 var oldPlayerAmount = playerAmount;
 
 var playerAreas = [];
@@ -25,11 +26,19 @@ var collidableMeshList = [];
 
 var playerAreaWidth = 100; // TODO duplicated in playerArea
 
-// custom global variables
 var borderMaterial;
 var mesh;
 var gameDirector;
 var ball;
+
+// TOUCH
+// var getPointerEvent, $touchArea;
+var deltaPosition = {
+	x: 0,
+	y: 0
+};
+var swiping = false;
+var swipeSpeed = 0.12;
 
 init();
 animate();
@@ -51,14 +60,14 @@ function init() {
 	// CAMERA
 	SCREEN_WIDTH = window.innerWidth;
 	SCREEN_HEIGHT = window.innerHeight;
-	VIEW_ANGLE = 45;
-	ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
-	NEAR = 0.1;
+	VIEW_ANGLE = 45,
+	ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT,
+	NEAR = -20000,
 	FAR = 20000;
 	// camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 	camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(0, 1000, -375);
+	camera.position.set(0, 300, -100); // (0, 1000, -375);
 	camera.lookAt(scene.position);
 
 	// DAT GUI
@@ -92,6 +101,61 @@ function init() {
 	// CONTROLS
 	controls = new THREE.OrbitControls(camera, renderer.domElement);
 	controls.userZoom = false;
+
+	// TOUCH
+	getPointerEvent = function(event) {
+		return event.originalEvent.targetTouches ? event.originalEvent.targetTouches[0] : event;
+	};
+	$touchArea = $('#touchArea'),
+	touchStarted = false, // detect if a touch event is sarted
+	currX = 0,
+	currY = 0,
+	cachedX = 0,
+	cachedY = 0;
+
+	//setting the events listeners
+	$touchArea.on('touchstart mousedown', function(e) {
+		// console.log("touch start");
+		e.preventDefault();
+		var pointer = getPointerEvent(e);
+		// caching the current x
+		cachedX = currX = pointer.pageX;
+		// caching the current y
+		cachedY = currY = pointer.pageY;
+		// a touch event is detected      
+		touchStarted = true;
+		// detecting if after 200ms the finger is still in the same position
+		setTimeout(function() {
+			if ((cachedX === currX) && !touchStarted && (cachedY === currY)) {
+				// Here you get the Tap event
+			}
+		}, 200);
+	});
+	$touchArea.on('touchend mouseup touchcancel', function(e) {
+		// console.log("touch end");
+		e.preventDefault();
+		// here we can consider finished the touch event
+		touchStarted = false;
+		swiping = false;
+		deltaPosition.x = 0;
+	});
+	$touchArea.on('touchmove mousemove', function(e) {
+		// console.log("touch move");
+		e.preventDefault();
+		var pointer = getPointerEvent(e);
+		if (touchStarted) {
+			// here you are swiping
+			swiping = true;
+
+			deltaPosition.x = (currX - pointer.pageX);
+			deltaPosition.y = window.innerHeight * (currY - pointer.pageY);
+		}
+		currX = pointer.pageX;
+		currY = pointer.pageY;
+		// console.log("swiping" + deltaPosition.x);
+
+
+	});
 
 	// STATS
 	stats = new Stats();
@@ -152,9 +216,6 @@ function init() {
 	ball = new Ball(borderMaterial);
 	gui.add(ball, 'speed').min(0.1).max(400).step(0.1).listen();
 	scene.add(ball.sphereMesh);
-
-	// generate scene in menu?
-	// generateScene();
 
 	gameDirector = new Director();
 	//initNet(clientUpdate);
@@ -231,7 +292,7 @@ function generateScene() {
 
 	// update the camera
 	var gameAreaDiameter = (radius * 25 + (playerAreaWidth * 2)); // TODO 25 the magic number
-	console.log("gameAreaDiameter: " + gameAreaDiameter);
+	// console.log("gameAreaDiameter: " + gameAreaDiameter);
 	if (SCREEN_HEIGHT < SCREEN_WIDTH) {
 		camera.left = ASPECT * -gameAreaDiameter / 2;
 		camera.right = ASPECT * gameAreaDiameter / 2;
@@ -240,8 +301,8 @@ function generateScene() {
 	} else {
 		camera.left = -gameAreaDiameter / 2;
 		camera.right = gameAreaDiameter / 2;
-		camera.top =  gameAreaDiameter / 2 / ASPECT;
-		camera.bottom =  -gameAreaDiameter / 2 / ASPECT;
+		camera.top = gameAreaDiameter / 2 / ASPECT;
+		camera.bottom = -gameAreaDiameter / 2 / ASPECT;
 	}
 
 	camera.updateProjectionMatrix();
@@ -307,8 +368,8 @@ function update() {
 	if (netRole !== null) {
 		var racketPositions = [];
 		for (var i = 0; i < playerAreas.length; i++) {
-		        playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientID, i);
-	                racketPositions.push(playerAreas[i].racketMesh.position);
+			playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
+			racketPositions.push(playerAreas[i].racketMesh.position);
 		}
 	} else {
 		// offline game mode
@@ -408,29 +469,46 @@ function getRandomColor() {
 }
 
 function clientUpdate(msg) {
-        // called in client mode (when we're just showing what server tells us).
-        if (msg.dt === undefined || msg.ballpos === undefined || msg.racketspos === undefined)
-                throw "update msg: missing properties";
-        ball.sphereMesh.position = msg.ballpos;
+	// called in client mode (when we're just showing what server tells us).
+	if (msg.dt === undefined || msg.ballpos === undefined || msg.racketspos === undefined)
+		throw "update msg: missing properties";
+	ball.sphereMesh.position = msg.ballpos;
 	// ball.update(collidableMeshList, msg.dt);
-        for (var i = 0; i < playerAreas.length; i++)
-                playerAreas[i].clientUpdate(msg);
-        return readKeyboard();
+	for (var i = 0; i < playerAreas.length; i++) {
+		playerAreas[i].clientUpdate(msg);
+		if (clientPlayerAmount !== playerAmount && playerAreas[i].player.id === ThisPeerID) {
+			var worldPos = new THREE.Vector3();
+			worldPos.getPositionFromMatrix(playerAreas[i].borderLeft.matrixWorld);
+			camera.position.x = worldPos.x;
+			camera.position.z = worldPos.z;
+			camera.lookAt(playerAreas[i].group.position);
+
+			clientPlayerAmount = playerAmount; // Helps to prevent unnecessary camera position modification
+		}
+	}
+
+	var inputs = {
+		keyboard: readKeyboard(),
+		touch: deltaPosition.x * swipeSpeed,
+	};
+
+	return inputs;
 }
 
-function readKeyboard() {        
-        var pressed = [];
-        function checkPressed(keyname) {
-                if (keyboard.pressed(keyname))
-                        pressed.push(keyname);
-        }
+function readKeyboard() {
+	var pressed = [];
 
-        checkPressed("left");
-        checkPressed("right");
-        checkPressed("a");
-        checkPressed("d");
-        checkPressed("o");
-        checkPressed("p");
+	function checkPressed(keyname) {
+		if (keyboard.pressed(keyname))
+			pressed.push(keyname);
+	}
 
-        return pressed;
- }
+	checkPressed("left");
+	checkPressed("right");
+	checkPressed("a");
+	checkPressed("d");
+	// checkPressed("o");
+	// checkPressed("p");
+
+	return pressed;
+}

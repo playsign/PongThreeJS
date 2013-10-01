@@ -24,7 +24,9 @@ var ThisPeerID = null; // used only in this file
 var clientID = null; // used from pong.js
 var serverID = null; // used from playerArea.js
 var timeOutTable = []; 
-var timeout = 7; // in seconds
+var clientTouch = null;
+var timeoutByServer = 7; // in seconds
+var timeoutByClient = 30000; // in milliseconds
 var playerArray = [];
 var playerAmount = null; // used in pong.js
 var timeoutDebug = false; // first connection will fake-timeout to exercise code
@@ -79,9 +81,11 @@ function gotData(conn, data) {
             return Vec3FromArray(arr);
         });
         if (clientUpdateCallback) {
-            var keys = clientUpdateCallback(msg);
+            var keys = clientUpdateCallback(msg).keyboard;
+            var newSwipe = clientUpdateCallback(msg).touch;
             conn.send(JSON.stringify({
                 pressedkeys: keys,
+                swipe: newSwipe,
                 playerID: ThisPeerID,
             }))
         } else {
@@ -89,6 +93,7 @@ function gotData(conn, data) {
         }
     } else if (netRole === 'server' && msg.pressedkeys !== undefined) {
         clientKeysPressed = msg.pressedkeys;
+        clientTouch = msg.swipe;
         clientID = msg.playerID;
     } else if (netRole === 'server') {
 	console.log("undefined keys in net msg");
@@ -171,7 +176,7 @@ function attemptServerConnection(peerid) {
 	    }
 	}
     }
-    window.setTimeout(connectionTimeout, 15000 /*ms*/);
+    window.setTimeout(connectionTimeout, timeoutByClient /*ms*/);
     return conn;
 }
 
@@ -228,7 +233,7 @@ function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers) {
 		timeOutTable[i] += timedelta;
 
 
-		if (timeOutTable[i] >= timeout) {
+		if (timeOutTable[i] >= timeoutByServer) {
                     // peer disconnected
                     console.log("peer disconnected");
 		    peerConnections.splice(i, 1);
