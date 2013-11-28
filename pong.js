@@ -236,57 +236,16 @@ function update() {
 		offlineUpdate(delta);
 	}
 
-	// // Refresh the scene if the player amount has changed
-	// var delta = clock.getDelta(); // seconds.
-
-	// if (playerAmount !== oldPlayerAmount) {
-	// 	generateScene();
-	// }
-
-	// orbitControls.update();
-	// sceneGen.camera.up = new THREE.Vector3(0, 1, 0);
-	// stats.update();
-
-	// if (netRole === 'client')
-	// 	return;
-
-	// // online game mode
-	// if (netRole !== null) {
-	// 	var racketPositions = [];
-	// 	for (var i = 0; i < playerAreas.length; i++) {
-	// 		playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
-	// 		racketPositions.push(playerAreas[i].racketMesh.position);
-	// 	}
-	// } else {
-	// 	// offline game mode
-	// 	for (var i = 0; i < playerAreas.length; i++) {
-	// 		playerAreas[i].offlineUpdate(collidableMeshList, delta);
-	// 	}
-	// }
-
-	// // Ammo.js btWorld update
-	// sceneGen.btWorldUpdate();
-
-	// sceneGen.ball.update(collidableMeshList, delta);
-
-	// // online game mode
-	// if (netRole !== null) {
-	// 	serverNetUpdate(racketPositions, sceneGen.ball.sphereMesh.position, delta, playerAmount);
-	// }
-
 	requestAnimationFrame(update);
 	render();
 }
 
 // Update the scene etc.
-
 function clientUpdate() {
 	sceneUpdate();
 }
 
 function serverUpdate(delta) {
-	
-
 	var racketPositions = [];
 	for (var i = 0; i < playerAreas.length; i++) {
 		playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
