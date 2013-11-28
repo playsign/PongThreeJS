@@ -1,9 +1,13 @@
 /* -*- js-indent-level: 8 -*-
 
-	Pong
-	Author: Playsign
-	Date: 2013
- */
+/*
+*	Pong
+* 	@author Tapani Jamsa
+*	@author Erno Kuusela
+*	@author Toni Alatalo
+*	Date: 2013
+*/
+ 
 // "use strict";
 /* jshint -W097, -W040 */
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens, PlayerArea */
@@ -361,10 +365,10 @@ function update() {
 	camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
 
-    if (netRole === 'client')
-        return;
+	if (netRole === 'client')
+		return;
 
-    // online game mode
+	// online game mode
 	if (netRole !== null) {
 		var racketPositions = [];
 		for (var i = 0; i < playerAreas.length; i++) {
@@ -452,8 +456,8 @@ function update() {
 
 	// online game mode
 	if (netRole !== null) {
-    	serverNetUpdate(racketPositions, ball.sphereMesh.position, delta, playerAmount);
-    }
+		serverNetUpdate(racketPositions, ball.sphereMesh.position, delta, playerAmount);
+	}
 }
 
 function render() {
