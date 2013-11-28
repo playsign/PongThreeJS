@@ -257,75 +257,9 @@ function update() {
 		}
 	}
 
-	// ammo.js step simulation
-	var timeStep = 1 / 60; // time passed after last simulation. if timeStep is 0.1 then it will include 6 (timeStep / fixedTimeStep) internal simulations. It's important that timeStep is always less than maxSubSteps*fixedTimeStep, otherwise you are losing time
-	var maxSubSteps = 20; // 5
-	var fixedTimeStep = 1 / 240; // Internally simulation is done for some internal constant steps. fixedTimeStep ~~~ 0.01666666 = 1/60. If you are finding that your objects are moving very fast and escaping from your walls instead of colliding with them, then one way to help fix this problem is by decreasing fixedTimeStep. If you do this, then you will need to increase maxSubSteps to ensure the equation listed above is still satisfied. Say you want twice the resolution, you'll need twice the maxSubSteps,
-	sceneGen.btWorld.stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
+	// Ammo.js btWorld update
+	sceneGen.btWorldUpdate();
 
-	// ammo.js check collisions
-	var numManifolds = sceneGen.btWorld.getDispatcher().getNumManifolds();
-	// if(numManifolds > 0) {
-	// 	console.log("numManifolds: "+numManifolds);
-	// }
-
-	for (var i = 0; i < numManifolds; i++) {
-		var contactManifold = sceneGen.btWorld.getDispatcher().getManifoldByIndexInternal(i);
-		var obA = contactManifold.getBody0();
-		var obB = contactManifold.getBody1();
-
-		var numContacts = contactManifold.getNumContacts();
-		for (var j = 0; j < numContacts; j++) {
-			var pt = contactManifold.getContactPoint(j);
-
-			// console.log("pt.getDistance(): " + pt.getDistance());
-
-			if (pt.getDistance() <= 2) { // If the value is too high then it looks like the ball reflects from air
-
-
-				var ptA = pt.getPositionWorldOnA();
-				var ptB = pt.getPositionWorldOnB();
-				// console.log("i________________ :" + i);
-				// console.log("ptA.getZ() :" + ptA.getZ());
-				// console.log("ptB.getZ() :" + ptB.getZ());
-
-				var lpA = pt.get_m_localPointA();
-				var lpB = pt.get_m_localPointB();
-				var hitsEnd = false;
-				if (lpB.getX() >= 49.999 || lpB.getX() <= -49.999) {
-					hitsEnd = true;
-				}
-				var mind0 = pt.get_m_index0();
-				var mind1 = pt.get_m_index1();
-				// var normalOnA = pt.get_m_normalWorldOnA();
-				var normalOnB = pt.get_m_normalWorldOnB();
-				// console.log("lpA " + lpA.getX() + " " + lpA.getZ());
-				// console.log("lpB " + lpB.getX() + " " + lpB.getZ());
-				// console.log("mind0 " + mind0);
-				// console.log("mind1 " + mind1);
-				// console.log("normalOnB " + normalOnB.getX() + " " + normalOnB.getZ());
-
-				var rbA = Ammo.wrapPointer(obA, Ammo.btRigidBody);
-				var rbB = Ammo.wrapPointer(obB, Ammo.btCollisionObject);
-
-				if (rbA.mesh !== null && rbB.mesh !== null) {
-					// console.log("rbA " + rbA.mesh.name);
-					// console.log("rbB " + rbB.mesh.name);
-					if (rbA.mesh.name === "ball" && rbB.mesh.type === "box") {
-						// console.log("ball collides a border 1");
-
-						// rbB is a border
-						sceneGen.ball.onCollision(rbB.mesh, ptB, hitsEnd);
-					} else if (rbB.mesh.name === "ball" && rbA.mesh.type === "box") {
-						// console.log("ball collides a border 2");
-
-						// rbA is a border
-						sceneGen.ball.onCollision(rbA.mesh, ptB, hitsEnd);
-					}
-				}
-			}
-		}
-	}
 
 	sceneGen.ball.update(collidableMeshList, delta);
 
