@@ -170,7 +170,7 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 
 	function checkTouch(areaPlayerID) {
 		if (serverID == areaPlayerID) {
-			return deltaPosition.x * swipeSpeed;
+			return touchController.deltaPosition.x * touchController.swipeSpeed;
 		} else if (playerID == areaPlayerID) {
 			return clientTouch;
 		}
@@ -242,7 +242,7 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 	var cloneLastPosition = this.meshClone.position.clone();
 
 	// Racket controls
-	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d") || (swiping && delta.x != 0)) {
+	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d") || (touchController.swiping && delta.x != 0)) {
 		var racketForward = new THREE.Vector3();
 
 		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
@@ -255,9 +255,9 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 		racketForward.normalize();
 
 		// Racket's speed
-		if (swiping) {
+		if (touchController.swiping) {
 			// Touch / Mouse
-			racketForward.multiplyScalar(this.racketSpeed * deltaPosition.x * swipeSpeed * delta);
+			racketForward.multiplyScalar(this.racketSpeed * touchController.deltaPosition.x * touchController.swipeSpeed * delta);
 		} else {
 			// Keyboard
 			racketForward.multiplyScalar(this.racketSpeed * delta);
@@ -275,7 +275,7 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 			}
 
 			// Touch
-			if (swiping) {
+			if (touchController.swiping) {
 				this.racketMesh.position.add(racketForward);
 				this.meshClone.position.add(racketForward);
 			}

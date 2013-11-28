@@ -38,7 +38,7 @@ function Ball(material) {
 
 Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 {
-	if(delta <= 0){
+	if (delta <= 0) {
 		return;
 	}
 
@@ -72,7 +72,7 @@ Ball.prototype.update = function(collidableMeshList, delta) // Define Method
 	var btVelo = this.collider.getLinearVelocity();
 	btVelo = btVelo.normalized();
 	var tweak = 100; // TODO remove magic number
-	var btV3 = new Ammo.btVector3(btVelo.getX() * this.speed  * tweak * delta, 0, btVelo.getZ() * this.speed * tweak * delta);
+	var btV3 = new Ammo.btVector3(btVelo.getX() * this.speed * tweak * delta, 0, btVelo.getZ() * this.speed * tweak * delta);
 	this.collider.setLinearVelocity(btV3);
 
 	var transform = new Ammo.btTransform();
@@ -95,7 +95,11 @@ Ball.prototype.onCollision = function(border, collisionPoint, hitsEnd) {
 	}
 
 	//  Do collision logic if the ball is not colliding same object as previously
-	if (this.lastCollider != border && distance > 10 ) {
+	if (this.lastCollider != border && distance > 10) {
+		if (gameDirector.currentScreen === 0) {
+			console.log("*ball bounce*");
+		}
+
 		this.lastCollider = border;
 
 		// Border's direction

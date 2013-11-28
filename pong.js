@@ -7,14 +7,14 @@
 *	@author Toni Alatalo
 *	Date: 2013
 */
- 
+
 // "use strict";
 /* jshint -W097, -W040 */
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens, PlayerArea */
 // MAIN
 
 // standard global variables
-var container, scene, camera, renderer, controls, stats, gui;
+var container, scene, camera, renderer, controls, touchController, stats, gui;
 var SCREEN_WIDTH, SCREEN_HEIGHT, VIEW_ANGLE, ASPECT, NEAR, FAR;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
@@ -36,13 +36,6 @@ var gameDirector;
 var ball;
 
 // TOUCH
-// var getPointerEvent, $touchArea;
-var deltaPosition = {
-	x: 0,
-	y: 0
-};
-var swiping = false;
-var swipeSpeed = 0.12;
 
 init();
 animate();
@@ -107,59 +100,7 @@ function init() {
 	controls.userZoom = false;
 
 	// TOUCH
-	getPointerEvent = function(event) {
-		return event.originalEvent.targetTouches ? event.originalEvent.targetTouches[0] : event;
-	};
-	$touchArea = $('#touchArea'),
-	touchStarted = false, // detect if a touch event is sarted
-	currX = 0,
-	currY = 0,
-	cachedX = 0,
-	cachedY = 0;
-
-	//setting the events listeners
-	$touchArea.on('touchstart mousedown', function(e) {
-		// console.log("touch start");
-		e.preventDefault();
-		var pointer = getPointerEvent(e);
-		// caching the current x
-		cachedX = currX = pointer.pageX;
-		// caching the current y
-		cachedY = currY = pointer.pageY;
-		// a touch event is detected      
-		touchStarted = true;
-		// detecting if after 200ms the finger is still in the same position
-		setTimeout(function() {
-			if ((cachedX === currX) && !touchStarted && (cachedY === currY)) {
-				// Here you get the Tap event
-			}
-		}, 200);
-	});
-	$touchArea.on('touchend mouseup touchcancel', function(e) {
-		// console.log("touch end");
-		e.preventDefault();
-		// here we can consider finished the touch event
-		touchStarted = false;
-		swiping = false;
-		deltaPosition.x = 0;
-	});
-	$touchArea.on('touchmove mousemove', function(e) {
-		// console.log("touch move");
-		e.preventDefault();
-		var pointer = getPointerEvent(e);
-		if (touchStarted) {
-			// here you are swiping
-			swiping = true;
-
-			deltaPosition.x = (currX - pointer.pageX);
-			deltaPosition.y = window.innerHeight * (currY - pointer.pageY);
-		}
-		currX = pointer.pageX;
-		currY = pointer.pageY;
-		// console.log("swiping" + deltaPosition.x);
-
-
-	});
+	touchController = new TouchInputController();
 
 	// STATS
 	stats = new Stats();
@@ -493,7 +434,7 @@ function clientUpdate(msg) {
 
 	var inputs = {
 		keyboard: readKeyboard(),
-		touch: deltaPosition.x * swipeSpeed,
+		touch: touchController.deltaPosition.x * touchController.swipeSpeed,
 	};
 
 	return inputs;
