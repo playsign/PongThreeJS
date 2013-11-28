@@ -101,9 +101,9 @@ function PlayerArea(btWorld, position, rotation, id, tController) {
 		// console.log("set camera position");
 		// console.log("position.x: " + worldPos.x);
 		// console.log("position.z: " + worldPos.z);
-		camera.position.x = worldPos.x;
-		camera.position.z = worldPos.z;
-		camera.lookAt(position);
+		sceneGen.camera.position.x = worldPos.x;
+		sceneGen.camera.position.z = worldPos.z;
+		sceneGen.camera.lookAt(position);
 	}
 }
 
@@ -174,7 +174,7 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 
 	function checkTouch(areaPlayerID) {
 		if (serverID == areaPlayerID) {
-			return this.touchController.deltaPosition.x * this.touchController.swipeSpeed;
+			return touchController.deltaPosition.x * touchController.swipeSpeed;
 		} else if (playerID == areaPlayerID) {
 			return clientTouch;
 		}

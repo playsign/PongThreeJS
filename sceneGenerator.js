@@ -79,7 +79,7 @@ function SceneGenerator() {
 
 }
 
-SceneGenerator.prototype.btWorldUpdate = function() {
+SceneGenerator.prototype.btWorldUpdate = function(delta) {
 	// ammo.js step simulation
 	var timeStep = 1 / 60; // time passed after last simulation. if timeStep is 0.1 then it will include 6 (timeStep / fixedTimeStep) internal simulations. It's important that timeStep is always less than maxSubSteps*fixedTimeStep, otherwise you are losing time
 	var maxSubSteps = 20; // 5
@@ -149,4 +149,6 @@ SceneGenerator.prototype.btWorldUpdate = function() {
 			}
 		}
 	}
+
+	this.ball.update(collidableMeshList, delta);
 }

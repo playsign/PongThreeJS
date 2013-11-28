@@ -18,7 +18,7 @@
 // var container, scene, renderer, camera;
 var sceneGen;
 
-var controls, touchController, stats, gui;
+var orbitControls, touchController, stats, gui;
 // var SCREEN_WIDTH, SCREEN_HEIGHT, VIEW_ANGLE, ASPECT, NEAR, FAR;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
@@ -37,7 +37,7 @@ var gameDirector;
 // var ball;
 
 init();
-animate();
+update();
 
 // FUNCTIONS
 
@@ -74,8 +74,8 @@ function init() {
 	});
 
 	// CONTROLS
-	controls = new THREE.OrbitControls(sceneGen.camera, renderer.domElement);
-	controls.userZoom = false;
+	orbitControls = new THREE.OrbitControls(sceneGen.camera, renderer.domElement);
+	orbitControls.userZoom = false;
 
 	// TOUCH
 	touchController = new TouchInputController();
@@ -105,7 +105,7 @@ function deleteScene() {
 		sceneGen.btWorld.removeRigidBody(playerAreas[i].borderTop.collider);
 		sceneGen.btWorld.removeRigidBody(playerAreas[i].racketMesh.collider);
 
-		sceneGen.remove(playerAreas[i].group);
+		sceneGen.scene.remove(playerAreas[i].group);
 	}
 
 	playerAreas = [];
@@ -222,66 +222,102 @@ function refreshPlayersInfo() {
 	}
 }
 
-function animate() {
-	requestAnimationFrame(animate);
+function update() {
+	var delta = clock.getDelta(); // seconds
+
+	orbitControls.update();
+	stats.update();
+
+	if (netRole === 'client') {
+		clientUpdate();
+	} else if (netRole === 'server') {
+		serverUpdate(delta);
+	} else if (netRole === null) {
+		offlineUpdate(delta);
+	}
+
+	// // Refresh the scene if the player amount has changed
+	// var delta = clock.getDelta(); // seconds.
+
+	// if (playerAmount !== oldPlayerAmount) {
+	// 	generateScene();
+	// }
+
+	// orbitControls.update();
+	// sceneGen.camera.up = new THREE.Vector3(0, 1, 0);
+	// stats.update();
+
+	// if (netRole === 'client')
+	// 	return;
+
+	// // online game mode
+	// if (netRole !== null) {
+	// 	var racketPositions = [];
+	// 	for (var i = 0; i < playerAreas.length; i++) {
+	// 		playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
+	// 		racketPositions.push(playerAreas[i].racketMesh.position);
+	// 	}
+	// } else {
+	// 	// offline game mode
+	// 	for (var i = 0; i < playerAreas.length; i++) {
+	// 		playerAreas[i].offlineUpdate(collidableMeshList, delta);
+	// 	}
+	// }
+
+	// // Ammo.js btWorld update
+	// sceneGen.btWorldUpdate();
+
+	// sceneGen.ball.update(collidableMeshList, delta);
+
+	// // online game mode
+	// if (netRole !== null) {
+	// 	serverNetUpdate(racketPositions, sceneGen.ball.sphereMesh.position, delta, playerAmount);
+	// }
+
+	requestAnimationFrame(update);
 	render();
-	update();
 }
 
-function update() {
-	// Refresh the scene if the player amount has changed
-	var delta = clock.getDelta(); // seconds.
+// Update the scene etc.
 
+function clientUpdate() {
+	sceneUpdate();
+}
+
+function serverUpdate(delta) {
+	
+
+	var racketPositions = [];
+	for (var i = 0; i < playerAreas.length; i++) {
+		playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
+		racketPositions.push(playerAreas[i].racketMesh.position);
+	}
+
+	sceneUpdate();
+	sceneGen.btWorldUpdate(delta);
+
+	serverNetUpdate(racketPositions, sceneGen.ball.sphereMesh.position, delta, playerAmount);
+}
+
+function offlineUpdate(delta) {
+	for (var i = 0; i < playerAreas.length; i++) {
+		playerAreas[i].offlineUpdate(collidableMeshList, delta);
+	}
+
+	sceneUpdate();
+	sceneGen.btWorldUpdate(delta);
+}
+
+function sceneUpdate() {
 	if (playerAmount !== oldPlayerAmount) {
 		generateScene();
 	}
-
-	controls.update();
-	sceneGen.camera.up = new THREE.Vector3(0, 1, 0);
-	stats.update();
-
-	if (netRole === 'client')
-		return;
-
-	// online game mode
-	if (netRole !== null) {
-		var racketPositions = [];
-		for (var i = 0; i < playerAreas.length; i++) {
-			playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
-			racketPositions.push(playerAreas[i].racketMesh.position);
-		}
-	} else {
-		// offline game mode
-		for (var i = 0; i < playerAreas.length; i++) {
-			playerAreas[i].offlineUpdate(collidableMeshList, delta);
-		}
-	}
-
-	// Ammo.js btWorld update
-	sceneGen.btWorldUpdate();
-
-
-	sceneGen.ball.update(collidableMeshList, delta);
-
-	// online game mode
-	if (netRole !== null) {
-		serverNetUpdate(racketPositions, sceneGen.ball.sphereMesh.position, delta, playerAmount);
-	}
+	// sceneGen.camera.up = new THREE.Vector3(0, 1, 0); // What is this?
 }
 
-function render() {
-	renderer.render(sceneGen.scene, sceneGen.camera);
-}
+// Callback from the server
 
-function showHelp() {
-	gameDirector.setScreen(DirectorScreens.controls);
-}
-
-function getRandomColor() {
-	return '#' + '000000'.concat(Math.floor(Math.random() * 16777215).toString(16)).substr(-6);
-}
-
-function clientUpdate(msg) {
+function updateClient(msg) {
 	// called in client mode (when we're just showing what server tells us).
 	if (msg.dt === undefined || msg.ballpos === undefined || msg.racketspos === undefined)
 		throw "update msg: missing properties";
@@ -306,6 +342,18 @@ function clientUpdate(msg) {
 	};
 
 	return inputs;
+}
+
+function render() {
+	renderer.render(sceneGen.scene, sceneGen.camera);
+}
+
+function showHelp() {
+	gameDirector.setScreen(DirectorScreens.controls);
+}
+
+function getRandomColor() {
+	return '#' + '000000'.concat(Math.floor(Math.random() * 16777215).toString(16)).substr(-6);
 }
 
 function readKeyboard() {
