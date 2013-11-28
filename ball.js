@@ -1,4 +1,5 @@
-function Ball(material) {
+function Ball(btWorld, material) {
+	this.btWorld = btWorld;
 	this.speed = 80;
 	this.radius = 5;
 
@@ -27,7 +28,7 @@ function Ball(material) {
 	sphereAmmo = new Ammo.btRigidBody(rbInfo);
 	sphereAmmo.mesh = this.sphereMesh;
 	sphereAmmo.setLinearFactor(new Ammo.btVector3(1, 0, 1));
-	scene.world.addRigidBody(sphereAmmo);
+	this.btWorld.addRigidBody(sphereAmmo);
 	this.collider = sphereAmmo;
 	var btV3 = new Ammo.btVector3(1, 0, 1);
 	this.collider.setLinearVelocity(btV3);

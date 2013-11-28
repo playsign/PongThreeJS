@@ -14,12 +14,14 @@
 // MAIN
 
 // standard global variables
-var container, scene, camera, renderer, controls, touchController, stats, gui;
-var SCREEN_WIDTH, SCREEN_HEIGHT, VIEW_ANGLE, ASPECT, NEAR, FAR;
+
+// var container, scene, renderer, camera;
+var sceneGen;
+
+var controls, touchController, stats, gui;
+// var SCREEN_WIDTH, SCREEN_HEIGHT, VIEW_ANGLE, ASPECT, NEAR, FAR;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
-
-var cameraTweak = 0.1;
 
 var playerAmount = 3;
 var clientPlayerAmount = 0;
@@ -31,11 +33,8 @@ var collidableMeshList = [];
 var playerAreaWidth = 100; // TODO duplicated in playerArea
 
 var borderMaterial;
-var mesh;
 var gameDirector;
-var ball;
-
-// TOUCH
+// var ball;
 
 init();
 animate();
@@ -44,28 +43,7 @@ animate();
 
 function init() {
 	// SCENE
-	scene = new THREE.Scene();
-
-	// AMMO.JS
-	var collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
-	var dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
-	var overlappingPairCache = new Ammo.btDbvtBroadphase();
-	var solver = new Ammo.btSequentialImpulseConstraintSolver();
-	scene.world = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-	scene.world.setGravity(new Ammo.btVector3(0, 0, 0));
-
-	// CAMERA
-	SCREEN_WIDTH = window.innerWidth;
-	SCREEN_HEIGHT = window.innerHeight;
-	VIEW_ANGLE = 45,
-	ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT,
-	NEAR = -20000,
-	FAR = 20000;
-	// camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-	camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
-	scene.add(camera);
-	camera.position.set(0, 300, -100); // (0, 1000, -375);
-	camera.lookAt(scene.position);
+	sceneGen = new SceneGenerator();
 
 	// DAT GUI
 	container = document.getElementById('ThreeJS');
@@ -85,18 +63,18 @@ function init() {
 		});
 	else
 		renderer = new THREE.CanvasRenderer();
-	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	renderer.setSize(window.innerWidth, window.innerHeight);
 
 	container.appendChild(renderer.domElement);
 
 	// EVENTS
-	THREEx.WindowResize(renderer, camera);
+	THREEx.WindowResize(renderer, sceneGen.camera);
 	THREEx.FullScreen.bindKey({
 		charCode: 'm'.charCodeAt(0)
 	});
 
 	// CONTROLS
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	controls = new THREE.OrbitControls(sceneGen.camera, renderer.domElement);
 	controls.userZoom = false;
 
 	// TOUCH
@@ -109,58 +87,9 @@ function init() {
 	stats.domElement.style.zIndex = 100;
 	container.appendChild(stats.domElement);
 
-	var light;
-	// LIGHT
-	// light = new THREE.AmbientLight(0x999999); // soft white light
-	// scene.add(light);
 
-	light = new THREE.PointLight(0xffffff);
-	light.position.set(-300, 300, -300);
-	scene.add(light);
+	gui.add(sceneGen.ball, 'speed').min(0.1).max(400).step(0.1).listen();
 
-	// White directional light at half intensity shining from the top.
-	light = new THREE.DirectionalLight(0xffffff, 1);
-	light.position.set(300, 300, 300);
-	scene.add(light);
-
-
-	// FLOOR
-	// var floorTexture = new THREE.ImageUtils.loadTexture('images/checkerboard.jpg');
-	// floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-	// floorTexture.repeat.set(10, 10);
-	// var floorMaterial = new THREE.MeshBasicMaterial({
-	// 	map: floorTexture,
-	// 	side: THREE.DoubleSide
-	// });
-	// var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	// var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	// floor.position.y = -0.5;
-	// floor.rotation.x = Math.PI / 2;
-	// scene.add(floor);
-	// SKYBOX
-	var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
-	var skyBoxMaterial = new THREE.MeshBasicMaterial({
-		color: 0x000000,
-		side: THREE.BackSide
-	});
-	var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
-	scene.add(skyBox);
-
-	////////////
-	// CUSTOM //
-	////////////
-
-	var material = new THREE.MeshLambertMaterial({
-		color: 0x999999
-	});
-
-	borderMaterial = new THREE.MeshLambertMaterial({
-		color: 0x999999
-	});
-
-	ball = new Ball(borderMaterial);
-	gui.add(ball, 'speed').min(0.1).max(400).step(0.1).listen();
-	scene.add(ball.sphereMesh);
 
 	gameDirector = new Director();
 	//initNet(clientUpdate);
@@ -171,12 +100,12 @@ function deleteScene() {
 
 	for (var i = 0; i < playerAreas.length; i++) {
 		// ammo.js
-		scene.world.removeRigidBody(playerAreas[i].borderBottom.collider);
-		scene.world.removeRigidBody(playerAreas[i].borderLeft.collider);
-		scene.world.removeRigidBody(playerAreas[i].borderTop.collider);
-		scene.world.removeRigidBody(playerAreas[i].racketMesh.collider);
+		sceneGen.btWorld.removeRigidBody(playerAreas[i].borderBottom.collider);
+		sceneGen.btWorld.removeRigidBody(playerAreas[i].borderLeft.collider);
+		sceneGen.btWorld.removeRigidBody(playerAreas[i].borderTop.collider);
+		sceneGen.btWorld.removeRigidBody(playerAreas[i].racketMesh.collider);
 
-		scene.remove(playerAreas[i].group);
+		sceneGen.remove(playerAreas[i].group);
 	}
 
 	playerAreas = [];
@@ -188,12 +117,12 @@ function generateScene() {
 
 	playerAmount = Math.round(playerAmount);
 
-	ball.lastCollider = null;
+	sceneGen.ball.lastCollider = null;
 
 	// ammo.js . Reset positions
-	transform = ball.collider.getCenterOfMassTransform();
+	transform = sceneGen.ball.collider.getCenterOfMassTransform();
 	transform.setOrigin(new Ammo.btVector3(0, 0, 0));
-	ball.collider.setCenterOfMassTransform(transform);
+	sceneGen.ball.collider.setCenterOfMassTransform(transform);
 
 	// Angle in radians
 	var radians = Math.PI * 2 / playerAmount;
@@ -223,7 +152,7 @@ function generateScene() {
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
 
-		var pa = new PlayerArea(new THREE.Vector3(x, 0, z), radians, i);
+		var pa = new PlayerArea(sceneGen.btWorld, new THREE.Vector3(x, 0, z), radians, i, touchController);
 
 		playerAreas.push(pa);
 
@@ -232,25 +161,30 @@ function generateScene() {
 		collidableMeshList.push(pa.borderTop);
 		collidableMeshList.push(pa.racketMesh);
 
-		scene.add(pa.group);
+		sceneGen.scene.add(pa.group);
 	}
 
 	// update the camera
 	var gameAreaDiameter = (radius * 25 + (playerAreaWidth * 2)); // TODO 25 the magic number
 	// console.log("gameAreaDiameter: " + gameAreaDiameter);
+
+	var SCREEN_WIDTH = window.innerWidth;
+	var SCREEN_HEIGHT = window.innerHeight;
+	var ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
+
 	if (SCREEN_HEIGHT < SCREEN_WIDTH) {
-		camera.left = ASPECT * -gameAreaDiameter / 2;
-		camera.right = ASPECT * gameAreaDiameter / 2;
-		camera.top = gameAreaDiameter / 2;
-		camera.bottom = -gameAreaDiameter / 2;
+		sceneGen.camera.left = ASPECT * -gameAreaDiameter / 2;
+		sceneGen.camera.right = ASPECT * gameAreaDiameter / 2;
+		sceneGen.camera.top = gameAreaDiameter / 2;
+		sceneGen.camera.bottom = -gameAreaDiameter / 2;
 	} else {
-		camera.left = -gameAreaDiameter / 2;
-		camera.right = gameAreaDiameter / 2;
-		camera.top = gameAreaDiameter / 2 / ASPECT;
-		camera.bottom = -gameAreaDiameter / 2 / ASPECT;
+		sceneGen.camera.left = -gameAreaDiameter / 2;
+		sceneGen.camera.right = gameAreaDiameter / 2;
+		sceneGen.camera.top = gameAreaDiameter / 2 / ASPECT;
+		sceneGen.camera.bottom = -gameAreaDiameter / 2 / ASPECT;
 	}
 
-	camera.updateProjectionMatrix();
+	sceneGen.camera.updateProjectionMatrix();
 
 	// Players info
 	refreshPlayersInfo();
@@ -303,7 +237,7 @@ function update() {
 	}
 
 	controls.update();
-	camera.up = new THREE.Vector3(0, 1, 0);
+	sceneGen.camera.up = new THREE.Vector3(0, 1, 0);
 	stats.update();
 
 	if (netRole === 'client')
@@ -327,16 +261,16 @@ function update() {
 	var timeStep = 1 / 60; // time passed after last simulation. if timeStep is 0.1 then it will include 6 (timeStep / fixedTimeStep) internal simulations. It's important that timeStep is always less than maxSubSteps*fixedTimeStep, otherwise you are losing time
 	var maxSubSteps = 20; // 5
 	var fixedTimeStep = 1 / 240; // Internally simulation is done for some internal constant steps. fixedTimeStep ~~~ 0.01666666 = 1/60. If you are finding that your objects are moving very fast and escaping from your walls instead of colliding with them, then one way to help fix this problem is by decreasing fixedTimeStep. If you do this, then you will need to increase maxSubSteps to ensure the equation listed above is still satisfied. Say you want twice the resolution, you'll need twice the maxSubSteps,
-	scene.world.stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
+	sceneGen.btWorld.stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
 
 	// ammo.js check collisions
-	var numManifolds = scene.world.getDispatcher().getNumManifolds();
+	var numManifolds = sceneGen.btWorld.getDispatcher().getNumManifolds();
 	// if(numManifolds > 0) {
 	// 	console.log("numManifolds: "+numManifolds);
 	// }
 
 	for (var i = 0; i < numManifolds; i++) {
-		var contactManifold = scene.world.getDispatcher().getManifoldByIndexInternal(i);
+		var contactManifold = sceneGen.btWorld.getDispatcher().getManifoldByIndexInternal(i);
 		var obA = contactManifold.getBody0();
 		var obB = contactManifold.getBody1();
 
@@ -381,28 +315,28 @@ function update() {
 						// console.log("ball collides a border 1");
 
 						// rbB is a border
-						ball.onCollision(rbB.mesh, ptB, hitsEnd);
+						sceneGen.ball.onCollision(rbB.mesh, ptB, hitsEnd);
 					} else if (rbB.mesh.name === "ball" && rbA.mesh.type === "box") {
 						// console.log("ball collides a border 2");
 
 						// rbA is a border
-						ball.onCollision(rbA.mesh, ptB, hitsEnd);
+						sceneGen.ball.onCollision(rbA.mesh, ptB, hitsEnd);
 					}
 				}
 			}
 		}
 	}
 
-	ball.update(collidableMeshList, delta);
+	sceneGen.ball.update(collidableMeshList, delta);
 
 	// online game mode
 	if (netRole !== null) {
-		serverNetUpdate(racketPositions, ball.sphereMesh.position, delta, playerAmount);
+		serverNetUpdate(racketPositions, sceneGen.ball.sphereMesh.position, delta, playerAmount);
 	}
 }
 
 function render() {
-	renderer.render(scene, camera);
+	renderer.render(sceneGen.scene, sceneGen.camera);
 }
 
 function showHelp() {
@@ -417,16 +351,16 @@ function clientUpdate(msg) {
 	// called in client mode (when we're just showing what server tells us).
 	if (msg.dt === undefined || msg.ballpos === undefined || msg.racketspos === undefined)
 		throw "update msg: missing properties";
-	ball.sphereMesh.position = msg.ballpos;
+	sceneGen.ball.sphereMesh.position = msg.ballpos;
 	// ball.update(collidableMeshList, msg.dt);
 	for (var i = 0; i < playerAreas.length; i++) {
 		playerAreas[i].clientUpdate(msg);
 		if (clientPlayerAmount !== playerAmount && playerAreas[i].player.id === ThisPeerID) {
 			var worldPos = new THREE.Vector3();
 			worldPos.getPositionFromMatrix(playerAreas[i].borderLeft.matrixWorld);
-			camera.position.x = worldPos.x;
-			camera.position.z = worldPos.z;
-			camera.lookAt(playerAreas[i].group.position);
+			sceneGen.camera.position.x = worldPos.x;
+			sceneGen.camera.position.z = worldPos.z;
+			sceneGen.camera.lookAt(playerAreas[i].group.position);
 
 			clientPlayerAmount = playerAmount; // Helps to prevent unnecessary camera position modification
 		}

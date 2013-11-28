@@ -3,7 +3,11 @@
 /* jshint -W097, -W040 */
 /* global window, THREE, console, netRole, playerArray, getRandomColor,
    Player, Ammo, serverID, scene, keyboard */
-function PlayerArea(position, rotation, id) {
+function PlayerArea(btWorld, position, rotation, id, tController) {
+	this.btWorld = btWorld;
+
+	this.touchController = tController;
+
 	// PLAYER INFO
 	if (netRole && playerArray[id]) {
 		// online
@@ -143,7 +147,7 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	var boxAmmo = new Ammo.btCollisionObject();
 	boxAmmo.setWorldTransform(startTransform);
 	boxAmmo.setCollisionShape(boxShape);
-	scene.world.addCollisionObject(boxAmmo);
+	this.btWorld.addCollisionObject(boxAmmo);
 	boxAmmo.mesh = mesh;
 	// set it as ghost object
 	boxAmmo.setCollisionFlags(4);
@@ -170,7 +174,7 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 
 	function checkTouch(areaPlayerID) {
 		if (serverID == areaPlayerID) {
-			return touchController.deltaPosition.x * touchController.swipeSpeed;
+			return this.touchController.deltaPosition.x * this.touchController.swipeSpeed;
 		} else if (playerID == areaPlayerID) {
 			return clientTouch;
 		}
@@ -242,7 +246,7 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 	var cloneLastPosition = this.meshClone.position.clone();
 
 	// Racket controls
-	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d") || (touchController.swiping && delta.x != 0)) {
+	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d") || (this.touchController.swiping && delta.x != 0)) {
 		var racketForward = new THREE.Vector3();
 
 		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
@@ -255,9 +259,9 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 		racketForward.normalize();
 
 		// Racket's speed
-		if (touchController.swiping) {
+		if (this.touchController.swiping) {
 			// Touch / Mouse
-			racketForward.multiplyScalar(this.racketSpeed * touchController.deltaPosition.x * touchController.swipeSpeed * delta);
+			racketForward.multiplyScalar(this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed * delta);
 		} else {
 			// Keyboard
 			racketForward.multiplyScalar(this.racketSpeed * delta);
@@ -275,7 +279,7 @@ PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
 			}
 
 			// Touch
-			if (touchController.swiping) {
+			if (this.touchController.swiping) {
 				this.racketMesh.position.add(racketForward);
 				this.meshClone.position.add(racketForward);
 			}
