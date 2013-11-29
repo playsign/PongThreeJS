@@ -210,7 +210,7 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 	if (checkPressed(left_key, this.p2pCtrl.serverID, this.player.id)) {
 		this.racketMesh.position.add(racketForward);
 		this.meshClone.position.add(racketForward);
-	} else if (checkPressed(right_key, this.player.id)) {
+	} else if (checkPressed(right_key, this.p2pCtrl.serverID, this.player.id)) {
 		this.racketMesh.position.sub(racketForward);
 		this.meshClone.position.sub(racketForward);
 	}
