@@ -240,7 +240,7 @@ PlayerArea.prototype.clientUpdate = function(msg) {
 }
 
 // OFFLINE game mode
-PlayerArea.prototype.offlineUpdate = function(collidableMeshList, delta) {
+PlayerArea.prototype.offlineUpdate = function(delta) {
 
 	var lastPosition = this.racketMesh.position.clone();
 	var cloneLastPosition = this.meshClone.position.clone();

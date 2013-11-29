@@ -37,7 +37,7 @@ function Ball(sceneGen, material) {
 	this.reversed = false;
 }
 
-Ball.prototype.update = function(collidableMeshList, delta) // Define Method
+Ball.prototype.update = function(delta) // Define Method
 {
 	if (delta <= 0) {
 		return;

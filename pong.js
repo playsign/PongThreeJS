@@ -13,23 +13,9 @@
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens, PlayerArea */
 // MAIN
 
-// standard global variables
-
-// var container, scene, renderer, camera;
-var sceneGen;
-
-var orbitControls, touchController, stats, gui;
-// var SCREEN_WIDTH, SCREEN_HEIGHT, VIEW_ANGLE, ASPECT, NEAR, FAR;
+var sceneGen, orbitControls, touchController, stats, gui, gameDirector;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
-
-var collidableMeshList = [];
-
-var playerAreaWidth = 100; // TODO duplicated in playerArea
-
-var borderMaterial;
-var gameDirector;
-// var ball;
 
 init();
 update();
@@ -82,9 +68,7 @@ function init() {
 	stats.domElement.style.zIndex = 100;
 	container.appendChild(stats.domElement);
 
-
 	gui.add(sceneGen.ball, 'speed').min(0.1).max(400).step(0.1).listen();
-
 
 	gameDirector = new Director();
 	//initNet(clientUpdate);
@@ -139,7 +123,7 @@ function update() {
 	render();
 }
 
-// Update the scene etc.
+// Update the scene
 function clientUpdate() {
 	sceneGen.updateScene();
 }
@@ -159,7 +143,7 @@ function serverUpdate(delta) {
 
 function offlineUpdate(delta) {
 	for (var i = 0; i < sceneGen.playerAreas.length; i++) {
-		sceneGen.playerAreas[i].offlineUpdate(collidableMeshList, delta);
+		sceneGen.playerAreas[i].offlineUpdate(delta);
 	}
 
 	sceneGen.updateScene();
@@ -167,13 +151,12 @@ function offlineUpdate(delta) {
 }
 
 // Callback from the server
-
 function updateClient(msg) {
 	// called in client mode (when we're just showing what server tells us).
 	if (msg.dt === undefined || msg.ballpos === undefined || msg.racketspos === undefined)
 		throw "update msg: missing properties";
 	sceneGen.ball.sphereMesh.position = msg.ballpos;
-	// ball.update(collidableMeshList, msg.dt);
+
 	for (var i = 0; i < sceneGen.playerAreas.length; i++) {
 		sceneGen.playerAreas[i].clientUpdate(msg);
 		if (sceneGen.clientPlayerAmount !== sceneGen.playerAmount && sceneGen.playerAreas[i].player.id === ThisPeerID) {

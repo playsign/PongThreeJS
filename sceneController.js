@@ -1,6 +1,6 @@
 "use strict";
 
-function SceneGenerator() {
+function SceneController() {
 
 	// var container, scene, renderer, camera;
 
@@ -18,11 +18,8 @@ function SceneGenerator() {
 	this.camera.position.set(0, 300, -100); // (0, 1000, -375);
 	this.camera.lookAt(this.scene.position);
 
-
 	// LIGHT
 	var light;
-	// light = new THREE.AmbientLight(0x999999); // soft white light
-	// this.scene.add(light);
 
 	light = new THREE.PointLight(0xffffff);
 	light.position.set(-300, 300, -300);
@@ -33,20 +30,6 @@ function SceneGenerator() {
 	light.position.set(300, 300, 300);
 	this.scene.add(light);
 
-
-	// FLOOR
-	// var floorTexture = new THREE.ImageUtils.loadTexture('images/checkerboard.jpg');
-	// floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-	// floorTexture.repeat.set(10, 10);
-	// var floorMaterial = new THREE.MeshBasicMaterial({
-	// 	map: floorTexture,
-	// 	side: THREE.DoubleSide
-	// });
-	// var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	// var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	// floor.position.y = -0.5;
-	// floor.rotation.x = Math.PI / 2;
-	// this.scene.add(floor);
 	// SKYBOX
 	var skyBoxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
 	var skyBoxMaterial = new THREE.MeshBasicMaterial({
@@ -69,6 +52,7 @@ function SceneGenerator() {
 	this.clientPlayerAmount = 0;
 	this.oldPlayerAmount = this.playerAmount;
 	this.playerAreas = [];
+	this.playerAreaWidth = 100; // TODO duplicated in playerArea
 
 	// BALL
 	var material = new THREE.MeshLambertMaterial({
@@ -154,7 +138,7 @@ SceneGenerator.prototype.btWorldUpdate = function(delta) {
 			}
 		}
 	}
-	this.ball.update(collidableMeshList, delta);
+	this.ball.update(delta);
 }
 
 SceneGenerator.prototype.updateScene = function() {
@@ -209,16 +193,11 @@ SceneGenerator.prototype.generateScene = function() {
 
 		this.playerAreas.push(pa);
 
-		collidableMeshList.push(pa.borderBottom);
-		collidableMeshList.push(pa.borderLeft);
-		collidableMeshList.push(pa.borderTop);
-		collidableMeshList.push(pa.racketMesh);
-
 		this.scene.add(pa.group);
 	}
 
 	// update the camera
-	var gameAreaDiameter = (radius * 25 + (playerAreaWidth * 2)); // TODO 25 the magic number
+	var gameAreaDiameter = (radius * 25 + (this.playerAreaWidth * 2)); // TODO 25 the magic number
 	// console.log("gameAreaDiameter: " + gameAreaDiameter);
 
 	var SCREEN_WIDTH = window.innerWidth;
@@ -246,7 +225,6 @@ SceneGenerator.prototype.generateScene = function() {
 }
 
 SceneGenerator.prototype.deleteScene = function() {
-	collidableMeshList = [];
 
 	for (var i = 0; i < this.playerAreas.length; i++) {
 		// ammo.js
