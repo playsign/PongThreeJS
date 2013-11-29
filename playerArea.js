@@ -3,8 +3,8 @@
 /* jshint -W097, -W040 */
 /* global window, THREE, console, netRole, playerArray, getRandomColor,
    Player, Ammo, serverID, scene, keyboard */
-function PlayerArea(btWorld, position, rotation, id, tController) {
-	this.btWorld = btWorld;
+function PlayerArea(sceneGen, position, rotation, id, tController) {
+	this.sceneGen = sceneGen;
 
 	this.touchController = tController;
 
@@ -101,9 +101,9 @@ function PlayerArea(btWorld, position, rotation, id, tController) {
 		// console.log("set camera position");
 		// console.log("position.x: " + worldPos.x);
 		// console.log("position.z: " + worldPos.z);
-		sceneGen.camera.position.x = worldPos.x;
-		sceneGen.camera.position.z = worldPos.z;
-		sceneGen.camera.lookAt(position);
+		this.sceneGen.camera.position.x = worldPos.x;
+		this.sceneGen.camera.position.z = worldPos.z;
+		this.sceneGen.camera.lookAt(position);
 	}
 }
 
@@ -147,7 +147,7 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	var boxAmmo = new Ammo.btCollisionObject();
 	boxAmmo.setWorldTransform(startTransform);
 	boxAmmo.setCollisionShape(boxShape);
-	this.btWorld.addCollisionObject(boxAmmo);
+	this.sceneGen.btWorld.addCollisionObject(boxAmmo);
 	boxAmmo.mesh = mesh;
 	// set it as ghost object
 	boxAmmo.setCollisionFlags(4);

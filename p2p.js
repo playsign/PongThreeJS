@@ -56,8 +56,8 @@ function gotConnection(conn) {
 function refreshScene() {
     // Updated scene
     playerAmount = playerArray.length;
-    ball.speed = playerAmount * 70;
-    generateScene();
+    sceneGen.ball.speed = playerAmount * 70;
+    sceneGen.generateScene();
 }
 
 

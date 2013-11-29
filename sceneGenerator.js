@@ -68,6 +68,7 @@ function SceneGenerator() {
 	this.playerAmount = 3;
 	this.clientPlayerAmount = 0;
 	this.oldPlayerAmount = this.playerAmount;
+	this.playerAreas = [];
 
 	// BALL
 	var material = new THREE.MeshLambertMaterial({
@@ -78,7 +79,7 @@ function SceneGenerator() {
 		color: 0x999999
 	});
 
-	this.ball = new Ball(this.btWorld, borderMaterial);
+	this.ball = new Ball(this, borderMaterial);
 	this.scene.add(this.ball.sphereMesh);
 
 }
@@ -157,8 +158,105 @@ SceneGenerator.prototype.btWorldUpdate = function(delta) {
 }
 
 SceneGenerator.prototype.updateScene = function() {
-	if (sceneGen.playerAmount !== sceneGen.oldPlayerAmount) {
-		generateScene();
+	if (this.playerAmount !== this.oldPlayerAmount) {
+		this.generateScene();
 	}
 	// sceneGen.camera.up = new THREE.Vector3(0, 1, 0); // What is this?
+}
+
+SceneGenerator.prototype.generateScene = function() {
+	// delete previous scene
+	this.deleteScene();
+
+	this.playerAmount = Math.round(this.playerAmount);
+
+	this.ball.lastCollider = null;
+
+	// ammo.js . Reset positions
+	var transform = this.ball.collider.getCenterOfMassTransform();
+	transform.setOrigin(new Ammo.btVector3(0, 0, 0));
+	this.ball.collider.setCenterOfMassTransform(transform);
+
+	// Angle in radians
+	var radians = Math.PI * 2 / this.playerAmount;
+
+	var radius = this.playerAmount; // * radiusTweak;
+	var pivotPoint = 9; // 10 Push player area forward by width of the area
+
+	// Two player tweak to remove gaps between player areas
+	if (this.playerAmount === 2) {
+		pivotPoint -= 5; // 4.5 , 5,5
+	} else if (this.playerAmount === 3) {
+		pivotPoint -= 0.5; //-0,5
+	}
+
+	// Calculate player area offset
+	var tHypotenuse = radius;
+	var tAngle = radians / 2;
+	var tAdjacent = Math.cos(tAngle) * tHypotenuse;
+	var playerAreaOffset = radius - tAdjacent;
+
+	radius += radius - playerAreaOffset;
+
+	for (var i = 0; i < this.playerAmount; i++) {
+		radians = Math.PI * 2 / this.playerAmount * (i + 1);
+		// var degree = 360 - (radians * (180 / Math.PI));
+
+		var x = Math.cos(radians) * radius * pivotPoint;
+		var z = Math.sin(radians) * radius * -1 * pivotPoint;
+
+		var pa = new PlayerArea(this, new THREE.Vector3(x, 0, z), radians, i, touchController);
+
+		this.playerAreas.push(pa);
+
+		collidableMeshList.push(pa.borderBottom);
+		collidableMeshList.push(pa.borderLeft);
+		collidableMeshList.push(pa.borderTop);
+		collidableMeshList.push(pa.racketMesh);
+
+		this.scene.add(pa.group);
+	}
+
+	// update the camera
+	var gameAreaDiameter = (radius * 25 + (playerAreaWidth * 2)); // TODO 25 the magic number
+	// console.log("gameAreaDiameter: " + gameAreaDiameter);
+
+	var SCREEN_WIDTH = window.innerWidth;
+	var SCREEN_HEIGHT = window.innerHeight;
+	var ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
+
+	if (SCREEN_HEIGHT < SCREEN_WIDTH) {
+		this.camera.left = ASPECT * -gameAreaDiameter / 2;
+		this.camera.right = ASPECT * gameAreaDiameter / 2;
+		this.camera.top = gameAreaDiameter / 2;
+		this.camera.bottom = -gameAreaDiameter / 2;
+	} else {
+		this.camera.left = -gameAreaDiameter / 2;
+		this.camera.right = gameAreaDiameter / 2;
+		this.camera.top = gameAreaDiameter / 2 / ASPECT;
+		this.camera.bottom = -gameAreaDiameter / 2 / ASPECT;
+	}
+
+	this.camera.updateProjectionMatrix();
+
+	// Players info
+	refreshPlayersInfo();
+
+	this.oldPlayerAmount = this.playerAmount;
+}
+
+SceneGenerator.prototype.deleteScene = function() {
+	collidableMeshList = [];
+
+	for (var i = 0; i < this.playerAreas.length; i++) {
+		// ammo.js
+		this.btWorld.removeRigidBody(this.playerAreas[i].borderBottom.collider);
+		this.btWorld.removeRigidBody(this.playerAreas[i].borderLeft.collider);
+		this.btWorld.removeRigidBody(this.playerAreas[i].borderTop.collider);
+		this.btWorld.removeRigidBody(this.playerAreas[i].racketMesh.collider);
+
+		this.scene.remove(this.playerAreas[i].group);
+	}
+
+	this.playerAreas = [];
 }
