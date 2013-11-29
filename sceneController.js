@@ -1,9 +1,12 @@
 "use strict";
 /*
-* 	@author Tapani Jamsa
-*/
+ * 	@author Tapani Jamsa
+ */
 
-function SceneController() {
+function SceneController(p2pCtrl) {
+	if (p2pCtrl !== undefined) {
+		this.p2pCtrl = p2pCtrl;
+	}
 
 	// var container, scene, renderer, camera;
 
@@ -192,7 +195,7 @@ SceneController.prototype.generateScene = function() {
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
 
-		var pa = new PlayerArea(this, new THREE.Vector3(x, 0, z), radians, i, touchController);
+		var pa = new PlayerArea(this, new THREE.Vector3(x, 0, z), radians, i, touchController, p2pCtrl);
 
 		this.playerAreas.push(pa);
 

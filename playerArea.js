@@ -2,19 +2,23 @@
 "use strict";
 /* jshint -W097, -W040 */
 /*
-* 	@author Tapani Jamsa
-*/
+ * 	@author Tapani Jamsa
+ */
 /* global window, THREE, console, netRole, playerArray, getRandomColor,
    Player, Ammo, serverID, scene, keyboard */
-function PlayerArea(sceneCtrl, position, rotation, id, tController) {
+
+function PlayerArea(sceneCtrl, position, rotation, id, tController, p2pCtrl) {
+	if (p2pCtrl !== undefined) {
+		this.p2pCtrl = p2pCtrl;
+	}
 	this.sceneCtrl = sceneCtrl;
 
 	this.touchController = tController;
 
 	// PLAYER INFO
-	if (netRole && playerArray[id]) {
+	if (this.p2pCtrl.netRole && p2pCtrl.playerArray[id]) {
 		// online
-		this.player = playerArray[id];
+		this.player = p2pCtrl.playerArray[id];
 	} else {
 		// offline
 		var randomColor = getRandomColor();
@@ -98,7 +102,7 @@ function PlayerArea(sceneCtrl, position, rotation, id, tController) {
 	this.groupMeshes.push(this.borderTop);
 
 	// CAMERA POSITION (online)
-	if (netRole && playerArray[id] && serverID == this.player.id ) {
+	if (this.p2pCtrl.netRole && this.p2pCtrl.playerArray[id] && this.p2pCtrl.serverID == this.player.id) {
 		var worldPos = new THREE.Vector3();
 		worldPos.getPositionFromMatrix(this.borderLeft.matrixWorld);
 		// console.log("set camera position");
@@ -163,19 +167,19 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 	var cloneLastPosition = this.meshClone.position.clone();
 	// if (clientKeyboard.length > 0)
 	// console.log("PlayerArea: keys pressed: " + clientKeyboard + ", playerID: " + playerID + ", areaPlayerID: " + this.player.id);
-        function checkPressed(keyname, areaPlayerID) {
-			if (keyname === null)
-				return false;
-			if (serverID == areaPlayerID) {
- 				return keyboard.pressed(keyname);
-			}
-			else if(playerID == areaPlayerID){
-				return clientKeyboard.indexOf(keyname) != -1;
-			}
+
+	function checkPressed(keyname, serverID, areaPlayerID) {
+		if (keyname === null)
 			return false;
+		if (serverID == areaPlayerID) {
+			return keyboard.pressed(keyname);
+		} else if (playerID == areaPlayerID) {
+			return clientKeyboard.indexOf(keyname) != -1;
+		}
+		return false;
 	}
 
-	function checkTouch(areaPlayerID) {
+	function checkTouch(serverID, areaPlayerID) {
 		if (serverID == areaPlayerID) {
 			return touchController.deltaPosition.x * touchController.swipeSpeed;
 		} else if (playerID == areaPlayerID) {
@@ -186,7 +190,8 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 
 
 	// Racket controls
-	var left_key = 'left', right_key = 'right';	
+	var left_key = 'left',
+		right_key = 'right';
 
 	var racketForward = new THREE.Vector3();
 
@@ -202,7 +207,7 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 	// Racket's speed
 	racketForward.multiplyScalar(this.racketSpeed * delta);
 
-	if (checkPressed(left_key, this.player.id)) {
+	if (checkPressed(left_key, this.p2pCtrl.serverID, this.player.id)) {
 		this.racketMesh.position.add(racketForward);
 		this.meshClone.position.add(racketForward);
 	} else if (checkPressed(right_key, this.player.id)) {
@@ -211,7 +216,7 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 	}
 	// Touch / Mouse
 	else {
-		var touchSpeedModifier = checkTouch(this.player.id);
+		var touchSpeedModifier = checkTouch(this.p2pCtrl.serverID, this.player.id);
 		if (touchSpeedModifier != 0) {
 			racketForward.multiplyScalar(touchSpeedModifier);
 

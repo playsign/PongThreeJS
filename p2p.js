@@ -1,13 +1,31 @@
 /* jshint -W097, -W099 */
 /*
-*   @author Erno Kuusela
-*/
+ *   @author Erno Kuusela
+ */
 /* global window, THREE, console, Player, getRandomColor */
 "use strict";
 
-var peerJsApiKey = "gnyz9wskc2chaor";
+function P2P() {
 
-function getPeerIdFromURL() {
+    this.peerJsApiKey = "gnyz9wskc2chaor";
+
+    this.peerConnections = []; // used only in this file
+    this.netRole = null; // used all over
+    this.clientUpdateCallback = null; // used only in this file
+    this.clientKeysPressed = null; // used from pong.js
+    this.ThisPeerID = null; // used only in this file
+    this.clientID = null; // used from pong.js
+    this.serverID = null; // used from playerArea.js
+    this.timeOutTable = [];
+    this.clientTouch = null;
+    this.timeoutByServer = 7; // in seconds
+    this.timeoutByClient = 30000; // in milliseconds
+    this.playerArray = [];
+    this.timeoutDebug = false; // first connection will fake-timeout to exercise code
+
+}
+
+P2P.prototype.getPeerIdFromURL = function() {
     if (window.location.search) {
         var params = window.location.search.substring(1).split('&');
         for (var i = 0; i < params.length; ++i) {
@@ -19,87 +37,81 @@ function getPeerIdFromURL() {
     return null;
 }
 
-var peerConnections = []; // used only in this file
-var netRole = null; // used all over
-var clientUpdateCallback = null; // used only in this file
-var clientKeysPressed = null; // used from pong.js
-var ThisPeerID = null; // used only in this file
-var clientID = null; // used from pong.js
-var serverID = null; // used from playerArea.js
-var timeOutTable = []; 
-var clientTouch = null;
-var timeoutByServer = 7; // in seconds
-var timeoutByClient = 30000; // in milliseconds
-var playerArray = [];
-// var playerAmount = null; // used in pong.js
-var timeoutDebug = false; // first connection will fake-timeout to exercise code
+P2P.prototype.gotConnection = function(conn) {
+    if (conn !== undefined) {
+        conn.scope = this;
+    }
 
-function gotConnection(conn) {
-    if (peerConnections.length > 0 && netRole === 'client') {
+    if (this.peerConnections.length > 0 && this.netRole === 'client') {
         console.log("Can't handle several connections in client mode");
-	conn.close();
+        conn.close();
         return;
     }
-    peerConnections.push(conn);
-    timeOutTable.push(0);
-    conn.on('data', function(data) { gotData(conn, data); });
+    this.peerConnections.push(conn);
+    this.timeOutTable.push(0);
+    conn.on('data', function(data) {
+        this.scope.gotData(conn, data);
+    });
 
 
-    if (netRole === 'server') {
+    if (this.netRole === 'server') {
         // Add player
         var randomColor = getRandomColor();
-        var newPeerID = peerConnections[peerConnections.length-1].peer;
-        playerArray.push(new Player(newPeerID, newPeerID, randomColor));
+        var newPeerID = this.peerConnections[this.peerConnections.length - 1].peer;
+        this.playerArray.push(new Player(newPeerID, newPeerID, randomColor));
         console.log("new player, id:" + newPeerID);
 
-        refreshScene();
+        this.refreshScene();
     }
 }
 
-function refreshScene() {
+P2P.prototype.refreshScene = function() {
     // Updated scene
-    sceneCtrl.playerAmount = playerArray.length;
+    sceneCtrl.playerAmount = this.playerArray.length;
     sceneCtrl.ball.speed = sceneCtrl.playerAmount * 70;
     sceneCtrl.generateScene();
 }
 
 
-function Vec3FromArray(a) {
+P2P.prototype.Vec3FromArray = function(a) {
     var v3 = new THREE.Vector3();
     v3.copy(a);
     return v3;
 }
 
-function gotData(conn, data) {
+P2P.prototype.gotData = function(conn, data) {
     var msg;
+
     try {
         msg = JSON.parse(data);
     } catch (err) {
         console.log("not JSON: " + data);
         return;
     }
-    if (netRole === 'client' && msg.ballpos !== undefined) {
-        msg.ballpos = Vec3FromArray(msg.ballpos);
+    if (this.netRole === 'client' && msg.ballpos !== undefined) {
+        msg.ballpos = this.Vec3FromArray(msg.ballpos);
         msg.racketspos = msg.racketspos.map(function(arr) {
-            return Vec3FromArray(arr);
+            return p2pCtrl.Vec3FromArray(arr);
         });
-        if (clientUpdateCallback) {
-            var keys = clientUpdateCallback(msg).keyboard;
-            var newSwipe = clientUpdateCallback(msg).touch;
+        if (this.clientUpdateCallback) {
+            var keys = this.clientUpdateCallback(msg).keyboard;
+            var newSwipe = this.clientUpdateCallback(msg).touch;
+            var peerID = this.ThisPeerID;
+            console.log("newSwipe: "+newSwipe);
             conn.send(JSON.stringify({
                 pressedkeys: keys,
                 swipe: newSwipe,
-                playerID: ThisPeerID,
+                playerID: peerID,
             }))
         } else {
-            console.log("update msg without handler, in " + netRole + " mod");
+            console.log("update msg without handler, in " + this.netRole + " mod");
         }
-    } else if (netRole === 'server' && msg.pressedkeys !== undefined) {
-        clientKeysPressed = msg.pressedkeys;
-        clientTouch = msg.swipe;
-        clientID = msg.playerID;
-    } else if (netRole === 'server') {
-	console.log("undefined keys in net msg");
+    } else if (this.netRole === 'server' && msg.pressedkeys !== undefined) {
+        this.clientKeysPressed = msg.pressedkeys;
+        this.clientTouch = msg.swipe;
+        this.clientID = msg.playerID;
+    } else if (this.netRole === 'server') {
+        console.log("undefined keys in net msg");
     }
 
 
@@ -107,105 +119,113 @@ function gotData(conn, data) {
     if (msg.playeramount !== undefined)
         sceneCtrl.playerAmount = msg.playeramount;
     if (msg.players !== undefined)
-        playerArray = msg.players;
+        this.playerArray = msg.players;
 
 }
 
-function removePeerConnection(conn) {
-    for (var i = 0; i < peerConnections.length; i++) {
-	if (conn === peerConnections[i]) {
-	    peerConnections.splice(i, 1);
-	    timeOutTable.splice(i, 1);
-	}
+P2P.prototype.removePeerConnection = function(conn) {
+    for (var i = 0; i < this.peerConnections.length; i++) {
+        if (conn === this.peerConnections[i]) {
+            this.peerConnections.splice(i, 1);
+            this.timeOutTable.splice(i, 1);
+        }
     }
 }
 
 
-function makePeer() {
-    return new Peer({key: peerJsApiKey})
+P2P.prototype.makePeer = function() {
+    return new Peer({
+        key: this.peerJsApiKey
+    })
 }
 
-function initNet(updateCallback) {
-    var peerid = getPeerIdFromURL();
-    
+P2P.prototype.initNet = function(updateCallback) {
+    var peerid = this.getPeerIdFromURL();
+
     if (peerid !== null) {
-	initClient(updateCallback, peerid);
+        this.initClient(updateCallback, peerid);
     } else {
-	initServer(updateCallback);
-    } 
+        this.initServer(updateCallback);
+    }
 }
 
 var connectionRetries = 0;
 
-function attemptServerConnection(peerid) {
+P2P.prototype.attemptServerConnection = function(peerid) {
     if ((typeof peerid) !== "string")
-	throw("peerid must be string! got this: " + peerid);
-    var pjs = makePeer();
-    pjs.on('open', function(myid) { ThisPeerID = myid; });
+        throw ("peerid must be string! got this: " + peerid);
+    var pjs = this.makePeer();
+    pjs.scope = this;
+    pjs.on('open', function(myid) {
+        this.scope.ThisPeerID = myid;
+    });
     var conn = pjs.connect(peerid);
-    conn.on("open", function () {
-	console.log("connection estabilished to server");
-	showHelp();
+    conn.on("open", function() {
+        console.log("connection estabilished to server");
+        showHelp();
     });
-    conn.on("error", function () {
-	console.log("connection error to server");
+    conn.on("error", function() {
+        console.log("connection error to server");
     });
-    gotConnection(conn);
+    this.gotConnection(conn);
     console.log("connecting to peer " + peerid);
 
     var connectionTimeout = function() {
-	var connectionOk = undefined;
-	var connectionFailureFaked = undefined;
-	if (timeoutDebug && conn.open === true && connectionRetries === 0) {
-	    // fake timeout on first attempt
-	    connectionOk = false;
-	    connectionFailureFaked = true;
-	} else {
-	    connectionOk = conn.open;
-	    connectionFailureFaked = false;
-	}
+        var connectionOk = undefined;
+        var connectionFailureFaked = undefined;
+        if (this.timeoutDebug && conn.open === true && connectionRetries === 0) {
+            // fake timeout on first attempt
+            connectionOk = false;
+            connectionFailureFaked = true;
+        } else {
+            connectionOk = conn.open;
+            connectionFailureFaked = false;
+        }
 
-	if (connectionOk === false && netRole !== null) {
-	    removePeerConnection(conn);
-	    conn.close();
-	    pjs.disconnect();
-	    console.log("server connection timed out - faked=" + connectionFailureFaked);
-	    if (connectionRetries++ < 10) {
-		console.log("retrying connetion, attempt #" + connectionRetries);
-		attemptServerConnection(peerid);
-	    } else {
-		console.log("giving up");
-		// can put callback here for connection failure?
-	    }
-	}
+        if (connectionOk === false && this.netRole !== null) {
+            this.removePeerConnection(conn);
+            conn.close();
+            pjs.disconnect();
+            console.log("server connection timed out - faked=" + connectionFailureFaked);
+            if (connectionRetries++ < 10) {
+                console.log("retrying connetion, attempt #" + connectionRetries);
+                this.attemptServerConnection(peerid);
+            } else {
+                console.log("giving up");
+                // can put callback here for connection failure?
+            }
+        }
     }
-    window.setTimeout(connectionTimeout, timeoutByClient /*ms*/);
+    window.setTimeout(connectionTimeout, this.timeoutByClient /*ms*/ );
     return conn;
 }
 
-function initClient(updateCallback, peerid) {
-    var conn = attemptServerConnection(peerid)
-    netRole = 'client';
-    clientUpdateCallback = updateCallback;
+P2P.prototype.initClient = function(updateCallback, peerid) {
+    var conn = this.attemptServerConnection(peerid)
+    this.netRole = 'client';
+    this.clientUpdateCallback = updateCallback;
     // console.log("client update callback registered");
 }
 
-function initServer(updateCallback) {
-    netRole = 'server';
-    var pjs = makePeer();
-    pjs.on('open', function(myid) { ThisPeerID = myid; });
+P2P.prototype.initServer = function(updateCallback) {
+    this.netRole = 'server';
+    var pjs = this.makePeer();
+    pjs.scope = this;
+    pjs.on('open', function(myid) {
+        this.scope.ThisPeerID = myid;
+    });
     pjs.on('open', function(myid) {
         var gamemsg = window.location.href + '?peer-id=' + myid
         // alert(gamemsg);
         $("#playerUrl").html(gamemsg);
         $("#urlBox").dialog("open");
 
-        if (netRole === 'server') {
+        if (this.scope.netRole === 'server') {
             // server is always the player 0
             var randomColor = getRandomColor();
-            playerArray[0] = new Player(myid, "server", randomColor);
+            this.scope.playerArray[0] = new Player(myid, "server", randomColor);
             sceneCtrl.playerAmount = 1;
-            serverID = myid;
+            this.scope.serverID = myid;
             console.log("server id:" + myid);
         }
 
@@ -214,51 +234,52 @@ function initServer(updateCallback) {
     });
 
     pjs.on('connection', function(conn) {
-        gotConnection(conn);
+        this.scope.gotConnection(conn);
     });
 }
 
 
-function serverNetUpdate(racketPositions, ballPos, timedelta, amountPlayers) {
-    if (netRole === 'server') {
+P2P.prototype.serverNetUpdate = function(racketPositions, ballPos, timedelta, amountPlayers) {
+    if (this.netRole === 'server') {
         // console.log("server net update");
         var update_msg = {
             dt: timedelta,
             racketspos: racketPositions,
             ballpos: ballPos,
             playeramount: amountPlayers,
-            players: playerArray,
+            players: this.playerArray,
         };
-	
-	var json_msg = JSON.stringify(update_msg);
-	for (var i = 0; i < peerConnections.length; i++)
-            if (peerConnections[i].open === false) {
-		timeOutTable[i] += timedelta;
+
+        var json_msg = JSON.stringify(update_msg);
+        for (var i = 0; i < this.peerConnections.length; i++)
+            if (this.peerConnections[i].open === false) {
+                this.timeOutTable[i] += timedelta;
 
 
-		if (timeOutTable[i] >= timeoutByServer) {
+                if (this.timeOutTable[i] >= this.timeoutByServer) {
                     // peer disconnected
                     console.log("peer disconnected");
-		    peerConnections.splice(i, 1);
-		    timeOutTable.splice(i, 1);
-                    
-                    playerArray.splice(i+1, 1);
+                    this.peerConnections.splice(i, 1);
+                    this.timeOutTable.splice(i, 1);
 
-                    refreshScene();
-		}
-            } 
-        else {
-            if (timeOutTable[i] !== 0) {
-                timeOutTable[i] = 0;
+                    this.playerArray.splice(i + 1, 1);
+
+                    this.refreshScene();
+                }
+            } else {
+                if (this.timeOutTable[i] !== 0) {
+                    this.timeOutTable[i] = 0;
+                }
+                var conn = this.peerConnections[i];
+                try {
+                    conn.send(json_msg);
+                } catch (err) {
+                    console.log("Send to peer connection " + i + " failed: " + err + " - removing that connection");
+                    this.removePeerConnection(conn);
+                    try {
+                        conn.close();
+                    } catch (e) {}
+                }
             }
-	    var conn = peerConnections[i];
-	    try {
-		conn.send(json_msg);
-	    } catch (err) {
-		console.log("Send to peer connection " + i + " failed: " + err + " - removing that connection");
-		removePeerConnection(conn);
-		try { conn.close(); } catch (e) { }
-	    }
-        }
     }
 }

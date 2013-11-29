@@ -2,8 +2,11 @@
 * 	@author Tapani Jamsa
 */
 
-Director = function() {
+Director = function(p2pCtrl) {
 	this.setScreen(DirectorScreens.menu);
+	if(p2pCtrl !== undefined){
+		this.p2pCtrl = p2pCtrl;
+	}
 };
 
 DirectorScreens = {
@@ -67,7 +70,7 @@ Director.prototype.setScreen = function(newScreen) {
 
 				$("#okButton").show();
 
-				if (netRole == null) {
+				if (p2pCtrl.netRole == null) {
 					$("#helpOffline").show();
 					gui.open();
 				} else {

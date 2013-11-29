@@ -23,8 +23,11 @@ update();
 // FUNCTIONS
 
 function init() {
+	// P2P
+	p2pCtrl = new P2P();
+
 	// SCENE
-	sceneCtrl = new SceneController();
+	sceneCtrl = new SceneController(p2pCtrl);
 
 	// DAT GUI
 	container = document.getElementById('ThreeJS');
@@ -105,17 +108,18 @@ function refreshPlayersInfo() {
 }
 
 // UPDATE FUNCTIONS
+
 function update() {
 	var delta = clock.getDelta(); // seconds
 
 	orbitControls.update();
 	stats.update();
 
-	if (netRole === 'client') {
+	if (p2pCtrl.netRole === 'client') {
 		clientUpdate();
-	} else if (netRole === 'server') {
+	} else if (p2pCtrl.netRole === 'server') {
 		serverUpdate(delta);
-	} else if (netRole === null) {
+	} else if (p2pCtrl.netRole === null) {
 		offlineUpdate(delta);
 	}
 
@@ -124,6 +128,7 @@ function update() {
 }
 
 // Update the scene
+
 function clientUpdate() {
 	sceneCtrl.updateScene();
 }
@@ -131,14 +136,14 @@ function clientUpdate() {
 function serverUpdate(delta) {
 	var racketPositions = [];
 	for (var i = 0; i < sceneCtrl.playerAreas.length; i++) {
-		sceneCtrl.playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
+		sceneCtrl.playerAreas[i].serverUpdate(delta, p2pCtrl.clientKeysPressed ? p2pCtrl.clientKeysPressed : [], p2pCtrl.clientTouch ? p2pCtrl.clientTouch : 0, p2pCtrl.clientID, i);
 		racketPositions.push(sceneCtrl.playerAreas[i].racketMesh.position);
 	}
 
 	sceneCtrl.updateScene();
 	sceneCtrl.btWorldUpdate(delta);
 
-	serverNetUpdate(racketPositions, sceneCtrl.ball.sphereMesh.position, delta, sceneCtrl.playerAmount);
+	p2pCtrl.serverNetUpdate(racketPositions, sceneCtrl.ball.sphereMesh.position, delta, sceneCtrl.playerAmount);
 }
 
 function offlineUpdate(delta) {
@@ -151,6 +156,7 @@ function offlineUpdate(delta) {
 }
 
 // Callback from the server
+
 function updateClient(msg) {
 	// called in client mode (when we're just showing what server tells us).
 	if (msg.dt === undefined || msg.ballpos === undefined || msg.racketspos === undefined)
@@ -159,7 +165,7 @@ function updateClient(msg) {
 
 	for (var i = 0; i < sceneCtrl.playerAreas.length; i++) {
 		sceneCtrl.playerAreas[i].clientUpdate(msg);
-		if (sceneCtrl.clientPlayerAmount !== sceneCtrl.playerAmount && sceneCtrl.playerAreas[i].player.id === ThisPeerID) {
+		if (sceneCtrl.clientPlayerAmount !== sceneCtrl.playerAmount && sceneCtrl.playerAreas[i].player.id === p2pCtrl.ThisPeerID) {
 			var worldPos = new THREE.Vector3();
 			worldPos.getPositionFromMatrix(sceneCtrl.playerAreas[i].borderLeft.matrixWorld);
 			sceneCtrl.camera.position.x = worldPos.x;

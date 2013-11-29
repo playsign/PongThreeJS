@@ -17,25 +17,25 @@ $(function() {
 		sceneCtrl.deleteScene();
 
 		// online
-		if (netRole != null) {
+		if (p2pCtrl.netRole != null) {
 			// Close peer connections
-		    for (var i = 0; i < peerConnections.length; i++) {
-		    	peerConnections[i].close();
-			    peerConnections.splice(i, 1);
+		    for (var i = 0; i < p2pCtrl.peerConnections.length; i++) {
+		    	p2pCtrl.peerConnections[i].close();
+			    p2pCtrl.peerConnections.splice(i, 1);
 	    	}
 		    for (var i = 0; i < players.length; i++) {
 			    players.splice(i, 1);
 	    	}
-	    	peerConnections = [];
-			netRole = null;
-			clientUpdateCallback = null;
-			clientKeysPressed = null;
-			clientTouch = null;
+	    	p2pCtrl.peerConnections = [];
+			p2pCtrl.netRole = null;
+			p2pCtrl.clientUpdateCallback = null;
+			p2pCtrl.clientKeysPressed = null;
+			p2pCtrl.clientTouch = null;
 			id = null;
-			ThisPeerID = null;
-			clientID = null;
-			serverID = null;
-			timeOutTable = [];
+			p2pCtrl.ThisPeerID = null;
+			p2pCtrl.clientID = null;
+			p2pCtrl.serverID = null;
+			p2pCtrl.timeOutTable = [];
 		}
 
 		})

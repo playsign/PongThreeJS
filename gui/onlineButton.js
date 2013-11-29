@@ -22,8 +22,8 @@ $(function() {
 	})
 		.click(function() {
 		// if not already connected
-		if(peerConnections.length === 0){
-			initNet(updateClient);
+		if(p2pCtrl.peerConnections.length === 0){
+			p2pCtrl.initNet(updateClient);
 		}
 		else {
 			showHelp();
