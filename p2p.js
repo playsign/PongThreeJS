@@ -1,4 +1,7 @@
 /* jshint -W097, -W099 */
+/*
+*   @author Erno Kuusela
+*/
 /* global window, THREE, console, Player, getRandomColor */
 "use strict";
 
@@ -28,7 +31,7 @@ var clientTouch = null;
 var timeoutByServer = 7; // in seconds
 var timeoutByClient = 30000; // in milliseconds
 var playerArray = [];
-var playerAmount = null; // used in pong.js
+// var playerAmount = null; // used in pong.js
 var timeoutDebug = false; // first connection will fake-timeout to exercise code
 
 function gotConnection(conn) {
@@ -55,9 +58,9 @@ function gotConnection(conn) {
 
 function refreshScene() {
     // Updated scene
-    playerAmount = playerArray.length;
-    sceneGen.ball.speed = playerAmount * 70;
-    sceneGen.generateScene();
+    sceneCtrl.playerAmount = playerArray.length;
+    sceneCtrl.ball.speed = sceneCtrl.playerAmount * 70;
+    sceneCtrl.generateScene();
 }
 
 
@@ -102,7 +105,7 @@ function gotData(conn, data) {
 
     // Sync scene variables
     if (msg.playeramount !== undefined)
-        playerAmount = msg.playeramount;
+        sceneCtrl.playerAmount = msg.playeramount;
     if (msg.players !== undefined)
         playerArray = msg.players;
 
@@ -201,7 +204,7 @@ function initServer(updateCallback) {
             // server is always the player 0
             var randomColor = getRandomColor();
             playerArray[0] = new Player(myid, "server", randomColor);
-            playerAmount = 1;
+            sceneCtrl.playerAmount = 1;
             serverID = myid;
             console.log("server id:" + myid);
         }

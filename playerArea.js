@@ -1,6 +1,9 @@
 /* -*- js-indent-level: 8 -*- */
 "use strict";
 /* jshint -W097, -W040 */
+/*
+* 	@author Tapani Jamsa
+*/
 /* global window, THREE, console, netRole, playerArray, getRandomColor,
    Player, Ammo, serverID, scene, keyboard */
 function PlayerArea(sceneCtrl, position, rotation, id, tController) {

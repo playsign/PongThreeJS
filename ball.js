@@ -1,3 +1,7 @@
+/*
+* 	@author Tapani Jamsa
+*/
+
 function Ball(sceneCtrl, material) {
 	this.sceneCtrl = sceneCtrl;
 	this.speed = 80;

@@ -1,3 +1,6 @@
+/*
+* 	@author Tapani Jamsa
+*/
 
 Director = function() {
 	this.setScreen(DirectorScreens.menu);

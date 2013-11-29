@@ -1,4 +1,7 @@
 "use strict";
+/*
+* 	@author Tapani Jamsa
+*/
 
 function SceneController() {
 
