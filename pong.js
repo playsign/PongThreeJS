@@ -13,7 +13,7 @@
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens, PlayerArea */
 // MAIN
 
-var sceneGen, orbitControls, touchController, stats, gui, gameDirector;
+var sceneCtrl, orbitControls, touchController, stats, gui, gameDirector;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
@@ -24,13 +24,13 @@ update();
 
 function init() {
 	// SCENE
-	sceneGen = new SceneGenerator();
+	sceneCtrl = new SceneController();
 
 	// DAT GUI
 	container = document.getElementById('ThreeJS');
 	gui = new dat.GUI();
 	/* using "this" here works only by accident? needs non-strict mode */
-	gui.add(sceneGen, 'playerAmount').min(2).max(100).step(1).listen();
+	gui.add(sceneCtrl, 'playerAmount').min(2).max(100).step(1).listen();
 	gui.close();
 	gui.domElement.style.position = 'absolute';
 	gui.domElement.style.right = '0px';
@@ -49,13 +49,13 @@ function init() {
 	container.appendChild(renderer.domElement);
 
 	// EVENTS
-	THREEx.WindowResize(renderer, sceneGen.camera);
+	THREEx.WindowResize(renderer, sceneCtrl.camera);
 	THREEx.FullScreen.bindKey({
 		charCode: 'm'.charCodeAt(0)
 	});
 
 	// CONTROLS
-	orbitControls = new THREE.OrbitControls(sceneGen.camera, renderer.domElement);
+	orbitControls = new THREE.OrbitControls(sceneCtrl.camera, renderer.domElement);
 	orbitControls.userZoom = false;
 
 	// TOUCH
@@ -68,7 +68,7 @@ function init() {
 	stats.domElement.style.zIndex = 100;
 	container.appendChild(stats.domElement);
 
-	gui.add(sceneGen.ball, 'speed').min(0.1).max(400).step(0.1).listen();
+	gui.add(sceneCtrl.ball, 'speed').min(0.1).max(400).step(0.1).listen();
 
 	gameDirector = new Director();
 	//initNet(clientUpdate);
@@ -76,10 +76,10 @@ function init() {
 
 function refreshPlayersInfo() {
 	$("#playersInfo").empty();
-	for (var i = 0; i < sceneGen.playerAmount; i++) {
+	for (var i = 0; i < sceneCtrl.playerAmount; i++) {
 
-		$("#playersInfo").append("<font color = " + sceneGen.playerAreas[i].player.color + ">Player" + (i + 1) + "</font>");
-		switch (sceneGen.playerAreas[i].player.balls) {
+		$("#playersInfo").append("<font color = " + sceneCtrl.playerAreas[i].player.color + ">Player" + (i + 1) + "</font>");
+		switch (sceneCtrl.playerAreas[i].player.balls) {
 			case 0:
 				$("#playersInfo").append("<img width='Â¨12' height='12' src='images/ballIconRed.png'/> ");
 				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> ");
@@ -125,29 +125,29 @@ function update() {
 
 // Update the scene
 function clientUpdate() {
-	sceneGen.updateScene();
+	sceneCtrl.updateScene();
 }
 
 function serverUpdate(delta) {
 	var racketPositions = [];
-	for (var i = 0; i < sceneGen.playerAreas.length; i++) {
-		sceneGen.playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
-		racketPositions.push(sceneGen.playerAreas[i].racketMesh.position);
+	for (var i = 0; i < sceneCtrl.playerAreas.length; i++) {
+		sceneCtrl.playerAreas[i].serverUpdate(delta, clientKeysPressed ? clientKeysPressed : [], clientTouch ? clientTouch : 0, clientID, i);
+		racketPositions.push(sceneCtrl.playerAreas[i].racketMesh.position);
 	}
 
-	sceneGen.updateScene();
-	sceneGen.btWorldUpdate(delta);
+	sceneCtrl.updateScene();
+	sceneCtrl.btWorldUpdate(delta);
 
-	serverNetUpdate(racketPositions, sceneGen.ball.sphereMesh.position, delta, sceneGen.playerAmount);
+	serverNetUpdate(racketPositions, sceneCtrl.ball.sphereMesh.position, delta, sceneCtrl.playerAmount);
 }
 
 function offlineUpdate(delta) {
-	for (var i = 0; i < sceneGen.playerAreas.length; i++) {
-		sceneGen.playerAreas[i].offlineUpdate(delta);
+	for (var i = 0; i < sceneCtrl.playerAreas.length; i++) {
+		sceneCtrl.playerAreas[i].offlineUpdate(delta);
 	}
 
-	sceneGen.updateScene();
-	sceneGen.btWorldUpdate(delta);
+	sceneCtrl.updateScene();
+	sceneCtrl.btWorldUpdate(delta);
 }
 
 // Callback from the server
@@ -155,18 +155,18 @@ function updateClient(msg) {
 	// called in client mode (when we're just showing what server tells us).
 	if (msg.dt === undefined || msg.ballpos === undefined || msg.racketspos === undefined)
 		throw "update msg: missing properties";
-	sceneGen.ball.sphereMesh.position = msg.ballpos;
+	sceneCtrl.ball.sphereMesh.position = msg.ballpos;
 
-	for (var i = 0; i < sceneGen.playerAreas.length; i++) {
-		sceneGen.playerAreas[i].clientUpdate(msg);
-		if (sceneGen.clientPlayerAmount !== sceneGen.playerAmount && sceneGen.playerAreas[i].player.id === ThisPeerID) {
+	for (var i = 0; i < sceneCtrl.playerAreas.length; i++) {
+		sceneCtrl.playerAreas[i].clientUpdate(msg);
+		if (sceneCtrl.clientPlayerAmount !== sceneCtrl.playerAmount && sceneCtrl.playerAreas[i].player.id === ThisPeerID) {
 			var worldPos = new THREE.Vector3();
-			worldPos.getPositionFromMatrix(sceneGen.playerAreas[i].borderLeft.matrixWorld);
-			sceneGen.camera.position.x = worldPos.x;
-			sceneGen.camera.position.z = worldPos.z;
-			sceneGen.camera.lookAt(sceneGen.playerAreas[i].group.position);
+			worldPos.getPositionFromMatrix(sceneCtrl.playerAreas[i].borderLeft.matrixWorld);
+			sceneCtrl.camera.position.x = worldPos.x;
+			sceneCtrl.camera.position.z = worldPos.z;
+			sceneCtrl.camera.lookAt(sceneCtrl.playerAreas[i].group.position);
 
-			sceneGen.clientPlayerAmount = sceneGen.playerAmount; // Helps to prevent unnecessary camera position modification
+			sceneCtrl.clientPlayerAmount = sceneCtrl.playerAmount; // Helps to prevent unnecessary camera position modification
 		}
 	}
 
@@ -179,7 +179,7 @@ function updateClient(msg) {
 }
 
 function render() {
-	renderer.render(sceneGen.scene, sceneGen.camera);
+	renderer.render(sceneCtrl.scene, sceneCtrl.camera);
 }
 
 function showHelp() {

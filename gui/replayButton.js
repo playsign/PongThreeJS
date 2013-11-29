@@ -14,7 +14,7 @@ $(function() {
 	.button({})
 		.click(function() {
 		gameDirector.setScreen(DirectorScreens.game);
-		sceneGen.generateScene();
+		sceneCtrl.generateScene();
 	})
 		.append("<img width='"+width+"' height='"+width+"' src='images/replayIcon.png'/>")
 });

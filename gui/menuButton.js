@@ -14,7 +14,7 @@ $(function() {
 	.button({})
 		.click(function() {
 		gameDirector.setScreen(DirectorScreens.menu);
-		sceneGen.deleteScene();
+		sceneCtrl.deleteScene();
 
 		// online
 		if (netRole != null) {

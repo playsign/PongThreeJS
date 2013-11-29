@@ -68,7 +68,7 @@ function SceneController() {
 
 }
 
-SceneGenerator.prototype.btWorldUpdate = function(delta) {
+SceneController.prototype.btWorldUpdate = function(delta) {
 	// ammo.js step simulation
 	var timeStep = 1 / 60; // time passed after last simulation. if timeStep is 0.1 then it will include 6 (timeStep / fixedTimeStep) internal simulations. It's important that timeStep is always less than maxSubSteps*fixedTimeStep, otherwise you are losing time
 	var maxSubSteps = 20; // 5
@@ -141,14 +141,14 @@ SceneGenerator.prototype.btWorldUpdate = function(delta) {
 	this.ball.update(delta);
 }
 
-SceneGenerator.prototype.updateScene = function() {
+SceneController.prototype.updateScene = function() {
 	if (this.playerAmount !== this.oldPlayerAmount) {
 		this.generateScene();
 	}
-	// sceneGen.camera.up = new THREE.Vector3(0, 1, 0); // What is this?
+	// sceneCtrl.camera.up = new THREE.Vector3(0, 1, 0); // What is this?
 }
 
-SceneGenerator.prototype.generateScene = function() {
+SceneController.prototype.generateScene = function() {
 	// delete previous scene
 	this.deleteScene();
 
@@ -224,7 +224,7 @@ SceneGenerator.prototype.generateScene = function() {
 	this.oldPlayerAmount = this.playerAmount;
 }
 
-SceneGenerator.prototype.deleteScene = function() {
+SceneController.prototype.deleteScene = function() {
 
 	for (var i = 0; i < this.playerAreas.length; i++) {
 		// ammo.js

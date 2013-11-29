@@ -1,5 +1,5 @@
-function Ball(sceneGen, material) {
-	this.sceneGen = sceneGen;
+function Ball(sceneCtrl, material) {
+	this.sceneCtrl = sceneCtrl;
 	this.speed = 80;
 	this.radius = 5;
 
@@ -28,7 +28,7 @@ function Ball(sceneGen, material) {
 	sphereAmmo = new Ammo.btRigidBody(rbInfo);
 	sphereAmmo.mesh = this.sphereMesh;
 	sphereAmmo.setLinearFactor(new Ammo.btVector3(1, 0, 1));
-	this.sceneGen.btWorld.addRigidBody(sphereAmmo);
+	this.sceneCtrl.btWorld.addRigidBody(sphereAmmo);
 	this.collider = sphereAmmo;
 	var btV3 = new Ammo.btVector3(1, 0, 1);
 	this.collider.setLinearVelocity(btV3);
@@ -44,7 +44,7 @@ Ball.prototype.update = function(delta) // Define Method
 	}
 
 	//  Reset position if the ball is out of the scene
-	if (sceneGen.playerAreas[0] != null && this.sphereMesh.position.length() > (sceneGen.playerAreas[0].group.position.length() + 200)) {
+	if (sceneCtrl.playerAreas[0] != null && this.sphereMesh.position.length() > (sceneCtrl.playerAreas[0].group.position.length() + 200)) {
 		console.log(" reset ");
 		// ammo.js . Reset positions
 		var transform = this.collider.getCenterOfMassTransform();
