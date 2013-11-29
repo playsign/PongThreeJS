@@ -64,8 +64,12 @@ function SceneGenerator() {
 	this.btWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 	this.btWorld.setGravity(new Ammo.btVector3(0, 0, 0));
 
-	// BALL
+	// PLAYERS
+	this.playerAmount = 3;
+	this.clientPlayerAmount = 0;
+	this.oldPlayerAmount = this.playerAmount;
 
+	// BALL
 	var material = new THREE.MeshLambertMaterial({
 		color: 0x999999
 	});
@@ -149,6 +153,12 @@ SceneGenerator.prototype.btWorldUpdate = function(delta) {
 			}
 		}
 	}
-
 	this.ball.update(collidableMeshList, delta);
+}
+
+SceneGenerator.prototype.updateScene = function() {
+	if (sceneGen.playerAmount !== sceneGen.oldPlayerAmount) {
+		generateScene();
+	}
+	// sceneGen.camera.up = new THREE.Vector3(0, 1, 0); // What is this?
 }

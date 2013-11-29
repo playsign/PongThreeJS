@@ -23,10 +23,6 @@ var orbitControls, touchController, stats, gui;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
-var playerAmount = 3;
-var clientPlayerAmount = 0;
-var oldPlayerAmount = playerAmount;
-
 var playerAreas = [];
 var collidableMeshList = [];
 
@@ -49,7 +45,7 @@ function init() {
 	container = document.getElementById('ThreeJS');
 	gui = new dat.GUI();
 	/* using "this" here works only by accident? needs non-strict mode */
-	gui.add(this, 'playerAmount').min(2).max(100).step(1).listen();
+	gui.add(sceneGen, 'playerAmount').min(2).max(100).step(1).listen();
 	gui.close();
 	gui.domElement.style.position = 'absolute';
 	gui.domElement.style.right = '0px';
@@ -115,7 +111,7 @@ function generateScene() {
 	// delete previous scene
 	deleteScene();
 
-	playerAmount = Math.round(playerAmount);
+	sceneGen.playerAmount = Math.round(sceneGen.playerAmount);
 
 	sceneGen.ball.lastCollider = null;
 
@@ -125,15 +121,15 @@ function generateScene() {
 	sceneGen.ball.collider.setCenterOfMassTransform(transform);
 
 	// Angle in radians
-	var radians = Math.PI * 2 / playerAmount;
+	var radians = Math.PI * 2 / sceneGen.playerAmount;
 
-	var radius = playerAmount; // * radiusTweak;
+	var radius = sceneGen.playerAmount; // * radiusTweak;
 	var pivotPoint = 9; // 10 Push player area forward by width of the area
 
 	// Two player tweak to remove gaps between player areas
-	if (playerAmount === 2) {
+	if (sceneGen.playerAmount === 2) {
 		pivotPoint -= 5; // 4.5 , 5,5
-	} else if (playerAmount === 3) {
+	} else if (sceneGen.playerAmount === 3) {
 		pivotPoint -= 0.5; //-0,5
 	}
 
@@ -145,8 +141,8 @@ function generateScene() {
 
 	radius += radius - playerAreaOffset;
 
-	for (var i = 0; i < playerAmount; i++) {
-		radians = Math.PI * 2 / playerAmount * (i + 1);
+	for (var i = 0; i < sceneGen.playerAmount; i++) {
+		radians = Math.PI * 2 / sceneGen.playerAmount * (i + 1);
 		// var degree = 360 - (radians * (180 / Math.PI));
 
 		var x = Math.cos(radians) * radius * pivotPoint;
@@ -189,12 +185,12 @@ function generateScene() {
 	// Players info
 	refreshPlayersInfo();
 
-	oldPlayerAmount = playerAmount;
+	sceneGen.oldPlayerAmount = sceneGen.playerAmount;
 }
 
 function refreshPlayersInfo() {
 	$("#playersInfo").empty();
-	for (var i = 0; i < playerAmount; i++) {
+	for (var i = 0; i < sceneGen.playerAmount; i++) {
 
 		$("#playersInfo").append("<font color = " + playerAreas[i].player.color + ">Player" + (i + 1) + "</font>");
 		switch (playerAreas[i].player.balls) {
@@ -242,7 +238,7 @@ function update() {
 
 // Update the scene etc.
 function clientUpdate() {
-	sceneUpdate();
+	sceneGen.updateScene();
 }
 
 function serverUpdate(delta) {
@@ -252,10 +248,10 @@ function serverUpdate(delta) {
 		racketPositions.push(playerAreas[i].racketMesh.position);
 	}
 
-	sceneUpdate();
+	sceneGen.updateScene();
 	sceneGen.btWorldUpdate(delta);
 
-	serverNetUpdate(racketPositions, sceneGen.ball.sphereMesh.position, delta, playerAmount);
+	serverNetUpdate(racketPositions, sceneGen.ball.sphereMesh.position, delta, sceneGen.playerAmount);
 }
 
 function offlineUpdate(delta) {
@@ -263,15 +259,8 @@ function offlineUpdate(delta) {
 		playerAreas[i].offlineUpdate(collidableMeshList, delta);
 	}
 
-	sceneUpdate();
+	sceneGen.updateScene();
 	sceneGen.btWorldUpdate(delta);
-}
-
-function sceneUpdate() {
-	if (playerAmount !== oldPlayerAmount) {
-		generateScene();
-	}
-	// sceneGen.camera.up = new THREE.Vector3(0, 1, 0); // What is this?
 }
 
 // Callback from the server
@@ -284,14 +273,14 @@ function updateClient(msg) {
 	// ball.update(collidableMeshList, msg.dt);
 	for (var i = 0; i < playerAreas.length; i++) {
 		playerAreas[i].clientUpdate(msg);
-		if (clientPlayerAmount !== playerAmount && playerAreas[i].player.id === ThisPeerID) {
+		if (sceneGen.clientPlayerAmount !== sceneGen.playerAmount && playerAreas[i].player.id === ThisPeerID) {
 			var worldPos = new THREE.Vector3();
 			worldPos.getPositionFromMatrix(playerAreas[i].borderLeft.matrixWorld);
 			sceneGen.camera.position.x = worldPos.x;
 			sceneGen.camera.position.z = worldPos.z;
 			sceneGen.camera.lookAt(playerAreas[i].group.position);
 
-			clientPlayerAmount = playerAmount; // Helps to prevent unnecessary camera position modification
+			sceneGen.clientPlayerAmount = sceneGen.playerAmount; // Helps to prevent unnecessary camera position modification
 		}
 	}
 
