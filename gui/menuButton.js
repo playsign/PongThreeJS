@@ -23,9 +23,10 @@ $(function() {
 		    	p2pCtrl.peerConnections[i].close();
 			    p2pCtrl.peerConnections.splice(i, 1);
 	    	}
-		    for (var i = 0; i < players.length; i++) {
-			    players.splice(i, 1);
-	    	}
+	    	// What is this?
+		    // for (var i = 0; i < players.length; i++) {
+			   //  players.splice(i, 1);
+	    	// }
 	    	p2pCtrl.peerConnections = [];
 			p2pCtrl.netRole = null;
 			p2pCtrl.clientUpdateCallback = null;

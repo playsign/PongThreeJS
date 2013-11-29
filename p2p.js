@@ -97,7 +97,6 @@ P2P.prototype.gotData = function(conn, data) {
             var keys = this.clientUpdateCallback(msg).keyboard;
             var newSwipe = this.clientUpdateCallback(msg).touch;
             var peerID = this.ThisPeerID;
-            console.log("newSwipe: "+newSwipe);
             conn.send(JSON.stringify({
                 pressedkeys: keys,
                 swipe: newSwipe,
