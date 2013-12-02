@@ -170,14 +170,6 @@ function updateClient(msg) {
 			sceneCtrl.camera.position.z = worldPos.z;
 			sceneCtrl.camera.lookAt(sceneCtrl.playerAreas[i].group.position);
 
-			console.log("lookAt");
-			console.log(sceneCtrl.clientPlayerAmount);
-			console.log(sceneCtrl.playerAmount);
-			console.log(sceneCtrl.playerAreas[i].player.id);
-			console.log(p2pCtrl.ThisPeerID);
-			console.log(sceneCtrl.playerAreas[1].group.position);
-			console.log(worldPos);
-
 			sceneCtrl.clientPlayerAmount = sceneCtrl.playerAreas.length; // Helps to prevent unnecessary camera position modification
 		}
 	}
