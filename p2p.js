@@ -1,11 +1,13 @@
+"use strict";
 /* jshint -W097, -W099 */
 /*
  *   @author Erno Kuusela
  */
-/* global window, THREE, console, Player, getRandomColor */
-"use strict";
+/* global window, THREE, console, Player */
 
 function P2P() {
+    // Pointer to global
+    this.sceneCtrl = sceneCtrl;
 
     this.peerJsApiKey = "gnyz9wskc2chaor";
 
@@ -35,7 +37,7 @@ P2P.prototype.getPeerIdFromURL = function() {
         }
     }
     return null;
-}
+};
 
 P2P.prototype.gotConnection = function(conn) {
     if (conn !== undefined) {
@@ -56,28 +58,28 @@ P2P.prototype.gotConnection = function(conn) {
 
     if (this.netRole === 'server') {
         // Add player
-        var randomColor = getRandomColor();
+        var randomColor = this.sceneCtrl.getRandomColor();
         var newPeerID = this.peerConnections[this.peerConnections.length - 1].peer;
         this.playerArray.push(new Player(newPeerID, newPeerID, randomColor));
         console.log("new player, id:" + newPeerID);
 
         this.refreshScene();
     }
-}
+};
 
 P2P.prototype.refreshScene = function() {
     // Updated scene
-    sceneCtrl.playerAmount = this.playerArray.length;
-    sceneCtrl.ball.speed = sceneCtrl.playerAmount * 70;
-    sceneCtrl.generateScene();
-}
+    this.sceneCtrl.playerAmount = this.playerArray.length;
+    this.sceneCtrl.ball.speed = this.sceneCtrl.playerAmount * 70;
+    this.sceneCtrl.generateScene();
+};
 
 
 P2P.prototype.Vec3FromArray = function(a) {
     var v3 = new THREE.Vector3();
     v3.copy(a);
     return v3;
-}
+};
 
 P2P.prototype.gotData = function(conn, data) {
     var msg;
@@ -90,8 +92,9 @@ P2P.prototype.gotData = function(conn, data) {
     }
     if (this.netRole === 'client' && msg.ballpos !== undefined) {
         msg.ballpos = this.Vec3FromArray(msg.ballpos);
+        var scope = this;
         msg.racketspos = msg.racketspos.map(function(arr) {
-            return p2pCtrl.Vec3FromArray(arr);
+            return scope.Vec3FromArray(arr);
         });
         if (this.clientUpdateCallback) {
             var keys = this.clientUpdateCallback(msg).keyboard;
@@ -101,7 +104,7 @@ P2P.prototype.gotData = function(conn, data) {
                 pressedkeys: keys,
                 swipe: newSwipe,
                 playerID: peerID,
-            }))
+            }));
         } else {
             console.log("update msg without handler, in " + this.netRole + " mod");
         }
@@ -113,14 +116,13 @@ P2P.prototype.gotData = function(conn, data) {
         console.log("undefined keys in net msg");
     }
 
-
     // Sync scene variables
     if (msg.playeramount !== undefined)
-        sceneCtrl.playerAmount = msg.playeramount;
+        this.sceneCtrl.playerAmount = msg.playeramount;
     if (msg.players !== undefined)
         this.playerArray = msg.players;
 
-}
+};
 
 P2P.prototype.removePeerConnection = function(conn) {
     for (var i = 0; i < this.peerConnections.length; i++) {
@@ -129,14 +131,13 @@ P2P.prototype.removePeerConnection = function(conn) {
             this.timeOutTable.splice(i, 1);
         }
     }
-}
-
+};
 
 P2P.prototype.makePeer = function() {
     return new Peer({
         key: this.peerJsApiKey
-    })
-}
+    });
+};
 
 P2P.prototype.initNet = function(updateCallback) {
     var peerid = this.getPeerIdFromURL();
@@ -144,9 +145,9 @@ P2P.prototype.initNet = function(updateCallback) {
     if (peerid !== null) {
         this.initClient(updateCallback, peerid);
     } else {
-        this.initServer(updateCallback);
+        this.initServer();
     }
-}
+};
 
 var connectionRetries = 0;
 
@@ -170,8 +171,8 @@ P2P.prototype.attemptServerConnection = function(peerid) {
     console.log("connecting to peer " + peerid);
 
     var connectionTimeout = function() {
-        var connectionOk = undefined;
-        var connectionFailureFaked = undefined;
+        var connectionOk;
+        var connectionFailureFaked;
         if (this.timeoutDebug && conn.open === true && connectionRetries === 0) {
             // fake timeout on first attempt
             connectionOk = false;
@@ -194,36 +195,38 @@ P2P.prototype.attemptServerConnection = function(peerid) {
                 // can put callback here for connection failure?
             }
         }
-    }
+    };
     window.setTimeout(connectionTimeout, this.timeoutByClient /*ms*/ );
     return conn;
-}
+};
 
 P2P.prototype.initClient = function(updateCallback, peerid) {
-    var conn = this.attemptServerConnection(peerid)
+    // var conn = this.attemptServerConnection(peerid);
+    this.attemptServerConnection(peerid);
     this.netRole = 'client';
     this.clientUpdateCallback = updateCallback;
     // console.log("client update callback registered");
-}
+};
 
-P2P.prototype.initServer = function(updateCallback) {
+P2P.prototype.initServer = function() {
     this.netRole = 'server';
     var pjs = this.makePeer();
+    var sceneCtrlPointer = this.sceneCtrl;
     pjs.scope = this;
     pjs.on('open', function(myid) {
         this.scope.ThisPeerID = myid;
     });
     pjs.on('open', function(myid) {
-        var gamemsg = window.location.href + '?peer-id=' + myid
+        var gamemsg = window.location.href + '?peer-id=' + myid;
         // alert(gamemsg);
         $("#playerUrl").html(gamemsg);
         $("#urlBox").dialog("open");
 
         if (this.scope.netRole === 'server') {
             // server is always the player 0
-            var randomColor = getRandomColor();
+            var randomColor = sceneCtrlPointer.getRandomColor();
             this.scope.playerArray[0] = new Player(myid, "server", randomColor);
-            sceneCtrl.playerAmount = 1;
+            sceneCtrlPointer.playerAmount = 1;
             this.scope.serverID = myid;
             console.log("server id:" + myid);
         }
@@ -235,8 +238,7 @@ P2P.prototype.initServer = function(updateCallback) {
     pjs.on('connection', function(conn) {
         this.scope.gotConnection(conn);
     });
-}
-
+};
 
 P2P.prototype.serverNetUpdate = function(racketPositions, ballPos, timedelta, amountPlayers) {
     if (this.netRole === 'server') {
@@ -281,4 +283,4 @@ P2P.prototype.serverNetUpdate = function(racketPositions, ballPos, timedelta, am
                 }
             }
     }
-}
+};

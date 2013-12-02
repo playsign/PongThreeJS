@@ -1,7 +1,7 @@
 "use strict";
 /*
-* 	@author Tapani Jamsa
-*/
+ * 	@author Tapani Jamsa
+ */
 
 function TouchInputController() {
 

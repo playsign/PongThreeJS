@@ -1,12 +1,10 @@
 /*
-* 	@author Tapani Jamsa
-*/
+ * 	@author Tapani Jamsa
+ */
 
-Director = function(p2pCtrl) {
+Director = function() {
+
 	this.setScreen(DirectorScreens.menu);
-	if(p2pCtrl !== undefined){
-		this.p2pCtrl = p2pCtrl;
-	}
 };
 
 DirectorScreens = {
@@ -70,7 +68,7 @@ Director.prototype.setScreen = function(newScreen) {
 
 				$("#okButton").show();
 
-				if (p2pCtrl.netRole == null) {
+				if (p2pCtrl.netRole === null) {
 					$("#helpOffline").show();
 					gui.open();
 				} else {
@@ -116,8 +114,8 @@ Director.prototype.setScreen = function(newScreen) {
 	} else {
 		console.log("screen already set");
 	}
-}
+};
 
 Director.prototype.doNextScreen = function() {
 	this.setScreen(this.currentScreen + 1);
-}
+};

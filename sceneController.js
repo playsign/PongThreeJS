@@ -3,13 +3,7 @@
  * 	@author Tapani Jamsa
  */
 
-function SceneController(p2pCtrl) {
-	if (p2pCtrl !== undefined) {
-		this.p2pCtrl = p2pCtrl;
-	}
-
-	// var container, scene, renderer, camera;
-
+function SceneController() {
 	// SCENE
 	this.scene = new THREE.Scene();
 
@@ -58,13 +52,9 @@ function SceneController(p2pCtrl) {
 	this.clientPlayerAmount = 0;
 	this.oldPlayerAmount = this.playerAmount;
 	this.playerAreas = [];
-	this.playerAreaWidth = 100; // TODO duplicated in playerArea
+	this.playerAreaWidth = 100;
 
 	// BALL
-	var material = new THREE.MeshLambertMaterial({
-		color: 0x999999
-	});
-
 	var borderMaterial = new THREE.MeshLambertMaterial({
 		color: 0x999999
 	});
@@ -101,22 +91,22 @@ SceneController.prototype.btWorldUpdate = function(delta) {
 			if (pt.getDistance() <= 2) { // If the value is too high then it looks like the ball reflects from air
 
 
-				var ptA = pt.getPositionWorldOnA();
+				// var ptA = pt.getPositionWorldOnA();
 				var ptB = pt.getPositionWorldOnB();
 				// console.log("i________________ :" + i);
 				// console.log("ptA.getZ() :" + ptA.getZ());
 				// console.log("ptB.getZ() :" + ptB.getZ());
 
-				var lpA = pt.get_m_localPointA();
+				// var lpA = pt.get_m_localPointA();
 				var lpB = pt.get_m_localPointB();
 				var hitsEnd = false;
 				if (lpB.getX() >= 49.999 || lpB.getX() <= -49.999) {
 					hitsEnd = true;
 				}
-				var mind0 = pt.get_m_index0();
-				var mind1 = pt.get_m_index1();
+				// var mind0 = pt.get_m_index0();
+				// var mind1 = pt.get_m_index1();
 				// var normalOnA = pt.get_m_normalWorldOnA();
-				var normalOnB = pt.get_m_normalWorldOnB();
+				// var normalOnB = pt.get_m_normalWorldOnB();
 				// console.log("lpA " + lpA.getX() + " " + lpA.getZ());
 				// console.log("lpB " + lpB.getX() + " " + lpB.getZ());
 				// console.log("mind0 " + mind0);
@@ -145,14 +135,13 @@ SceneController.prototype.btWorldUpdate = function(delta) {
 		}
 	}
 	this.ball.update(delta);
-}
+};
 
 SceneController.prototype.updateScene = function() {
 	if (this.playerAmount !== this.oldPlayerAmount) {
 		this.generateScene();
 	}
-	// sceneCtrl.camera.up = new THREE.Vector3(0, 1, 0); // What is this?
-}
+};
 
 SceneController.prototype.generateScene = function() {
 	// delete previous scene
@@ -195,7 +184,7 @@ SceneController.prototype.generateScene = function() {
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
 
-		var pa = new PlayerArea(this, new THREE.Vector3(x, 0, z), radians, i, touchController, p2pCtrl);
+		var pa = new PlayerArea(new THREE.Vector3(x, 0, z), radians, i);
 
 		this.playerAreas.push(pa);
 
@@ -228,7 +217,7 @@ SceneController.prototype.generateScene = function() {
 	refreshPlayersInfo();
 
 	this.oldPlayerAmount = this.playerAmount;
-}
+};
 
 SceneController.prototype.deleteScene = function() {
 
@@ -243,4 +232,8 @@ SceneController.prototype.deleteScene = function() {
 	}
 
 	this.playerAreas = [];
-}
+};
+
+SceneController.prototype.getRandomColor = function() {
+	return '#' + '000000'.concat(Math.floor(Math.random() * 16777215).toString(16)).substr(-6);
+};

@@ -1,19 +1,18 @@
-/* -*- js-indent-level: 8 -*- */
 "use strict";
+/* -*- js-indent-level: 8 -*- */
 /* jshint -W097, -W040 */
 /*
  * 	@author Tapani Jamsa
  */
-/* global window, THREE, console, netRole, playerArray, getRandomColor,
-   Player, Ammo, serverID, scene, keyboard */
+/* global window, THREE, console,
+   Player, Ammo, keyboard */
 
-function PlayerArea(sceneCtrl, position, rotation, id, tController, p2pCtrl) {
-	if (p2pCtrl !== undefined) {
-		this.p2pCtrl = p2pCtrl;
-	}
+function PlayerArea(position, rotation, id) {
+	// Pointers to globals
+	this.p2pCtrl = p2pCtrl;
 	this.sceneCtrl = sceneCtrl;
-
-	this.touchController = tController;
+	this.touchController = touchController;
+	this.keyboard = keyboard;
 
 	// PLAYER INFO
 	if (this.p2pCtrl.netRole && p2pCtrl.playerArray[id]) {
@@ -21,7 +20,7 @@ function PlayerArea(sceneCtrl, position, rotation, id, tController, p2pCtrl) {
 		this.player = p2pCtrl.playerArray[id];
 	} else {
 		// offline
-		var randomColor = getRandomColor();
+		var randomColor = this.sceneCtrl.getRandomColor();
 		this.player = new Player(id, id, randomColor);
 	}
 
@@ -35,7 +34,7 @@ function PlayerArea(sceneCtrl, position, rotation, id, tController, p2pCtrl) {
 
 	this.rotation = rotation;
 
-	this.bottomTopWidth = 100;
+	this.bottomTopWidth = this.sceneCtrl.playerAreaWidth;
 	this.bottomTopHeight = 10;
 	this.bottomTopGeometry = new THREE.CubeGeometry(this.bottomTopWidth, this.bottomTopHeight, this.bottomTopHeight, 1, 1, 1);
 	this.leftWidth = 120;
@@ -101,7 +100,7 @@ function PlayerArea(sceneCtrl, position, rotation, id, tController, p2pCtrl) {
 	this.groupMeshes.push(this.borderLeft);
 	this.groupMeshes.push(this.borderTop);
 
-	// CAMERA POSITION (online)
+	// CAMERA POSITION (for the server. client camera.lookAt in pong.js)
 	if (this.p2pCtrl.netRole && this.p2pCtrl.playerArray[id] && this.p2pCtrl.serverID == this.player.id) {
 		var worldPos = new THREE.Vector3();
 		worldPos.getPositionFromMatrix(this.borderLeft.matrixWorld);
@@ -165,29 +164,26 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch, playerID, i) {
 	var lastPosition = this.racketMesh.position.clone();
 	var cloneLastPosition = this.meshClone.position.clone();
-	// if (clientKeyboard.length > 0)
-	// console.log("PlayerArea: keys pressed: " + clientKeyboard + ", playerID: " + playerID + ", areaPlayerID: " + this.player.id);
 
-	function checkPressed(keyname, serverID, areaPlayerID) {
+	function checkPressed(scope, keyname, serverID, areaPlayerID) {
 		if (keyname === null)
 			return false;
 		if (serverID == areaPlayerID) {
-			return keyboard.pressed(keyname);
+			return scope.keyboard.pressed(keyname);
 		} else if (playerID == areaPlayerID) {
 			return clientKeyboard.indexOf(keyname) != -1;
 		}
 		return false;
 	}
 
-	function checkTouch(serverID, areaPlayerID) {
+	function checkTouch(scope, serverID, areaPlayerID) {
 		if (serverID == areaPlayerID) {
-			return touchController.deltaPosition.x * touchController.swipeSpeed;
+			return scope.touchController.deltaPosition.x * scope.touchController.swipeSpeed;
 		} else if (playerID == areaPlayerID) {
 			return clientTouch;
 		}
 		return false;
 	}
-
 
 	// Racket controls
 	var left_key = 'left',
@@ -207,17 +203,17 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 	// Racket's speed
 	racketForward.multiplyScalar(this.racketSpeed * delta);
 
-	if (checkPressed(left_key, this.p2pCtrl.serverID, this.player.id)) {
+	if (checkPressed(this, left_key, this.p2pCtrl.serverID, this.player.id)) {
 		this.racketMesh.position.add(racketForward);
 		this.meshClone.position.add(racketForward);
-	} else if (checkPressed(right_key, this.p2pCtrl.serverID, this.player.id)) {
+	} else if (checkPressed(this, right_key, this.p2pCtrl.serverID, this.player.id)) {
 		this.racketMesh.position.sub(racketForward);
 		this.meshClone.position.sub(racketForward);
 	}
 	// Touch / Mouse
 	else {
-		var touchSpeedModifier = checkTouch(this.p2pCtrl.serverID, this.player.id);
-		if (touchSpeedModifier != 0) {
+		var touchSpeedModifier = checkTouch(this,this.p2pCtrl.serverID, this.player.id);
+		if (touchSpeedModifier !== 0) {
 			racketForward.multiplyScalar(touchSpeedModifier);
 
 			this.racketMesh.position.add(racketForward);
@@ -236,7 +232,7 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 		this.racketMesh.position = lastPosition;
 		this.meshClone.position = cloneLastPosition;
 	}
-}
+};
 
 // ONLINE game mode
 PlayerArea.prototype.clientUpdate = function(msg) {
@@ -245,7 +241,7 @@ PlayerArea.prototype.clientUpdate = function(msg) {
 		this.racketMesh.position = newpos;
 	else
 		console.log("undefined position for racket");
-}
+};
 
 // OFFLINE game mode
 PlayerArea.prototype.offlineUpdate = function(delta) {
@@ -254,7 +250,7 @@ PlayerArea.prototype.offlineUpdate = function(delta) {
 	var cloneLastPosition = this.meshClone.position.clone();
 
 	// Racket controls
-	if (keyboard.pressed("left") || keyboard.pressed("right") || keyboard.pressed("a") || keyboard.pressed("d") || (this.touchController.swiping && delta.x != 0)) {
+	if (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || (this.touchController.swiping && delta.x !== 0)) {
 		var racketForward = new THREE.Vector3();
 
 		var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
@@ -277,11 +273,11 @@ PlayerArea.prototype.offlineUpdate = function(delta) {
 
 		// Keyboard
 		if (this.player.id == 1) {
-			if (keyboard.pressed("left")) {
+			if (this.keyboard.pressed("left")) {
 				this.racketMesh.position.add(racketForward);
 				this.meshClone.position.add(racketForward);
 			}
-			if (keyboard.pressed("right")) {
+			if (this.keyboard.pressed("right")) {
 				this.racketMesh.position.sub(racketForward);
 				this.meshClone.position.sub(racketForward);
 			}
@@ -292,11 +288,11 @@ PlayerArea.prototype.offlineUpdate = function(delta) {
 				this.meshClone.position.add(racketForward);
 			}
 		} else {
-			if (keyboard.pressed("a")) {
+			if (this.keyboard.pressed("a")) {
 				this.racketMesh.position.add(racketForward);
 				this.meshClone.position.add(racketForward);
 			}
-			if (keyboard.pressed("d")) {
+			if (this.keyboard.pressed("d")) {
 				this.racketMesh.position.sub(racketForward);
 				this.meshClone.position.sub(racketForward);
 			}
@@ -315,4 +311,4 @@ PlayerArea.prototype.offlineUpdate = function(delta) {
 		}
 	}
 
-}
+};

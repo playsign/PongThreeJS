@@ -10,29 +10,32 @@
 
 // "use strict";
 /* jshint -W097, -W040 */
-/* global THREE, THREEx, Ammo, window, Director, DirectorScreens, PlayerArea */
+/* global THREE, THREEx, Ammo, window, Director, DirectorScreens */
 // MAIN
 
-var sceneCtrl, orbitControls, touchController, stats, gui, gameDirector;
+var sceneCtrl, p2pCtrl, orbitControls, touchController, stats, gui, gameDirector;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
 init();
 update();
 
-// FUNCTIONS
-
 function init() {
-	// P2P
-	p2pCtrl = new P2P();
+	// TOUCH
+	touchController = new TouchInputController();
+
+	// DIRECTOR
+	gameDirector = new Director();
 
 	// SCENE
-	sceneCtrl = new SceneController(p2pCtrl);
+	sceneCtrl = new SceneController();
+
+	// P2P
+	p2pCtrl = new P2P();
 
 	// DAT GUI
 	container = document.getElementById('ThreeJS');
 	gui = new dat.GUI();
-	/* using "this" here works only by accident? needs non-strict mode */
 	gui.add(sceneCtrl, 'playerAmount').min(2).max(100).step(1).listen();
 	gui.close();
 	gui.domElement.style.position = 'absolute';
@@ -61,9 +64,6 @@ function init() {
 	orbitControls = new THREE.OrbitControls(sceneCtrl.camera, renderer.domElement);
 	orbitControls.userZoom = false;
 
-	// TOUCH
-	touchController = new TouchInputController();
-
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -72,9 +72,6 @@ function init() {
 	container.appendChild(stats.domElement);
 
 	gui.add(sceneCtrl.ball, 'speed').min(0.1).max(400).step(0.1).listen();
-
-	gameDirector = new Director();
-	//initNet(clientUpdate);
 }
 
 function refreshPlayersInfo() {
@@ -165,14 +162,23 @@ function updateClient(msg) {
 
 	for (var i = 0; i < sceneCtrl.playerAreas.length; i++) {
 		sceneCtrl.playerAreas[i].clientUpdate(msg);
-		if (sceneCtrl.clientPlayerAmount !== sceneCtrl.playerAmount && sceneCtrl.playerAreas[i].player.id === p2pCtrl.ThisPeerID) {
+		// Camera position. Server camera.lookAt in playerArea.js
+		if (sceneCtrl.clientPlayerAmount !== sceneCtrl.playerAreas.length && sceneCtrl.playerAreas[i].player.id === p2pCtrl.ThisPeerID) {
 			var worldPos = new THREE.Vector3();
 			worldPos.getPositionFromMatrix(sceneCtrl.playerAreas[i].borderLeft.matrixWorld);
 			sceneCtrl.camera.position.x = worldPos.x;
 			sceneCtrl.camera.position.z = worldPos.z;
 			sceneCtrl.camera.lookAt(sceneCtrl.playerAreas[i].group.position);
 
-			sceneCtrl.clientPlayerAmount = sceneCtrl.playerAmount; // Helps to prevent unnecessary camera position modification
+			console.log("lookAt");
+			console.log(sceneCtrl.clientPlayerAmount);
+			console.log(sceneCtrl.playerAmount);
+			console.log(sceneCtrl.playerAreas[i].player.id);
+			console.log(p2pCtrl.ThisPeerID);
+			console.log(sceneCtrl.playerAreas[1].group.position);
+			console.log(worldPos);
+
+			sceneCtrl.clientPlayerAmount = sceneCtrl.playerAreas.length; // Helps to prevent unnecessary camera position modification
 		}
 	}
 
@@ -190,10 +196,6 @@ function render() {
 
 function showHelp() {
 	gameDirector.setScreen(DirectorScreens.controls);
-}
-
-function getRandomColor() {
-	return '#' + '000000'.concat(Math.floor(Math.random() * 16777215).toString(16)).substr(-6);
 }
 
 function readKeyboard() {

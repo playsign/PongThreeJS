@@ -1,9 +1,14 @@
+"use strict";
 /*
-* 	@author Tapani Jamsa
-*/
+ * 	@author Tapani Jamsa
+ */
 
 function Ball(sceneCtrl, material) {
+	// Pointers to globals
 	this.sceneCtrl = sceneCtrl;
+	this.gameDirector = gameDirector;
+	this.keyboard = keyboard;
+
 	this.speed = 80;
 	this.radius = 5;
 
@@ -18,18 +23,18 @@ function Ball(sceneCtrl, material) {
 	this.lastCollider = null;
 
 	// Create sphere physics model
-	mass = 10 * 10 * 10;
-	localInertia = new Ammo.btVector3(0, 0, 0);
-	sphereShape = new Ammo.btSphereShape(this.radius);
+	var mass = 10 * 10 * 10;
+	var localInertia = new Ammo.btVector3(0, 0, 0);
+	var sphereShape = new Ammo.btSphereShape(this.radius);
 	sphereShape.calculateLocalInertia(mass, localInertia);
 
 	// Rigidbody
-	startTransform = new Ammo.btTransform();
+	var startTransform = new Ammo.btTransform();
 	startTransform.setIdentity();
 	startTransform.setOrigin(new Ammo.btVector3(0, 0, 0));
-	motionState = new Ammo.btDefaultMotionState(startTransform);
-	rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, sphereShape, localInertia);
-	sphereAmmo = new Ammo.btRigidBody(rbInfo);
+	var motionState = new Ammo.btDefaultMotionState(startTransform);
+	var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, sphereShape, localInertia);
+	var sphereAmmo = new Ammo.btRigidBody(rbInfo);
 	sphereAmmo.mesh = this.sphereMesh;
 	sphereAmmo.setLinearFactor(new Ammo.btVector3(1, 0, 1));
 	this.sceneCtrl.btWorld.addRigidBody(sphereAmmo);
@@ -48,7 +53,7 @@ Ball.prototype.update = function(delta) // Define Method
 	}
 
 	//  Reset position if the ball is out of the scene
-	if (sceneCtrl.playerAreas[0] != null && this.sphereMesh.position.length() > (sceneCtrl.playerAreas[0].group.position.length() + 200)) {
+	if (this.sceneCtrl.playerAreas[0] !== undefined && this.sphereMesh.position.length() > (this.sceneCtrl.playerAreas[0].group.position.length() + 200)) {
 		console.log(" reset ");
 		// ammo.js . Reset positions
 		var transform = this.collider.getCenterOfMassTransform();
@@ -59,16 +64,16 @@ Ball.prototype.update = function(delta) // Define Method
 	}
 
 	// Debug ball controls
-	if (keyboard.pressed("u")) {
+	if (this.keyboard.pressed("u")) {
 		var btV3 = new Ammo.btVector3(0, 0, -1);
 		this.collider.setLinearVelocity(btV3);
-	} else if (keyboard.pressed("j")) {
+	} else if (this.keyboard.pressed("j")) {
 		var btV3 = new Ammo.btVector3(0, 0, 1);
 		this.collider.setLinearVelocity(btV3);
-	} else if (keyboard.pressed("h")) {
+	} else if (this.keyboard.pressed("h")) {
 		var btV3 = new Ammo.btVector3(-1, 0, 0);
 		this.collider.setLinearVelocity(btV3);
-	} else if (keyboard.pressed("k")) {
+	} else if (this.keyboard.pressed("k")) {
 		var btV3 = new Ammo.btVector3(1, 0, 0);
 		this.collider.setLinearVelocity(btV3);
 	}
@@ -88,20 +93,20 @@ Ball.prototype.update = function(delta) // Define Method
 	this.sphereMesh.position.x = origin.x();
 	this.sphereMesh.position.y = origin.y();
 	this.sphereMesh.position.z = origin.z();
-}
+};
 
 Ball.prototype.onCollision = function(border, collisionPoint, hitsEnd) {
 	var distance = 9999;
 	var threeCollisionPoint = new THREE.Vector3(collisionPoint.getX(), collisionPoint.getY(), collisionPoint.getZ());
 
 	// Calculate distance between current collision point and previous collision point
-	if (this.lastCollider != null && this.lastCollider.ballPosition != null && threeCollisionPoint != null) {
+	if (this.lastCollider !== null && this.lastCollider.ballPosition !== null && threeCollisionPoint !== null) {
 		var distance = this.lastCollider.ballPosition.distanceTo(threeCollisionPoint);
 	}
 
 	//  Do collision logic if the ball is not colliding same object as previously
 	if (this.lastCollider != border && distance > 10) {
-		if (gameDirector.currentScreen === 0) {
+		if (this.gameDirector.currentScreen === 0) {
 			console.log("*ball bounce*");
 		}
 
@@ -220,9 +225,9 @@ Ball.prototype.onCollision = function(border, collisionPoint, hitsEnd) {
 		var btV3 = new Ammo.btVector3(newVelocity.x, newVelocity.y, newVelocity.z);
 		this.collider.setLinearVelocity(btV3);
 
-		if (this.lastCollider != null) {
+		if (this.lastCollider !== null) {
 			this.lastCollider.direction = btV3;
 			this.lastCollider.ballPosition = new THREE.Vector3(threeCollisionPoint.x, threeCollisionPoint.y, threeCollisionPoint.z);
 		}
 	}
-}
+};
