@@ -1,0 +1,3 @@
+[submodule "wex-ec-experiment"]
+	path = wex-ec-experiment
+	url = git@github.com:playsign/wex-ec-experiment.git
