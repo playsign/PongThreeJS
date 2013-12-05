@@ -1,0 +1,35 @@
+// ball genrated by blender2ogre 0.6.0
+
+material ball 
+{
+    receive_shadows on 
+
+    technique
+    {
+        pass ball
+        {
+            ambient 0.5939146876335144 0.8545626401901245 0.8091275095939636 1.0
+            diffuse 0.4751317571868263 0.6836501223392801 0.6473020173207225 1.0
+            specular 0.09882987290620804 0.45873746275901794 0.4800284206867218 1.0 12.5
+            emissive 0.0 0.0 0.0 1.0
+
+            alpha_to_coverage off
+            colour_write on
+            cull_hardware clockwise
+            depth_check on
+            depth_func less_equal
+            depth_write on
+            illumination_stage 
+            light_clip_planes off
+            light_scissor off
+            lighting on
+            normalise_normals off
+            polygon_mode solid
+            scene_blend one zero
+            scene_blend_op add
+            shading gouraud
+            transparent_sorting on
+
+        }
+    }
+}

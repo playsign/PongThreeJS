@@ -1,0 +1,92 @@
+<scene >
+  <entity id="105" >
+    <component sync="1" type="EC_Name" >
+      <attribute value="Sphere" name="name" />
+      <attribute value="" name="description" />
+    </component>
+    <component sync="1" type="EC_Placeable" >
+      <attribute value="0.000000,0.000000,-0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" name="Transform" />
+      <attribute value="false" name="Show bounding box" />
+      <attribute value="true" name="Visible" />
+      <attribute value="1" name="Selection layer" />
+    </component>
+    <component sync="1" type="EC_Mesh" >
+      <attribute value="Sphere.mesh" name="Mesh ref" />
+      <attribute value="ball.material" name="Mesh materials" />
+      <attribute value="0" name="Draw distance" />
+      <attribute value="false" name="Cast shadows" />
+    </component>
+  </entity>
+  <entity id="100" >
+    <component sync="1" type="EC_Name" >
+      <attribute value="borderBottom" name="name" />
+      <attribute value="" name="description" />
+    </component>
+    <component sync="1" type="EC_Placeable" >
+      <attribute value="41.739590,0.000000,-55.000000,-0.000000,-0.000000,179.999923,50.000000,5.000000,5.000000" name="Transform" />
+      <attribute value="false" name="Show bounding box" />
+      <attribute value="true" name="Visible" />
+      <attribute value="1" name="Selection layer" />
+    </component>
+    <component sync="1" type="EC_Mesh" >
+      <attribute value="pongCube.mesh" name="Mesh ref" />
+      <attribute value="wall.material" name="Mesh materials" />
+      <attribute value="0" name="Draw distance" />
+      <attribute value="false" name="Cast shadows" />
+    </component>
+  </entity>
+  <entity id="101" >
+    <component sync="1" type="EC_Name" >
+      <attribute value="borderTop" name="name" />
+      <attribute value="" name="description" />
+    </component>
+    <component sync="1" type="EC_Placeable" >
+      <attribute value="41.739590,0.000000,55.000000,0.000000,0.000147,0.000000,50.000000,5.000000,5.000000" name="Transform" />
+      <attribute value="false" name="Show bounding box" />
+      <attribute value="true" name="Visible" />
+      <attribute value="1" name="Selection layer" />
+    </component>
+    <component sync="1" type="EC_Mesh" >
+      <attribute value="pongCube.mesh" name="Mesh ref" />
+      <attribute value="wall.material" name="Mesh materials" />
+      <attribute value="0" name="Draw distance" />
+      <attribute value="false" name="Cast shadows" />
+    </component>
+  </entity>
+  <entity id="102" >
+    <component sync="1" type="EC_Name" >
+      <attribute value="racket" name="name" />
+      <attribute value="" name="description" />
+    </component>
+    <component sync="1" type="EC_Placeable" >
+      <attribute value="76.000000,0.000000,-4.000000,0.000000,-179.999923,0.000000,5.000000,5.000000,15.000000" name="Transform" />
+      <attribute value="false" name="Show bounding box" />
+      <attribute value="true" name="Visible" />
+      <attribute value="1" name="Selection layer" />
+    </component>
+    <component sync="1" type="EC_Mesh" >
+      <attribute value="pongCube.mesh" name="Mesh ref" />
+      <attribute value="wall.material" name="Mesh materials" />
+      <attribute value="0" name="Draw distance" />
+      <attribute value="false" name="Cast shadows" />
+    </component>
+  </entity>
+  <entity id="104" >
+    <component sync="1" type="EC_Name" >
+      <attribute value="borderLeft" name="name" />
+      <attribute value="" name="description" />
+    </component>
+    <component sync="1" type="EC_Placeable" >
+      <attribute value="96.055611,0.000000,-0.000000,0.000000,-89.999893,0.000000,59.999973,5.000000,4.999998" name="Transform" />
+      <attribute value="false" name="Show bounding box" />
+      <attribute value="true" name="Visible" />
+      <attribute value="1" name="Selection layer" />
+    </component>
+    <component sync="1" type="EC_Mesh" >
+      <attribute value="pongCube.mesh" name="Mesh ref" />
+      <attribute value="wall.material" name="Mesh materials" />
+      <attribute value="0" name="Draw distance" />
+      <attribute value="false" name="Cast shadows" />
+    </component>
+  </entity>
+</scene>

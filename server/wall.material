@@ -1,0 +1,35 @@
+// wall genrated by blender2ogre 0.6.0
+
+material wall 
+{
+    receive_shadows on 
+
+    technique
+    {
+        pass wall
+        {
+            ambient 0.7490684390068054 0.7435746192932129 0.3984715938568115 1.0
+            diffuse 0.599254760135036 0.5948597042986705 0.3187772798356008 1.0
+            specular 0.4752332270145416 0.4686768054962158 0.056823644787073135 1.0 12.5
+            emissive 0.0 0.0 0.0 1.0
+
+            alpha_to_coverage off
+            colour_write on
+            cull_hardware clockwise
+            depth_check on
+            depth_func less_equal
+            depth_write on
+            illumination_stage 
+            light_clip_planes off
+            light_scissor off
+            lighting on
+            normalise_normals off
+            polygon_mode solid
+            scene_blend one zero
+            scene_blend_op add
+            shading gouraud
+            transparent_sorting on
+
+        }
+    }
+}
