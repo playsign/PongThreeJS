@@ -7,7 +7,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="83.210709,0.000000,36.045074,0.000000,-38.063938,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="-18.385635,0.000000,-30.192984,0.000000,-61.064182,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -24,7 +24,7 @@
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
   </component>
   <component typeId="23" type="RigidBody" sync="true">
-   <attribute value="0.010000" type="real" id="mass" name="Mass"/>
+   <attribute value="1000.000000" type="real" id="mass" name="Mass"/>
    <attribute value="2" type="int" id="shapeType" name="Shape type"/>
    <attribute value="10.000000 10.000000 10.000000" type="float3" id="size" name="Size"/>
    <attribute value="local://Sphere.mesh" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
@@ -37,8 +37,8 @@
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="61.785500 0.000000 -50.818821" type="float3" id="linearVelocity" name="Linear velocity"/>
-   <attribute value="0.000000 -315.729919 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
+   <attribute value="-62.535267 0.000000 -49.893288" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 482.300568 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="0.000000" type="real" id="rollingFriction" name="Rolling friction"/>
