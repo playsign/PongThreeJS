@@ -7,7 +7,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="-46.485626,0.000000,-24.501970,180.000000,77.057358,180.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="83.210709,0.000000,36.045074,0.000000,-38.063938,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -30,18 +30,18 @@
    <attribute value="local://Sphere.mesh" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
    <attribute value="0.500000" type="real" id="friction" name="Friction"/>
    <attribute value="1.000000" type="real" id="restitution" name="Restitution"/>
-   <attribute value="0.010000" type="real" id="linearDamping" name="Linear damping"/>
+   <attribute value="0.000000" type="real" id="linearDamping" name="Linear damping"/>
    <attribute value="0.010000" type="real" id="angularDamping" name="Angular damping"/>
    <attribute value="1.000000 0.000000 1.000000" type="float3" id="linearFactor" name="Linear factor"/>
    <attribute value="0.000000 1.000000 0.000000" type="float3" id="angularFactor" name="Angular factor"/>
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="-69.384674 0.000000 -39.821693" type="float3" id="linearVelocity" name="Linear velocity"/>
-   <attribute value="0.000000 524.671021 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
+   <attribute value="61.785500 0.000000 -50.818821" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 -315.729919 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
-   <attribute value="0.010000" type="real" id="rollingFriction" name="Rolling friction"/>
+   <attribute value="0.000000" type="real" id="rollingFriction" name="Rolling friction"/>
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
