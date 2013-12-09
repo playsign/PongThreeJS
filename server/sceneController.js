@@ -1,28 +1,5 @@
 var zeroVec = new float3(0, 0, 0);
 
-// PLAYERAREAS
-var xOffset = -8;
-var zOffset = -9.796850830579018;
-var bxOffset = 8;
-var bzOffset = 1.9593701661158036;
-
-function offsetEntity(ent, xOff, zOff) {
-	var entT = ent.placeable.transform;
-	entT.pos = new float3(entT.pos.x + xOff, entT.pos.y, entT.pos.z + zOff);
-	ent.placeable.transform = entT;
-}
-
-// // Player 1
-// offsetEntity(scene.GetEntityByName("borderBottom"), xOffset, zOffset);
-// offsetEntity(scene.GetEntityByName("borderTop"), xOffset, zOffset);
-// offsetEntity(scene.GetEntityByName("borderLeft"), xOffset, zOffset);
-// offsetEntity(scene.GetEntityByName("racket"), xOffset, zOffset);
-// // Player 2
-// offsetEntity(scene.GetEntityByName("bBorderBottom"), bxOffset, bzOffset);
-// offsetEntity(scene.GetEntityByName("bBorderTop"), bxOffset, bzOffset);
-// offsetEntity(scene.GetEntityByName("bBorderLeft"), bxOffset, bzOffset);
-// offsetEntity(scene.GetEntityByName("bRacket"), bxOffset, bzOffset);
-
 // CAMERA
 var cam = scene.GetEntityByName("FreeLookCamera");
 var t = cam.placeable.transform;
