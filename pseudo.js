@@ -1,5 +1,5 @@
 <entity id="3" sync="1">
-var pa = new Entity();
+var pa = new Entity(); tai mielummi scene.createEntity(3)
 
 < component type = "EC_Placeable"sync = "1" >
 var component = pa.createComponent(components.length, "EC_Placeable","optionaalinenNimiVaikkaPlayerAreanPlaceable"); //id, typeId, name

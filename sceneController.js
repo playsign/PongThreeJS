@@ -6,6 +6,8 @@
 function SceneController() {
 	// SCENE
 	this.scene = new THREE.Scene();
+	// ec
+	this.ecScene = new Scene();
 
 	// CAMERA
 	var SCREEN_WIDTH = window.innerWidth;
@@ -61,6 +63,9 @@ function SceneController() {
 
 	this.ball = new Ball(this, borderMaterial);
 	this.scene.add(this.ball.sphereMesh);
+	// ec
+	var ecBall = this.ecScene.createEntity(this.ecScene.entities.length);
+	var comp = ecBall.createComponent(ecBall.components.length, "Placeable", "ball");
 
 }
 
