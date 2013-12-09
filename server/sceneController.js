@@ -29,6 +29,22 @@ ball.placeable.transform = ballt;
 ball.rigidbody.SetLinearVelocity(new float3(1, 0, 1));
 ball.rigidbody.SetAngularVelocity(zeroVec);
 // ball.rigidbody.SetLinearVelocity(zeroVec);
+// trigger
+ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
+
+function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {
+	// console.LogInfo(ent.name);
+	if (ent.name == "borderLeft") {
+		ball.placeable.transform = ballt;
+
+		console.LogInfo(ent.placeable.parentRef.ref);
+		var parent = scene.EntityById(ent.placeable.parentRef.ref);
+		// console.LogInfo(parent);
+		var attrs = parent.dynamiccomponent;
+		// console.LogInfo(attrs);
+		attrs.SetAttribute("playerBalls", attrs.GetAttribute("playerBalls") - 1);
+	}
+}
 
 function update(dt) {
 	var rigidbody = ball.rigidbody;

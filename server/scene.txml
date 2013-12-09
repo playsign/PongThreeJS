@@ -7,7 +7,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="-42.349506,0.000000,13.453577,0.000000,55.695427,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="37.077709,0.000000,-4.020549,180.000000,-39.176601,180.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -37,8 +37,8 @@
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="67.380669 0.000000 -43.125931" type="float3" id="linearVelocity" name="Linear velocity"/>
-   <attribute value="0.000000 -551.346191 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
+   <attribute value="-79.770607 0.000000 -6.053895" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 -34.939087 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="0.000000" type="real" id="rollingFriction" name="Rolling friction"/>
@@ -73,6 +73,9 @@
    <attribute value="" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
+  <component typeId="25" type="DynamicComponent" sync="true">
+   <attribute value="-80" type="int" id="playerBalls" name="playerBalls"/>
+  </component>
  </entity>
  <entity id="4" sync="true">
   <component typeId="26" type="Name" sync="true">
@@ -87,6 +90,9 @@
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
    <attribute value="" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
+  </component>
+  <component typeId="25" type="DynamicComponent" sync="true">
+   <attribute value="-76" type="int" id="playerBalls" name="playerBalls"/>
   </component>
  </entity>
  <entity id="5" sync="true">
@@ -186,7 +192,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="75.999962,0.000000,19.414516,0.000000,-179.999924,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="75.999962,0.000000,-4.638149,0.000000,-179.999924,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
