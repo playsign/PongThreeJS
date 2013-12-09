@@ -7,7 +7,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="-48.688717,0.000000,-39.039265,0.000000,-28.998915,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="-42.349506,0.000000,13.453577,0.000000,55.695427,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -37,15 +37,15 @@
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="44.448925 0.000000 -66.515358" type="float3" id="linearVelocity" name="Linear velocity"/>
-   <attribute value="0.000000 315.225708 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
+   <attribute value="67.380669 0.000000 -43.125931" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 -551.346191 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="0.000000" type="real" id="rollingFriction" name="Rolling friction"/>
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
- <entity id="6" sync="true">
+ <entity id="2" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="SceneController" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -59,7 +59,7 @@
    <attribute value="" type="string" id="className" name="Script class name"/>
   </component>
  </entity>
- <entity id="13" sync="true">
+ <entity id="3" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="Player2" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -74,7 +74,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
  </entity>
- <entity id="16" sync="true">
+ <entity id="4" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="Player1" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -89,7 +89,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
  </entity>
- <entity id="17" sync="true">
+ <entity id="5" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="borderBottom" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -100,7 +100,7 @@
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
-   <attribute value="13" type="EntityReference" id="parentRef" name="Parent entity ref"/>
+   <attribute value="3" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
@@ -134,7 +134,7 @@
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
- <entity id="18" sync="true">
+ <entity id="6" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="borderLeft" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -145,7 +145,7 @@
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
-   <attribute value="13" type="EntityReference" id="parentRef" name="Parent entity ref"/>
+   <attribute value="3" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
@@ -179,23 +179,23 @@
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
- <entity id="19" sync="true">
+ <entity id="7" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="racket" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="75.999962,0.000000,-4.000000,0.000000,-179.999924,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="75.999962,0.000000,19.414516,0.000000,-179.999924,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
-   <attribute value="13" type="EntityReference" id="parentRef" name="Parent entity ref"/>
+   <attribute value="3" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
-   <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
+   <attribute value="local://newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
@@ -204,8 +204,8 @@
   </component>
   <component typeId="23" type="RigidBody" sync="true">
    <attribute value="0.000000" type="real" id="mass" name="Mass"/>
-   <attribute value="0" type="int" id="shapeType" name="Shape type"/>
-   <attribute value="2.000000 2.000000 2.000000" type="float3" id="size" name="Size"/>
+   <attribute value="4" type="int" id="shapeType" name="Shape type"/>
+   <attribute value="1.000000 1.000000 1.000000" type="float3" id="size" name="Size"/>
    <attribute value="" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
    <attribute value="1.000000" type="real" id="friction" name="Friction"/>
    <attribute value="1.000000" type="real" id="restitution" name="Restitution"/>
@@ -224,7 +224,7 @@
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
- <entity id="20" sync="true">
+ <entity id="8" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="borderTop" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -235,7 +235,7 @@
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
-   <attribute value="13" type="EntityReference" id="parentRef" name="Parent entity ref"/>
+   <attribute value="3" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
@@ -269,7 +269,7 @@
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
- <entity id="21" sync="true">
+ <entity id="9" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="borderTop" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -280,7 +280,7 @@
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
-   <attribute value="16" type="EntityReference" id="parentRef" name="Parent entity ref"/>
+   <attribute value="4" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
@@ -314,7 +314,7 @@
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
- <entity id="22" sync="true">
+ <entity id="10" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="racket" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -325,12 +325,12 @@
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
-   <attribute value="16" type="EntityReference" id="parentRef" name="Parent entity ref"/>
+   <attribute value="4" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
-   <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
+   <attribute value="local://newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
@@ -339,8 +339,8 @@
   </component>
   <component typeId="23" type="RigidBody" sync="true">
    <attribute value="0.000000" type="real" id="mass" name="Mass"/>
-   <attribute value="0" type="int" id="shapeType" name="Shape type"/>
-   <attribute value="2.000000 2.000000 2.000000" type="float3" id="size" name="Size"/>
+   <attribute value="4" type="int" id="shapeType" name="Shape type"/>
+   <attribute value="1.000000 1.000000 1.000000" type="float3" id="size" name="Size"/>
    <attribute value="" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
    <attribute value="1.000000" type="real" id="friction" name="Friction"/>
    <attribute value="1.000000" type="real" id="restitution" name="Restitution"/>
@@ -359,7 +359,7 @@
    <attribute value="true" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
- <entity id="23" sync="true">
+ <entity id="11" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="borderLeft" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -370,7 +370,7 @@
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
-   <attribute value="16" type="EntityReference" id="parentRef" name="Parent entity ref"/>
+   <attribute value="4" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
@@ -404,7 +404,7 @@
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
- <entity id="24" sync="true">
+ <entity id="12" sync="true">
   <component typeId="26" type="Name" sync="true">
    <attribute value="borderBottom" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
@@ -415,7 +415,7 @@
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
-   <attribute value="16" type="EntityReference" id="parentRef" name="Parent entity ref"/>
+   <attribute value="4" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
