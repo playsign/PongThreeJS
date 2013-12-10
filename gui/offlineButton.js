@@ -21,8 +21,8 @@ $(function() {
 		label: "offline"
 	})
 		.click(function() {
-		p2pCtrl.netRole = null;
-		gameDirector.setScreen(DirectorScreens.controls);
+		app.p2pCtrl.netRole = null;
+		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.controls);
 	})
 		// .toggle()
 });

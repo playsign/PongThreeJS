@@ -13,8 +13,8 @@ $(function() {
 	}) // adds CSS
 	.button({})
 		.click(function() {
-		gameDirector.setScreen(DirectorScreens.game);
-		sceneCtrl.generateScene();
+		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.game);
+		app.sceneCtrl.generateScene();
 	})
 		.append("<img width='"+width+"' height='"+width+"' src='images/replayIcon.png'/>")
 });

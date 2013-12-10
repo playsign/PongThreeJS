@@ -20,8 +20,8 @@ $(function() {
 		label: "OK"
 	})
 		.click(function() {
-		gameDirector.doNextScreen();
-		sceneCtrl.generateScene();
+		app.sceneCtrl.gameDirector.doNextScreen();
+		app.sceneCtrl.generateScene();
 	})
 		// .hide()
 });

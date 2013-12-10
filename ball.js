@@ -4,10 +4,7 @@
  */
 
 function Ball(sceneCtrl, material) {
-	// Pointers to globals
 	this.sceneCtrl = sceneCtrl;
-	this.gameDirector = gameDirector;
-	this.keyboard = keyboard;
 
 	this.speed = 80;
 	this.radius = 5;
@@ -37,7 +34,7 @@ function Ball(sceneCtrl, material) {
 	var sphereAmmo = new Ammo.btRigidBody(rbInfo);
 	sphereAmmo.mesh = this.sphereMesh;
 	sphereAmmo.setLinearFactor(new Ammo.btVector3(1, 0, 1));
-	this.sceneCtrl.btWorld.addRigidBody(sphereAmmo);
+	this.sceneCtrl.btWorld.addRigidBody(sphereAmmo);0
 	this.collider = sphereAmmo;
 	var btV3 = new Ammo.btVector3(1, 0, 1);
 	this.collider.setLinearVelocity(btV3);
@@ -64,19 +61,19 @@ Ball.prototype.update = function(delta) // Define Method
 	}
 
 	// Debug ball controls
-	if (this.keyboard.pressed("u")) {
-		var btV3 = new Ammo.btVector3(0, 0, -1);
-		this.collider.setLinearVelocity(btV3);
-	} else if (this.keyboard.pressed("j")) {
-		var btV3 = new Ammo.btVector3(0, 0, 1);
-		this.collider.setLinearVelocity(btV3);
-	} else if (this.keyboard.pressed("h")) {
-		var btV3 = new Ammo.btVector3(-1, 0, 0);
-		this.collider.setLinearVelocity(btV3);
-	} else if (this.keyboard.pressed("k")) {
-		var btV3 = new Ammo.btVector3(1, 0, 0);
-		this.collider.setLinearVelocity(btV3);
-	}
+	// if (this.keyboard.pressed("u")) {
+	// 	var btV3 = new Ammo.btVector3(0, 0, -1);
+	// 	this.collider.setLinearVelocity(btV3);
+	// } else if (this.keyboard.pressed("j")) {
+	// 	var btV3 = new Ammo.btVector3(0, 0, 1);
+	// 	this.collider.setLinearVelocity(btV3);
+	// } else if (this.keyboard.pressed("h")) {
+	// 	var btV3 = new Ammo.btVector3(-1, 0, 0);
+	// 	this.collider.setLinearVelocity(btV3);
+	// } else if (this.keyboard.pressed("k")) {
+	// 	var btV3 = new Ammo.btVector3(1, 0, 0);
+	// 	this.collider.setLinearVelocity(btV3);
+	// }
 
 	// keep the speed of 1 (* delta)
 	var btVelo = this.collider.getLinearVelocity();
@@ -106,9 +103,8 @@ Ball.prototype.onCollision = function(border, collisionPoint, hitsEnd) {
 
 	//  Do collision logic if the ball is not colliding same object as previously
 	if (this.lastCollider != border && distance > 10) {
-		if (this.gameDirector.currentScreen === 0) {
-			console.log("*ball bounce*");
-		}
+		console.log("*ball bounce*");
+
 
 		this.lastCollider = border;
 
@@ -179,7 +175,7 @@ Ball.prototype.onCollision = function(border, collisionPoint, hitsEnd) {
 		else if (border.name == "left") {
 			// console.log("left border");
 			border.parentNode.playerBalls--;
-			refreshPlayersInfo();
+			this.sceneCtrl.refreshPlayersInfo();
 
 			// ammo.js . Reset positions
 			var transform = this.collider.getCenterOfMassTransform();

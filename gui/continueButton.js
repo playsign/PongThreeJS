@@ -14,7 +14,7 @@ $(function() {
 	.button({
 	})
 		.click(function() {
-		gameDirector.setScreen(DirectorScreens.game);
+		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.game);
 	})
 		.append("<img width='"+width+"' height='"+width+"' src='images/playIcon.png'/>")
 });

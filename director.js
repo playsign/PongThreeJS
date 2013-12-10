@@ -68,12 +68,12 @@ Director.prototype.setScreen = function(newScreen) {
 
 				$("#okButton").show();
 
-				if (p2pCtrl.netRole === null) {
+				if (app.p2pCtrl.netRole === null) {
 					$("#helpOffline").show();
-					gui.open();
+					app.viewer.gui.open();
 				} else {
 					$("#helpOnline").show();
-					gui.close();
+					app.viewer.gui.close();
 				}
 				break;
 			case 5: //  GAME SCENE

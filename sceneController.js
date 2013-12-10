@@ -4,6 +4,8 @@
  */
 
 function SceneController() {
+	this.gameDirector = new Director();
+	
 	// SCENE
 	this.scene = new THREE.Scene();
 	// ec
@@ -219,7 +221,7 @@ SceneController.prototype.generateScene = function() {
 	this.camera.updateProjectionMatrix();
 
 	// Players info
-	refreshPlayersInfo();
+	this.refreshPlayersInfo();
 
 	this.oldPlayerAmount = this.playerAmount;
 };
@@ -242,3 +244,37 @@ SceneController.prototype.deleteScene = function() {
 SceneController.prototype.getRandomColor = function() {
 	return '#' + '000000'.concat(Math.floor(Math.random() * 16777215).toString(16)).substr(-6);
 };
+
+SceneController.prototype.refreshPlayersInfo = function() {
+	$("#playersInfo").empty();
+	for (var i = 0; i < this.playerAmount; i++) {
+
+		$("#playersInfo").append("<font color = " + this.playerAreas[i].player.color + ">Player" + (i + 1) + "</font>");
+		switch (this.playerAreas[i].player.balls) {
+			case 0:
+				$("#playersInfo").append("<img width='Â¨12' height='12' src='images/ballIconRed.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> <br>");
+				break;
+			case 1:
+				$("#playersInfo").append("<img width='Â¨12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> <br>");
+				break;
+			case 2:
+				$("#playersInfo").append("<img width='Â¨12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIconRed.png'/> <br>");
+				break;
+			case 3:
+				$("#playersInfo").append("<img width='Â¨12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIcon.png'/> ");
+				$("#playersInfo").append("<img width='12' height='12' src='images/ballIcon.png'/> <br>");
+				break;
+		}
+	}
+}
+
+SceneController.prototype.showHelp = function() {
+	this.gameDirector.setScreen(DirectorScreens.controls);
+}

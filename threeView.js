@@ -52,7 +52,7 @@ function updateFromTransform(threeMesh, placeable) {
 	threeMesh.needsUpdate = true;
 }
 
-function ThreeView() {
+function ThreeView(sceneCtrl) {
 	// Pointer to global
 	this.sceneCtrl = sceneCtrl;
 

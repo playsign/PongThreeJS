@@ -22,11 +22,11 @@ $(function() {
 	})
 		.click(function() {
 		// if not already connected
-		if(p2pCtrl.peerConnections.length === 0){
-			p2pCtrl.initNet(updateClient);
+		if(app.p2pCtrl.peerConnections.length === 0){
+			app.p2pCtrl.initNet(app.updateClient);
 		}
 		else {
-			showHelp();
+			app.sceneCtrl.showHelp();
 		}
 	})
 	// .toggle()

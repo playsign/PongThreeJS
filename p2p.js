@@ -5,8 +5,7 @@
  */
 /* global window, THREE, console, Player */
 
-function P2P() {
-    // Pointer to global
+function P2P(sceneCtrl) {
     this.sceneCtrl = sceneCtrl;
 
     this.peerJsApiKey = "gnyz9wskc2chaor";
@@ -160,9 +159,10 @@ P2P.prototype.attemptServerConnection = function(peerid) {
         this.scope.ThisPeerID = myid;
     });
     var conn = pjs.connect(peerid);
+    conn.scope = this;
     conn.on("open", function() {
         console.log("connection estabilished to server");
-        showHelp();
+        this.scope.sceneCtrl.showHelp();
     });
     conn.on("error", function() {
         console.log("connection error to server");
@@ -232,7 +232,7 @@ P2P.prototype.initServer = function() {
         }
 
         console.log(gamemsg);
-        showHelp();
+        this.scope.sceneCtrl.showHelp();
     });
 
     pjs.on('connection', function(conn) {

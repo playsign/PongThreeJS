@@ -9,15 +9,15 @@
 
 function PlayerArea(position, rotation, id) {
 	// Pointers to globals
-	this.p2pCtrl = p2pCtrl;
-	this.sceneCtrl = sceneCtrl;
-	this.touchController = touchController;
-	this.keyboard = keyboard;
+	this.p2pCtrl = app.p2pCtrl;
+	this.sceneCtrl = app.sceneCtrl;
+	this.touchController = app.touchController;
+	this.keyboard = app.keyboard;
 
 	// PLAYER INFO
-	if (this.p2pCtrl.netRole && p2pCtrl.playerArray[id]) {
+	if (this.p2pCtrl.netRole && this.p2pCtrl.playerArray[id]) {
 		// online
-		this.player = p2pCtrl.playerArray[id];
+		this.player = this.p2pCtrl.playerArray[id];
 	} else {
 		// offline
 		var randomColor = this.sceneCtrl.getRandomColor();

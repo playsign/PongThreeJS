@@ -13,30 +13,30 @@ $(function() {
 	}) // adds CSS
 	.button({})
 		.click(function() {
-		gameDirector.setScreen(DirectorScreens.menu);
-		sceneCtrl.deleteScene();
+		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.menu);
+		app.sceneCtrl.deleteScene();
 
 		// online
-		if (p2pCtrl.netRole != null) {
+		if (app.p2pCtrl.netRole != null) {
 			// Close peer connections
-		    for (var i = 0; i < p2pCtrl.peerConnections.length; i++) {
-		    	p2pCtrl.peerConnections[i].close();
-			    p2pCtrl.peerConnections.splice(i, 1);
+		    for (var i = 0; i < app.p2pCtrl.peerConnections.length; i++) {
+		    	app.p2pCtrl.peerConnections[i].close();
+			    app.p2pCtrl.peerConnections.splice(i, 1);
 	    	}
 	    	// What is this?
 		    // for (var i = 0; i < players.length; i++) {
 			   //  players.splice(i, 1);
 	    	// }
-	    	p2pCtrl.peerConnections = [];
-			p2pCtrl.netRole = null;
-			p2pCtrl.clientUpdateCallback = null;
-			p2pCtrl.clientKeysPressed = null;
-			p2pCtrl.clientTouch = null;
+	    	app.p2pCtrl.peerConnections = [];
+			app.p2pCtrl.netRole = null;
+			app.p2pCtrl.clientUpdateCallback = null;
+			app.p2pCtrl.clientKeysPressed = null;
+			app.p2pCtrl.clientTouch = null;
 			id = null;
-			p2pCtrl.ThisPeerID = null;
-			p2pCtrl.clientID = null;
-			p2pCtrl.serverID = null;
-			p2pCtrl.timeOutTable = [];
+			app.p2pCtrl.ThisPeerID = null;
+			app.p2pCtrl.clientID = null;
+			app.p2pCtrl.serverID = null;
+			app.p2pCtrl.timeOutTable = [];
 		}
 
 		})
