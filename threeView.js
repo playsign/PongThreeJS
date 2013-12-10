@@ -12,7 +12,6 @@ function jsonLoad(url, addCallback) {
 	loader.load(url, function(geometry, material) {
 		addCallback(geometry, material);
 	});
-
 }
 
 var debugOnCheckFail = true;
@@ -61,7 +60,6 @@ function ThreeView() {
 	this.meshCache = {};
 
 	// DAT GUI
-	this.container = document.getElementById('ThreeJS');
 	this.gui = new dat.GUI();
 	this.gui.add(this.sceneCtrl, 'playerAmount').min(2).max(100).step(1).listen();
 	this.gui.close();
@@ -69,14 +67,12 @@ function ThreeView() {
 	this.gui.domElement.style.right = '0px';
 	// gui.domElement.style.zIndex = 100;
 	this.gui.add(this.sceneCtrl.ball, 'speed').min(0.1).max(400).step(0.1).listen();
-	this.container.appendChild(this.gui.domElement);
 
 	// STATS
 	this.stats = new Stats();
 	this.stats.domElement.style.position = 'absolute';
 	this.stats.domElement.style.bottom = '0px';
 	this.stats.domElement.style.zIndex = 100;
-	this.container.appendChild(this.stats.domElement);
 
 	// RENDERER    
 	if (Detector.webgl)
@@ -86,7 +82,6 @@ function ThreeView() {
 	else
 		this.renderer = new THREE.CanvasRenderer();
 	this.renderer.setSize(window.innerWidth, window.innerHeight);
-	this.container.appendChild(this.renderer.domElement);
 
 	// EVENTS
 	THREEx.WindowResize(this.renderer, this.sceneCtrl.camera);
@@ -94,11 +89,16 @@ function ThreeView() {
 		charCode: 'm'.charCodeAt(0)
 	});
 
+	// CONTAINER
+	this.container = document.getElementById('ThreeJS');
+	this.container.appendChild(this.gui.domElement);
+	this.container.appendChild(this.stats.domElement);
+	this.container.appendChild(this.renderer.domElement);
+	document.body.appendChild(this.container);
+
 	// debug
 	this.entitiesSeen = {};
 	this.entitiesWithMeshesSeen = {};
-
-	document.body.appendChild(this.container);
 }
 
 ThreeView.prototype.render = function() {

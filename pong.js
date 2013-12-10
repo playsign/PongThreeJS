@@ -1,7 +1,8 @@
 /* -*- js-indent-level: 8 -*-
 
+// For conditions of distribution and use, see copyright notice in LICENSE
 /*
-*	Pong
+*	PongThreeJS
 * 	@author Tapani Jamsa
 *	@author Erno Kuusela
 *	@author Toni Alatalo
@@ -11,9 +12,8 @@
 // "use strict";
 /* jshint -W097, -W040 */
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens */
-// MAIN
 
-var sceneCtrl, p2pCtrl, orbitControls, touchController, stats, gui, gameDirector, viewer;
+var sceneCtrl, p2pCtrl, orbitControls, touchController, gameDirector, viewer;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
@@ -33,14 +33,12 @@ function init() {
 	// P2P
 	p2pCtrl = new P2P();
 
-	// VIEW
+	// VIEWER
 	viewer = new ThreeView();
 
 	// CONTROLS
 	orbitControls = new THREE.OrbitControls(sceneCtrl.camera, viewer.renderer.domElement);
 	orbitControls.userZoom = false;
-
-	
 }
 
 function refreshPlayersInfo() {
