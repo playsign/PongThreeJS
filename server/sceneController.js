@@ -37,7 +37,7 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 	if (ent.name == "borderLeft") {
 		ball.placeable.transform = ballt;
 
-		console.LogInfo(ent.placeable.parentRef.ref);
+		// console.LogInfo(ent.placeable.parentRef.ref);
 		var parent = scene.EntityById(ent.placeable.parentRef.ref);
 		// console.LogInfo(parent);
 		var attrs = parent.dynamiccomponent;

@@ -5,11 +5,9 @@
 
 function SceneController() {
 	this.gameDirector = new Director();
-	
+
 	// SCENE
 	this.scene = new THREE.Scene();
-	// ec
-	// this.ecScene = new Scene();
 
 	// CAMERA
 	var SCREEN_WIDTH = window.innerWidth;
