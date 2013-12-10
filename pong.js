@@ -13,7 +13,7 @@
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens */
 // MAIN
 
-var sceneCtrl, p2pCtrl, orbitControls, touchController, stats, gui, gameDirector;
+var sceneCtrl, p2pCtrl, orbitControls, touchController, stats, gui, gameDirector, viewer;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
@@ -33,45 +33,14 @@ function init() {
 	// P2P
 	p2pCtrl = new P2P();
 
-	// DAT GUI
-	container = document.getElementById('ThreeJS');
-	gui = new dat.GUI();
-	gui.add(sceneCtrl, 'playerAmount').min(2).max(100).step(1).listen();
-	gui.close();
-	gui.domElement.style.position = 'absolute';
-	gui.domElement.style.right = '0px';
-	// gui.domElement.style.zIndex = 100;
-	container.appendChild(gui.domElement);
-
-	// RENDERER
-	if (Detector.webgl)
-		renderer = new THREE.WebGLRenderer({
-			antialias: true
-		});
-	else
-		renderer = new THREE.CanvasRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight);
-
-	container.appendChild(renderer.domElement);
-
-	// EVENTS
-	THREEx.WindowResize(renderer, sceneCtrl.camera);
-	THREEx.FullScreen.bindKey({
-		charCode: 'm'.charCodeAt(0)
-	});
+	// VIEW
+	viewer = new ThreeView();
 
 	// CONTROLS
-	orbitControls = new THREE.OrbitControls(sceneCtrl.camera, renderer.domElement);
+	orbitControls = new THREE.OrbitControls(sceneCtrl.camera, viewer.renderer.domElement);
 	orbitControls.userZoom = false;
 
-	// STATS
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.bottom = '0px';
-	stats.domElement.style.zIndex = 100;
-	container.appendChild(stats.domElement);
-
-	gui.add(sceneCtrl.ball, 'speed').min(0.1).max(400).step(0.1).listen();
+	
 }
 
 function refreshPlayersInfo() {
@@ -110,7 +79,7 @@ function update() {
 	var delta = clock.getDelta(); // seconds
 
 	orbitControls.update();
-	stats.update();
+	viewer.stats.update();
 
 	if (p2pCtrl.netRole === 'client') {
 		clientUpdate();
@@ -121,7 +90,7 @@ function update() {
 	}
 
 	requestAnimationFrame(update);
-	render();
+	viewer.render();
 }
 
 // Update the scene
@@ -180,10 +149,6 @@ function updateClient(msg) {
 	};
 
 	return inputs;
-}
-
-function render() {
-	renderer.render(sceneCtrl.scene, sceneCtrl.camera);
 }
 
 function showHelp() {
