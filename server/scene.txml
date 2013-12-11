@@ -7,7 +7,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="37.077709,0.000000,-4.020549,180.000000,-39.176601,180.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="9661.872070,0.000000,-3594.080322,0.000000,73.854721,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -37,8 +37,8 @@
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="-79.770607 0.000000 -6.053895" type="float3" id="linearVelocity" name="Linear velocity"/>
-   <attribute value="0.000000 -34.939087 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
+   <attribute value="74.979759 0.000000 -27.893299" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 159.816360 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="0.000000" type="real" id="rollingFriction" name="Rolling friction"/>
@@ -74,7 +74,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="25" type="DynamicComponent" sync="true">
-   <attribute value="-80" type="int" id="playerBalls" name="playerBalls"/>
+   <attribute value="-342" type="int" id="playerBalls" name="playerBalls"/>
   </component>
  </entity>
  <entity id="4" sync="true">
@@ -92,7 +92,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="25" type="DynamicComponent" sync="true">
-   <attribute value="-76" type="int" id="playerBalls" name="playerBalls"/>
+   <attribute value="-338" type="int" id="playerBalls" name="playerBalls"/>
   </component>
  </entity>
  <entity id="5" sync="true">
@@ -102,7 +102,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="41.739540,0.000000,-55.000000,-0.000000,-0.000000,179.999924,50.000000,5.000000,5.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="41.739540,0.000000,-55.000000,-0.000000,-0.000000,179.999924,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -110,7 +110,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
-   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
+   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,50.000000,5.000000,5.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
@@ -147,7 +147,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="96.055573,0.000000,0.000000,0.000000,-89.999893,0.000000,59.999973,5.000000,4.999998" type="Transform" id="transform" name="Transform"/>
+   <attribute value="96.055573,0.000000,0.000000,0.000000,-89.999893,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -155,7 +155,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
-   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
+   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,60.000000,5.000000,5.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
@@ -192,7 +192,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="75.999962,0.000000,-4.638149,0.000000,-179.999924,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="75.999962,0.000000,-4.638149,0.000000,-179.999924,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -200,7 +200,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
-   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
+   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,5.000000,5.000000,15.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="local://newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
@@ -237,7 +237,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="41.739540,0.000000,55.000000,0.000000,0.000147,0.000000,50.000000,5.000000,5.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="41.739540,0.000000,55.000000,0.000000,0.000147,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -245,7 +245,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
-   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
+   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,50.000000,5.000000,5.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
@@ -282,7 +282,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="41.739540,0.000000,55.000000,0.000000,0.000147,0.000000,50.000000,5.000000,5.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="41.739540,0.000000,55.000000,0.000000,0.000147,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -290,7 +290,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
-   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
+   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,50.000000,5.000000,5.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
@@ -327,7 +327,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="75.999962,0.000000,-4.000000,0.000000,-179.999924,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="75.999962,0.000000,-4.000000,0.000000,-179.999924,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -335,7 +335,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
-   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
+   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,5.000000,5.000000,15.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="local://newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
@@ -372,7 +372,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="96.055573,0.000000,0.000000,0.000000,-89.999893,0.000000,59.999973,5.000000,4.999998" type="Transform" id="transform" name="Transform"/>
+   <attribute value="96.055573,0.000000,0.000000,0.000000,-89.999893,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -380,7 +380,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
-   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
+   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,60.000000,5.000000,5.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
@@ -417,7 +417,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="41.739540,0.000000,-55.000000,-0.000000,-0.000000,179.999924,50.000000,5.000000,5.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="41.739540,0.000000,-55.000000,-0.000000,-0.000000,179.999924,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -425,7 +425,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="17" type="Mesh" sync="true">
-   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
+   <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,50.000000,5.000000,5.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>

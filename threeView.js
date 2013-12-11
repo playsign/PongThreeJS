@@ -63,10 +63,7 @@ ThreeView.prototype.render = function() {
 };
 
 ThreeView.prototype.addOrUpdate = function(entity, placeable, meshComp) {
-	// console.clear();
-	// console.log(entity);
-	// console.log(placeable);
-	// console.log(meshComp);
+	// console.log(placeable.parentRef.index);
 
 	this.checkDefined(entity, placeable, meshComp);
 	this.checkDefined(entity.id);
@@ -74,7 +71,21 @@ ThreeView.prototype.addOrUpdate = function(entity, placeable, meshComp) {
 	var url = meshComp.meshRef.value.ref;
 	if (url === 'Sphere.mesh') {
 		this.updateFromTransform(this.sceneCtrl.ball.sphereMesh, placeable);
+	} else if (url === 'local://newRacket.mesh') {
+		// console.clear();
+		// console.log(entity);
+		// console.log(placeable);
+		// console.log(meshComp);
+		// console.log(placeable.parentRef.valueInternal);
+
+		if(placeable.parentRef.valueInternal === '3'){
+			this.updateFromTransform(this.sceneCtrl.playerAreas[0].racketMesh, placeable);
+		} else if(placeable.parentRef.valueInternal === '4'){
+			this.updateFromTransform(this.sceneCtrl.playerAreas[1].racketMesh, placeable);
+		}
 	}
+
+
 
 	// this.checkDefined(entity, placeable, meshComp);
 	// this.checkDefined(entity.id);

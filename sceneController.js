@@ -271,8 +271,12 @@ SceneController.prototype.refreshPlayersInfo = function() {
 				break;
 		}
 	}
-}
+};
 
 SceneController.prototype.showHelp = function() {
 	this.gameDirector.setScreen(DirectorScreens.controls);
-}
+};
+
+SceneController.prototype.lerp = function(a, b, t) {
+	return a + (b - a) * t;
+};
