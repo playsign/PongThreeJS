@@ -17,7 +17,7 @@ function SceneController() {
 
 	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
 	this.scene.add(this.camera);
-	this.camera.position.set(0, 300, -100); // (0, 1000, -375);
+	this.camera.position.set(0, 300, 100); // (0, 1000, -375);
 	this.camera.lookAt(this.scene.position);
 
 	// LIGHT

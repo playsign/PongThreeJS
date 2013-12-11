@@ -76,9 +76,10 @@ ThreeView.prototype.addOrUpdate = function(entity, placeable, meshComp) {
 		// console.log(entity);
 		// console.log(placeable);
 		// console.log(meshComp);
-		// console.log(placeable.parentRef.valueInternal);
+		
 
 		if(placeable.parentRef.valueInternal === '3'){
+			console.log(placeable.parentRef.valueInternal);
 			this.updateFromTransform(this.sceneCtrl.playerAreas[0].racketMesh, placeable);
 		} else if(placeable.parentRef.valueInternal === '4'){
 			this.updateFromTransform(this.sceneCtrl.playerAreas[1].racketMesh, placeable);
