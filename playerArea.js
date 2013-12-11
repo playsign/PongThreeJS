@@ -81,7 +81,7 @@ function PlayerArea(position, rotation, id) {
 	// PLAYER RACKET
 	this.racketWidth = 30;
 	this.racketHeight = 20;
-	this.racketGeometry = new THREE.CubeGeometry(this.racketHeight / 2, this.racketHeight / 2, this.racketWidth, 1, 1, 1);
+	this.racketGeometry = new THREE.CubeGeometry(2, 2, 2, 1, 1, 1);
 	this.racketMesh = new THREE.Mesh(this.racketGeometry, this.material);
 	this.racketMesh.position.set(76, 0, 4);
 	this.racketMesh.rotation.y = 180 * (Math.PI / 180);
