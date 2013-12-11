@@ -1,6 +1,22 @@
 PongThreeJS
 ===========
 
+#### Installation of the EC branch
+
+This branch has a version which is ported to the realXtend Entity-Component system. It depends on a couple of submodules where the Tundra websocket networking is implemented. To get this branch and the submodules:
+
+     git clone https://github.com/playsign/PongThreeJS.git
+     git checkout ec
+     cd PongThreeJS/
+     git submodule init
+     git submodule update
+
+Then open a Tundra server with the server side of the game in the server/ dir of this repo:
+
+     ./Tundra --server --file /path/to/PongThreeJS/server/scene.txml
+
+Set the IP of the server to the client side conf in webTundraModel.js and open Pong.html in your browser.
+
 #### What
 
 PongThreeJS is an online multiplayer pong game. This game is part of FI-WARE (http://www.fi-ware.eu/).  It's designed to be used as a use case for fi-ware mifi platform dev.
