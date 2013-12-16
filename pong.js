@@ -15,6 +15,7 @@
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens */
 
 // var sceneCtrl, p2pCtrl, orbitControls, touchController, gameDirector, viewer;
+var sceneCtrl;
 var app;
 var debugTundra = true;
 
@@ -27,7 +28,8 @@ function init() {
 		useCubes = true;
 		useSignals = true;
 	}
-	app.dataConnection.host = "10.10.2.13";
+	// app.dataConnection.host = "10.10.2.13";
+	app.host = "10.10.2.13";
 	app.start();
 
 }
@@ -45,13 +47,13 @@ PongApp.prototype.logicInit = function() {
 	this.touchController = new TouchInputController();
 
 	// SCENE
-	// this.sceneCtrl = new SceneController();
+	this.sceneCtrl = new SceneController();
 
 	// VIEWER
 	// this.viewer = new ThreeView(this.scene, this.camera);
 
 	// P2P
-	this.p2pCtrl = new P2P(this.sceneCtrl);
+	// this.p2pCtrl = new P2P(this.sceneCtrl);
 
 	// CONTROLS
 	// this.controls.userZoom = false;
@@ -69,15 +71,15 @@ PongApp.prototype.logicInit = function() {
 // UPDATE FUNCTIONS
 
 PongApp.prototype.logicUpdate = function() {
-	// 	if (debugTundra) {
-	// 		//
-	// 	} else if (this.p2pCtrl.netRole === 'client') {
-	// 		this.clientUpdate();
-	// 	} else if (this.p2pCtrl.netRole === 'server') {
-	// 		this.serverUpdate(delta);
-	// 	} else if (this.p2pCtrl.netRole === null) {
-	// 		this.offlineUpdate(delta);
-	// 	}
+		if (debugTundra) {
+			//
+		} else if (this.p2pCtrl.netRole === 'client') {
+			this.clientUpdate();
+		} else if (this.p2pCtrl.netRole === 'server') {
+			this.serverUpdate(delta);
+		} else if (this.p2pCtrl.netRole === null) {
+			this.offlineUpdate(delta);
+		}
 }
 
 // PongApp.prototype.start = function() {
