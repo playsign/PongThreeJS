@@ -19,9 +19,6 @@ var sceneCtrl;
 var app;
 var debugTundra = true;
 
-// // var keyboard = new THREEx.KeyboardState();
-// // var clock = new THREE.Clock();
-
 function init() {
 	app = new PongApp();
 	app.host = "10.10.2.13";
@@ -33,6 +30,8 @@ function init() {
 		app.viewer.useCubes = true;
 		useSignals = true;
 	}
+
+	app.racketSpeed = 80;
 }
 
 function PongApp() {
@@ -71,15 +70,53 @@ PongApp.prototype.logicInit = function() {
 
 // UPDATE FUNCTIONS
 
-PongApp.prototype.logicUpdate = function() {
-	if (debugTundra) {
-		//
-	} else if (this.p2pCtrl.netRole === 'client') {
-		this.clientUpdate();
-	} else if (this.p2pCtrl.netRole === 'server') {
-		this.serverUpdate(delta);
-	} else if (this.p2pCtrl.netRole === null) {
-		this.offlineUpdate(delta);
+PongApp.prototype.logicUpdate = function(dt) {
+
+	// RACKET CONTROL
+	if (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping  /*&& delta.x !== 0)*/) {
+
+		// var racketForward = new THREE.Vector3();
+
+		var entID = 7;
+		var tf = this.dataConnection.scene.entities[entID].placeable.transform;
+		var newValue = tf.value;
+
+		// var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
+
+		// // Angle to vector3
+		// racketForward.x = Math.cos(rotation * -1);
+		// racketForward.z = Math.sin(rotation * -1);
+
+
+		// racketForward.normalize();
+
+		// // Racket's speed
+		// if (this.touchController.swiping) {
+		// 	// Touch / Mouse
+		// 	racketForward.multiplyScalar(this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed * dt);
+		// } else {
+		// 	// Keyboard
+		// 	racketForward.multiplyScalar(this.racketSpeed * dt);
+		// }
+
+		var deltaMovement = this.racketSpeed * dt;
+
+		// Keyboard
+		if (this.keyboard.pressed("left") || this.keyboard.pressed("a")) {
+			newValue.pos.z += deltaMovement;
+		}
+		if (this.keyboard.pressed("right") || this.keyboard.pressed("d")) {
+			newValue.pos.z -= deltaMovement;
+		}
+
+		// Touch
+		if (this.touchController.swiping) {
+			newValue.pos.z += deltaMovement;
+		}
+
+
+		this.dataConnection.scene.entities[entID].placeable.transform.set(newValue, 0);
+		this.dataConnection.syncManager.sendChanges();
 	}
 }
 
