@@ -1,6 +1,3 @@
-[submodule "wex-ec-experiment"]
-	path = wex-ec-experiment
-	url = https://github.com/playsign/wex-ec-experiment.git
 [submodule "WebTundraNetworking"]
 	path = WebTundraNetworking
 	url = https://github.com/realXtend/WebTundraNetworking.git
