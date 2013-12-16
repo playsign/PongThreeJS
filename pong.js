@@ -24,14 +24,15 @@ var debugTundra = true;
 
 function init() {
 	app = new PongApp();
-	if (debugTundra) {
-		useCubes = true;
-		useSignals = true;
-	}
-	// app.dataConnection.host = "10.10.2.13";
 	app.host = "10.10.2.13";
+	app.port = 2345;
+
 	app.start();
 
+	if (debugTundra) {
+		app.viewer.useCubes = true;
+		useSignals = true;
+	}
 }
 
 function PongApp() {
@@ -71,15 +72,15 @@ PongApp.prototype.logicInit = function() {
 // UPDATE FUNCTIONS
 
 PongApp.prototype.logicUpdate = function() {
-		if (debugTundra) {
-			//
-		} else if (this.p2pCtrl.netRole === 'client') {
-			this.clientUpdate();
-		} else if (this.p2pCtrl.netRole === 'server') {
-			this.serverUpdate(delta);
-		} else if (this.p2pCtrl.netRole === null) {
-			this.offlineUpdate(delta);
-		}
+	if (debugTundra) {
+		//
+	} else if (this.p2pCtrl.netRole === 'client') {
+		this.clientUpdate();
+	} else if (this.p2pCtrl.netRole === 'server') {
+		this.serverUpdate(delta);
+	} else if (this.p2pCtrl.netRole === null) {
+		this.offlineUpdate(delta);
+	}
 }
 
 // PongApp.prototype.start = function() {

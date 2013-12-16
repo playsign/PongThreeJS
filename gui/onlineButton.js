@@ -1,6 +1,6 @@
 $(function() {
 	var width = window.innerWidth * 0.25;
-	var posX = (window.innerWidth / 2) - (width * -0.25);
+	var posX = (window.innerWidth / 2) - (width / 2);
 	var posY = window.innerHeight * 0.8;
 	var fontSize = width + "%";
 
@@ -18,16 +18,16 @@ $(function() {
 		"color": "white"
 	}) // adds CSS
 	.button({
-		label: "online"
+		label: "Connect"
 	})
 		.click(function() {
 		// if not already connected
-		if(app.p2pCtrl.peerConnections.length === 0){
-			app.p2pCtrl.initNet(app.updateClient);
+		app.sceneCtrl.showHelp();
+		if (app.connected == false) {
+			app.connect(app.host, app.port);
 		}
-		else {
-			app.sceneCtrl.showHelp();
-		}
+		
+
 	})
 	// .toggle()
 });

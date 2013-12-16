@@ -22,15 +22,12 @@ Director.prototype.setScreen = function(newScreen) {
 	if (this.screen != newScreen) {
 		// *hide previous screen items
 		$("#onlineButton").hide();
-		$("#offlineButton").hide();
 		$("#title").hide();
 		$("#okButton").hide();
 		$("#helpOnline").hide();
-		$("#helpOffline").hide();
 		$("#gameMenuButton").hide();
 		$("#infoButton").hide();
 		$("#continueButton").hide();
-		$("#replayButton").hide();
 		$("#menuButton").hide();
 		$("#playersInfo").hide();
 
@@ -44,7 +41,6 @@ Director.prototype.setScreen = function(newScreen) {
 				// *show info button*
 				// *show volume button*
 				$("#onlineButton").show();
-				$("#offlineButton").show();
 				$("#title").show();
 				$("#infoButton").show();
 
@@ -67,14 +63,8 @@ Director.prototype.setScreen = function(newScreen) {
 				console.log("controls");
 
 				$("#okButton").show();
+				$("#helpOnline").show();
 
-				if (app.p2pCtrl.netRole === null) {
-					$("#helpOffline").show();
-					app.viewer.gui.open();
-				} else {
-					$("#helpOnline").show();
-					app.viewer.gui.close();
-				}
 				break;
 			case 5: //  GAME SCENE
 				// *generate scene*

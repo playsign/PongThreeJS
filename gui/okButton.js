@@ -21,7 +21,6 @@ $(function() {
 	})
 		.click(function() {
 		app.sceneCtrl.gameDirector.doNextScreen();
-		app.sceneCtrl.generateScene();
 	})
 		// .hide()
 });
