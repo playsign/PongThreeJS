@@ -7,7 +7,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="16.744890,0.000000,-5.971746,0.000000,34.215664,0.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="-68.887482,0.000000,8.265683,180.000000,-13.126620,180.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -18,7 +18,7 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="Sphere.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://ball.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
@@ -37,8 +37,8 @@
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="75.351563 0.000000 -26.872704" type="float3" id="linearVelocity" name="Linear velocity"/>
-   <attribute value="0.000000 153.969559 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
+   <attribute value="-57.001476 0.000000 56.132275" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 -443.408539 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="0.000000" type="real" id="rollingFriction" name="Rolling friction"/>
@@ -64,7 +64,7 @@
  </entity>
  <entity id="3" sync="true">
   <component typeId="26" type="Name" sync="true">
-   <attribute value="Player2" type="string" id="name" name="Name"/>
+   <attribute value="PlayerArea2" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
@@ -76,14 +76,14 @@
    <attribute value="" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
-  <component typeId="25" type="DynamicComponent" sync="true">
-   <attribute value="-1319" type="int" id="playerBalls" name="playerBalls"/>
-   <attribute value="false" type="bool" id="reserved" name="reserved"/>
+  <component typeId="25" type="DynamicComponent" sync="true" name="PlayerArea">
+   <attribute value="-4" type="int" id="playerBalls" name="playerBalls"/>
+   <attribute value="0" type="int" id="playerID" name="playerID"/>
   </component>
  </entity>
  <entity id="4" sync="true">
   <component typeId="26" type="Name" sync="true">
-   <attribute value="Player1" type="string" id="name" name="Name"/>
+   <attribute value="PlayerArea1" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
@@ -95,9 +95,9 @@
    <attribute value="" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
-  <component typeId="25" type="DynamicComponent" sync="true">
-   <attribute value="-1314" type="int" id="playerBalls" name="playerBalls"/>
-   <attribute value="false" type="bool" id="reserved" name="reserved"/>
+  <component typeId="25" type="DynamicComponent" sync="true" name="PlayerArea">
+   <attribute value="0" type="int" id="playerBalls" name="playerBalls"/>
+   <attribute value="0" type="int" id="playerID" name="playerID"/>
   </component>
  </entity>
  <entity id="5" sync="true">
@@ -118,7 +118,7 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
@@ -163,7 +163,7 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
@@ -197,7 +197,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="75.999962,0.000000,-4.638149,0.000000,-179.999924,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="76.000000,0.000000,33.249962,0.000000,0.000005,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -208,31 +208,36 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="local://newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
   </component>
   <component typeId="23" type="RigidBody" sync="true">
-   <attribute value="0.000000" type="real" id="mass" name="Mass"/>
-   <attribute value="4" type="int" id="shapeType" name="Shape type"/>
+   <attribute value="10000.000000" type="real" id="mass" name="Mass"/>
+   <attribute value="6" type="int" id="shapeType" name="Shape type"/>
    <attribute value="1.000000 1.000000 1.000000" type="float3" id="size" name="Size"/>
    <attribute value="" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
    <attribute value="1.000000" type="real" id="friction" name="Friction"/>
    <attribute value="1.000000" type="real" id="restitution" name="Restitution"/>
-   <attribute value="0.000000" type="real" id="linearDamping" name="Linear damping"/>
+   <attribute value="0.990000" type="real" id="linearDamping" name="Linear damping"/>
    <attribute value="0.000000" type="real" id="angularDamping" name="Angular damping"/>
-   <attribute value="1.000000 1.000000 1.000000" type="float3" id="linearFactor" name="Linear factor"/>
-   <attribute value="1.000000 1.000000 1.000000" type="float3" id="angularFactor" name="Angular factor"/>
-   <attribute value="true" type="bool" id="kinematic" name="Kinematic"/>
+   <attribute value="0.000000 0.000000 1.000000" type="float3" id="linearFactor" name="Linear factor"/>
+   <attribute value="0.000000 0.000000 0.000000" type="float3" id="angularFactor" name="Angular factor"/>
+   <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="0.000000 0.000000 0.000000" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 0.000000 -0.000773" type="float3" id="linearVelocity" name="Linear velocity"/>
    <attribute value="0.000000 0.000000 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="1.000000" type="real" id="rollingFriction" name="Rolling friction"/>
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
+  </component>
+  <component typeId="28" type="Highlight" sync="false" name="EcEditorHighlight">
+   <attribute value="true" type="bool" id="visible" name="Is visible"/>
+   <attribute value="0.300000 0.500000 0.100000 0.500000" type="Color" id="solidColor" name="Solid color"/>
+   <attribute value="1.000000 1.000000 1.000000 0.500000" type="Color" id="outlineColor" name="Outline color"/>
   </component>
  </entity>
  <entity id="8" sync="true">
@@ -253,7 +258,7 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
@@ -298,7 +303,7 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
@@ -332,7 +337,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="75.999962,0.000000,-4.000000,0.000000,-179.999924,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="76.000000,0.000000,34.947025,0.000000,-0.000000,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -343,31 +348,31 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="local://newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
   </component>
   <component typeId="23" type="RigidBody" sync="true">
-   <attribute value="0.000000" type="real" id="mass" name="Mass"/>
-   <attribute value="4" type="int" id="shapeType" name="Shape type"/>
+   <attribute value="10000.000000" type="real" id="mass" name="Mass"/>
+   <attribute value="6" type="int" id="shapeType" name="Shape type"/>
    <attribute value="1.000000 1.000000 1.000000" type="float3" id="size" name="Size"/>
    <attribute value="" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
    <attribute value="1.000000" type="real" id="friction" name="Friction"/>
    <attribute value="1.000000" type="real" id="restitution" name="Restitution"/>
-   <attribute value="0.000000" type="real" id="linearDamping" name="Linear damping"/>
+   <attribute value="0.990000" type="real" id="linearDamping" name="Linear damping"/>
    <attribute value="0.000000" type="real" id="angularDamping" name="Angular damping"/>
-   <attribute value="1.000000 1.000000 1.000000" type="float3" id="linearFactor" name="Linear factor"/>
-   <attribute value="1.000000 1.000000 1.000000" type="float3" id="angularFactor" name="Angular factor"/>
-   <attribute value="true" type="bool" id="kinematic" name="Kinematic"/>
+   <attribute value="0.000000 0.000000 1.000000" type="float3" id="linearFactor" name="Linear factor"/>
+   <attribute value="0.000000 0.000000 0.000000" type="float3" id="angularFactor" name="Angular factor"/>
+   <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="0.000000 0.000000 0.000000" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 0.000000 -0.000086" type="float3" id="linearVelocity" name="Linear velocity"/>
    <attribute value="0.000000 0.000000 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="1.000000" type="real" id="rollingFriction" name="Rolling friction"/>
-   <attribute value="true" type="bool" id="useGravity" name="Use gravity"/>
+   <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
   </component>
  </entity>
  <entity id="11" sync="true">
@@ -388,7 +393,7 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
@@ -433,7 +438,7 @@
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
    <attribute value="pongCube.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
-   <attribute value="local://wall.material" type="AssetReferenceList" id="materialRefs" name="Mesh materials"/>
+   <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
    <attribute value="false" type="bool" id="castShadows" name="Cast shadows"/>
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>

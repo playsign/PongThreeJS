@@ -28,6 +28,7 @@ function init() {
 	useSignals = true;
 
 	app.racketSpeed = 80;
+	app.playerAreaReserved = undefined;
 }
 
 function PongApp() {
@@ -49,55 +50,113 @@ PongApp.prototype.logicInit = function() {
 	// this.controls.userZoom = false;
 };
 
-// UPDATE FUNCTIONS
+PongApp.prototype.connectedCallback = function() {
+	console.log("connected callback");
+
+	// for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributes[0].valueInternal.length; i++) {
+	// 	var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributes[0].valueInternal[i];
+	// 	if (this.dataConnection.scene.entityById(entityID).dynamicComponent.attributes[1].value === false) {
+	// 		this.dataConnection.scene.entityById(entityID).dynamicComponent.attributes[1].value = true;
+	// 		console.log("reserved playerArea: " + i);
+	// 	}
+	// }
+};
+
+PongApp.prototype.disconnectedCallback = function() {
+	console.log("disconnected callback");
+	// if (this.dataConnection.scene.entityById(this.playerAreaReserved)) {
+	// 	this.dataConnection.scene.entityById(this.playerAreaReserved).dynamicComponent.attributes[0].value = false;
+	// 	this.dataConnection.syncManager.sendChanges();
+	// 	this.playerAreaReserved = undefined;
+	// }
+};
 
 PongApp.prototype.logicUpdate = function(dt) {
+	// console.log("update");
+	// if(this.connected){
+	// 	console.log("connected");
+	// 	if(this.dataConnection.scene.entityByName("SceneController").dynamicComponent === null){
+	// 		console.log("null");
+	// 	}
+	// 	else
+	// 		console.log("not null");
+	// }
 
-	// RACKET CONTROL
-	if (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ ) {
-
-		// var racketForward = new THREE.Vector3();
-
-		var entID = 7;
-		var tf = this.dataConnection.scene.entities[entID].placeable.transform;
-		var newValue = tf.value;
-
-		// var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
-
-		// // Angle to vector3
-		// racketForward.x = Math.cos(rotation * -1);
-		// racketForward.z = Math.sin(rotation * -1);
-
-
-		// racketForward.normalize();
-
-		// // Racket's speed
-		// if (this.touchController.swiping) {
-		// 	// Touch / Mouse
-		// 	racketForward.multiplyScalar(this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed * dt);
-		// } else {
-		// 	// Keyboard
-		// 	racketForward.multiplyScalar(this.racketSpeed * dt);
-		// }
-
-		var deltaMovement = this.racketSpeed * dt;
-
-		// Keyboard
-		if (this.keyboard.pressed("left") || this.keyboard.pressed("a")) {
-			newValue.pos.z += deltaMovement;
-		}
-		if (this.keyboard.pressed("right") || this.keyboard.pressed("d")) {
-			newValue.pos.z -= deltaMovement;
+	if (this.connected) {
+		if (!this.playerAreaReserved && this.dataConnection.scene.entityByName("SceneController")) {
+			for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributes[0].valueInternal.length; i++) {
+				var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributes[0].valueInternal[i];
+				if (this.dataConnection.scene.entityById(entityID).dynamicComponent.attributes[0].value === false) {
+					this.dataConnection.scene.entityById(entityID).dynamicComponent.attributes[0].value = true;
+					console.log("reserved playerArea: " + i);
+					this.playerAreaReserved = entityID;
+					this.dataConnection.syncManager.sendChanges();
+					break;
+				}
+			}
 		}
 
-		// Touch
-		if (this.touchController.swiping) {
-			newValue.pos.z += deltaMovement;
-		}
+		// RACKET CONTROL
+		if (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ ) {
 
-		this.dataConnection.scene.entities[entID].placeable.transform.set(newValue, 0);
-		this.dataConnection.syncManager.sendChanges();
+			// var racketForward = new THREE.Vector3();
+			var racketForward = 1;
+
+			// TODO
+			var entID = 7;
+			if (this.playerAreaReserved == 4) {
+				entID = 10;
+				racketForward = -1;
+			}
+
+			// var tf = this.dataConnection.scene.entities[entID].placeable.transform;
+			// var newValue = tf.value;
+
+			var newValue = app.dataConnection.scene.entities[entID].rigidBody.linearVelocity.value;
+
+			// var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
+
+			// // Angle to vector3
+			// racketForward.x = Math.cos(rotation * -1);
+			// racketForward.z = Math.sin(rotation * -1);
+
+
+			// racketForward.normalize();
+
+			// // Racket's speed
+			// if (this.touchController.swiping) {
+			// 	// Touch / Mouse
+			// 	racketForward.multiplyScalar(this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed * dt);
+			// } else {
+			// 	// Keyboard
+			// 	racketForward.multiplyScalar(this.racketSpeed * dt);
+			// }
+
+			// var deltaMovement = this.racketSpeed * dt;
+
+			// Keyboard
+			if (this.keyboard.pressed("left") || this.keyboard.pressed("a")) {
+				// newValue.pos.z += deltaMovement;
+				newValue.z = -this.racketSpeed * racketForward;
+
+			}
+			if (this.keyboard.pressed("right") || this.keyboard.pressed("d")) {
+				// newValue.pos.z -= deltaMovement;
+				newValue.z = this.racketSpeed * racketForward;
+			}
+
+			// // Touch
+			// if (this.touchController.swiping) {
+			// 	newValue.pos.z += deltaMovement;
+			// }
+
+			// this.dataConnection.scene.entities[entID].placeable.transform.set(newValue, 0);
+			app.dataConnection.scene.entities[entID].rigidBody.linearVelocity.set(newValue, 0);
+			this.dataConnection.syncManager.sendChanges();
+		}
 	}
+
+
 }
 
 // Update the scene

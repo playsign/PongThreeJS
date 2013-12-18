@@ -1,4 +1,19 @@
 var zeroVec = new float3(0, 0, 0);
+console.LogInfo(server);
+if (server.IsRunning()) {
+	console.LogInfo("server is running");
+	websocketserver.UserConnected.connect(ServerHandleUserConnected);
+	//console.LogInfo("websocketserver.ConnectionId()"+websocketserver.ConnectionId());
+
+	// If there are connected users when this script was added, add av for all of them
+	var users = server.AuthenticatedUsers();
+	if (users.length > 0)
+		console.LogInfo("[Pong Application] Application started.");
+
+	for (var i = 0; i < users.length; i++) {
+		ServerHandleUserConnected(users[i].id, users[i]);
+	}
+}
 
 // CAMERA
 var cam = scene.GetEntityByName("FreeLookCamera");
@@ -13,7 +28,10 @@ cam.placeable.transform = t;
 var playerAmount = 2;
 var clientPlayerAmount = 0;
 var oldPlayerAmount = playerAmount;
-var playerAreas = [];
+var playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
+for(var i = 0; i < playerAreas.length; i++){
+	console.LogInfo(playerAreas[i]);
+}
 var playerAreaWidth = 100;
 
 // For fixing collision duplicate problems
@@ -31,6 +49,12 @@ ball.rigidbody.SetAngularVelocity(zeroVec);
 // ball.rigidbody.SetLinearVelocity(zeroVec);
 // trigger
 ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
+
+function ServerHandleUserConnected(userConnection, responseData) {
+	console.LogInfo("handle user connected: "+userConnection.id);
+
+	
+}
 
 function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {
 	// console.LogInfo(ent.name);
