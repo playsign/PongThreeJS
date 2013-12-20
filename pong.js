@@ -62,14 +62,6 @@ PongApp.prototype.logicInit = function() {
 	// this.controls.userZoom = false;
 };
 
-PongApp.prototype.connectedCallback = function() {
-	// console.log("connected callback");
-};
-
-PongApp.prototype.disconnectedCallback = function() {
-	// console.log("disconnected callback");
-};
-
 PongApp.prototype.logicUpdate = function(dt) {
 
 	if (this.connected) {
