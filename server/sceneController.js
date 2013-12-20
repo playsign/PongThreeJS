@@ -3,6 +3,7 @@ console.LogInfo(server);
 if (server.IsRunning()) {
 	console.LogInfo("server is running");
 	websocketserver.UserConnected.connect(ServerHandleUserConnected);
+	websocketserver.UserDisconnected.connect(ServerHandleUserDisconnected);
 	//console.LogInfo("websocketserver.ConnectionId()"+websocketserver.ConnectionId());
 
 	// If there are connected users when this script was added, add av for all of them
@@ -30,7 +31,7 @@ var clientPlayerAmount = 0;
 var oldPlayerAmount = playerAmount;
 var playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
 for(var i = 0; i < playerAreas.length; i++){
-	console.LogInfo(playerAreas[i]);
+	console.LogInfo("player: " + playerAreas[i].player);
 }
 var playerAreaWidth = 100;
 
@@ -51,9 +52,42 @@ ball.rigidbody.SetAngularVelocity(zeroVec);
 ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
 
 function ServerHandleUserConnected(userConnection, responseData) {
-	console.LogInfo("handle user connected: "+userConnection.id);
+	console.LogInfo("userConnection.id: "+userConnection.id);
+	console.LogInfo("userConnection.LoginData(): "+userConnection.Property("name"));
 
-	
+
+	for(var i = 0; i < playerAreas.length; i++){
+		if(playerAreas[i].player === undefined) {
+			var attrs = playerAreas[i].dynamiccomponent;
+			console.LogInfo("set to: "+userConnection.Property("name"));
+			playerAreas[i].player = userConnection.Property("name");
+			attrs.SetAttribute("playerID", userConnection.Property("name"));
+			break;
+		}
+		else {
+			console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
+		}
+	}
+}
+
+function ServerHandleUserDisconnected(userConnection) {
+	console.LogInfo("user disconnected:");
+	console.LogInfo("userConnection.id: "+userConnection.id);
+	console.LogInfo("userConnection.LoginData(): "+userConnection.Property("name"));
+
+
+	for(var i = 0; i < playerAreas.length; i++){
+		if(playerAreas[i].player === userConnection.Property("name")) {
+			var attrs = playerAreas[i].dynamiccomponent;
+			console.LogInfo("set to undefined");
+			playerAreas[i].player = undefined;
+			attrs.SetAttribute("playerID", undefined);
+			break;
+		}
+		else {
+			console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
+		}
+	}
 }
 
 function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {

@@ -19,20 +19,32 @@ var app;
 
 function init() {
 	app = new PongApp();
-	app.host = "10.10.2.13";
-	app.port = 2345;
+	app.host = "10.10.2.13"; // IP to the Tundra server
+	app.port = 2345; // and port to the server
+
+
+	function getRandomInt(min, max) {
+		return Math.floor(Math.random() * (max - min + 1) + min);
+	}
 
 	app.start();
 
-	app.viewer.useCubes = true;
+	app.viewer.useCubes = true; // Use wireframe cube material for all objects
 	useSignals = true;
 
+	// Custom app properties
 	app.racketSpeed = 80;
-	app.playerAreaReserved = undefined;
+	// app.playerAreaReserved = undefined;
+	app.reservedRacket = undefined;
+
+	app.dataConnection.loginData = {
+		"name": Date.now().toString() + getRandomInt(0, 2000000).toString()
+	}
+	console.log("name: " + app.dataConnection.loginData.name);
 }
 
 function PongApp() {
-	Application.call(this);
+	Application.call(this); // Super class
 }
 
 PongApp.prototype = new Application();
@@ -51,68 +63,43 @@ PongApp.prototype.logicInit = function() {
 };
 
 PongApp.prototype.connectedCallback = function() {
-	console.log("connected callback");
-
-	// for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributes[0].valueInternal.length; i++) {
-	// 	var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributes[0].valueInternal[i];
-	// 	if (this.dataConnection.scene.entityById(entityID).dynamicComponent.attributes[1].value === false) {
-	// 		this.dataConnection.scene.entityById(entityID).dynamicComponent.attributes[1].value = true;
-	// 		console.log("reserved playerArea: " + i);
-	// 	}
-	// }
+	// console.log("connected callback");
 };
 
 PongApp.prototype.disconnectedCallback = function() {
-	console.log("disconnected callback");
-	// if (this.dataConnection.scene.entityById(this.playerAreaReserved)) {
-	// 	this.dataConnection.scene.entityById(this.playerAreaReserved).dynamicComponent.attributes[0].value = false;
-	// 	this.dataConnection.syncManager.sendChanges();
-	// 	this.playerAreaReserved = undefined;
-	// }
+	// console.log("disconnected callback");
 };
 
 PongApp.prototype.logicUpdate = function(dt) {
-	// console.log("update");
-	// if(this.connected){
-	// 	console.log("connected");
-	// 	if(this.dataConnection.scene.entityByName("SceneController").dynamicComponent === null){
-	// 		console.log("null");
-	// 	}
-	// 	else
-	// 		console.log("not null");
-	// }
 
 	if (this.connected) {
-		if (!this.playerAreaReserved && this.dataConnection.scene.entityByName("SceneController")) {
-			for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributes[0].valueInternal.length; i++) {
-				var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributes[0].valueInternal[i];
-				if (this.dataConnection.scene.entityById(entityID).dynamicComponent.attributes[0].value === false) {
-					this.dataConnection.scene.entityById(entityID).dynamicComponent.attributes[0].value = true;
-					console.log("reserved playerArea: " + i);
-					this.playerAreaReserved = entityID;
-					this.dataConnection.syncManager.sendChanges();
+
+		if (!this.reservedRacket && this.dataConnection.scene.entityByName("SceneController")) {
+			for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributeByName("playerAreas").valueInternal.length; i++) {
+				var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributeByName("playerAreas").valueInternal[i];
+				var entity = this.dataConnection.scene.entityById(entityID);
+				if (entity.dynamicComponent.attributeByName("playerID").value == this.dataConnection.loginData.name) {
+					var racketRef = entity.dynamicComponent.attributeById("racketRef").value;
+					this.reservedRacket = this.dataConnection.scene.entityById(racketRef);
+					console.log("reserved racket: " + this.reservedRacket);
 					break;
 				}
 			}
 		}
 
 		// RACKET CONTROL
-		if (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ ) {
+		if (this.reservedRacket !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
 
 			// var racketForward = new THREE.Vector3();
 			var racketForward = 1;
 
 			// TODO
-			var entID = 7;
-			if (this.playerAreaReserved == 4) {
-				entID = 10;
+			if (this.reservedRacket.id === 10) {
 				racketForward = -1;
 			}
 
-			// var tf = this.dataConnection.scene.entities[entID].placeable.transform;
-			// var newValue = tf.value;
-
-			var newValue = app.dataConnection.scene.entities[entID].rigidBody.linearVelocity.value;
+			// Get the original linear velocity of the rigidbody
+			var newValue = this.reservedRacket.rigidBody.attributeByName("Linear velocity").value;
 
 			// var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
 
@@ -134,7 +121,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 
 			// var deltaMovement = this.racketSpeed * dt;
 
-			// Keyboard
+			// Read keyboard
 			if (this.keyboard.pressed("left") || this.keyboard.pressed("a")) {
 				// newValue.pos.z += deltaMovement;
 				newValue.z = -this.racketSpeed * racketForward;
@@ -150,19 +137,14 @@ PongApp.prototype.logicUpdate = function(dt) {
 			// 	newValue.pos.z += deltaMovement;
 			// }
 
-			// this.dataConnection.scene.entities[entID].placeable.transform.set(newValue, 0);
-			app.dataConnection.scene.entities[entID].rigidBody.linearVelocity.set(newValue, 0);
+			// Set a new velocity for the entity
+			this.reservedRacket.rigidBody.linearVelocity.set(newValue, 0);
+			// Inform the server about the change
 			this.dataConnection.syncManager.sendChanges();
 		}
 	}
 
 
 }
-
-// Update the scene
-
-// PongApp.prototype.clientUpdate = function() {
-// 	this.sceneCtrl.updateScene();
-// }
 
 init();
