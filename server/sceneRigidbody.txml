@@ -7,7 +7,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="64.367218,0.000000,-22.735889,180.000000,-89.654510,180.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="56.884731,0.000000,27.490326,180.000000,36.256538,180.000000,1.000000,1.000000,1.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -37,8 +37,8 @@
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="65.447594 0.000000 46.006660" type="float3" id="linearVelocity" name="Linear velocity"/>
-   <attribute value="0.000000 530.708374 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
+   <attribute value="65.150993 0.000000 -46.425724" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 -527.358276 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="0.000000" type="real" id="rollingFriction" name="Rolling friction"/>
@@ -77,7 +77,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="25" type="DynamicComponent" sync="true" name="PlayerArea">
-   <attribute value="-4569" type="int" id="playerBalls" name="playerBalls"/>
+   <attribute value="-4601" type="int" id="playerBalls" name="playerBalls"/>
    <attribute value="" type="string" id="playerID" name="playerID"/>
    <attribute value="7" type="EntityReference" id="racketRef" name="racketRef"/>
   </component>
@@ -97,7 +97,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="25" type="DynamicComponent" sync="true" name="PlayerArea">
-   <attribute value="-4760" type="int" id="playerBalls" name="playerBalls"/>
+   <attribute value="-4789" type="int" id="playerBalls" name="playerBalls"/>
    <attribute value="" type="string" id="playerID" name="playerID"/>
    <attribute value="10" type="EntityReference" id="racketRef" name="racketRef"/>
   </component>
@@ -199,7 +199,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="76.000000,0.000000,34.473747,0.000000,0.000005,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="76.000000,0.000000,34.815376,0.000000,0.000005,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -208,7 +208,7 @@
   </component>
   <component typeId="17" type="Mesh" sync="true">
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
-   <attribute value="local://newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
+   <attribute value="newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
@@ -229,12 +229,17 @@
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="0.000000 0.000000 0.000073" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 0.000000 -0.000174" type="float3" id="linearVelocity" name="Linear velocity"/>
    <attribute value="0.000000 0.000000 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
    <attribute value="1.000000" type="real" id="rollingFriction" name="Rolling friction"/>
    <attribute value="false" type="bool" id="useGravity" name="Use gravity"/>
+  </component>
+  <component typeId="28" type="Highlight" sync="false" name="EcEditorHighlight">
+   <attribute value="true" type="bool" id="visible" name="Is visible"/>
+   <attribute value="0.300000 0.500000 0.100000 0.500000" type="Color" id="solidColor" name="Solid color"/>
+   <attribute value="1.000000 1.000000 1.000000 0.500000" type="Color" id="outlineColor" name="Outline color"/>
   </component>
  </entity>
  <entity id="8" sync="true">
@@ -334,7 +339,7 @@
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="20" type="Placeable" sync="true">
-   <attribute value="76.000000,0.000000,34.949116,0.000000,-0.000000,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
+   <attribute value="76.000000,0.000000,34.951664,0.000000,-0.000000,0.000000,5.000000,5.000000,15.000000" type="Transform" id="transform" name="Transform"/>
    <attribute value="false" type="bool" id="drawDebug" name="Show bounding box"/>
    <attribute value="true" type="bool" id="visible" name="Visible"/>
    <attribute value="1" type="int" id="selectionLayer" name="Selection layer"/>
@@ -343,7 +348,7 @@
   </component>
   <component typeId="17" type="Mesh" sync="true">
    <attribute value="0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1.000000,1.000000,1.000000" type="Transform" id="nodeTransformation" name="Transform"/>
-   <attribute value="local://newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
+   <attribute value="newRacket.mesh" type="AssetReference" id="meshRef" name="Mesh ref"/>
    <attribute value="" type="AssetReference" id="skeletonRef" name="Skeleton ref"/>
    <attribute value="" type="AssetReferenceList" id="meshMaterial" name="Mesh materials"/>
    <attribute value="0.000000" type="real" id="drawDistance" name="Draw distance"/>
@@ -364,7 +369,7 @@
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>
    <attribute value="true" type="bool" id="drawDebug" name="Draw Debug"/>
-   <attribute value="0.000000 0.000000 -0.000774" type="float3" id="linearVelocity" name="Linear velocity"/>
+   <attribute value="0.000000 0.000000 -0.000079" type="float3" id="linearVelocity" name="Linear velocity"/>
    <attribute value="0.000000 0.000000 0.000000" type="float3" id="angularVelocity" name="Angular velocity"/>
    <attribute value="-1" type="int" id="collisionLayer" name="Collision Layer"/>
    <attribute value="-1" type="int" id="collisionMask" name="Collision Mask"/>
