@@ -5,7 +5,7 @@
 // For conditions of distribution and use, see copyright notice in LICENSE
 /*
 *	PongThreeJS
-* 	@author Tapani Jamsa
+*	@author Tapani Jamsa
 *	@author Erno Kuusela
 *	@author Toni Alatalo
 *	Date: 2013
@@ -40,6 +40,7 @@ function init() {
 	app.dataConnection.loginData = {
 		"name": Date.now().toString() + getRandomInt(0, 2000000).toString()
 	}
+
 	console.log("name: " + app.dataConnection.loginData.name);
 }
 
@@ -146,6 +147,6 @@ PongApp.prototype.logicUpdate = function(dt) {
 	}
 
 
-}
+};
 
 init();
