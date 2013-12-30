@@ -34,11 +34,12 @@ function Ball(sceneCtrl, material) {
 	startTransform.setOrigin(new Ammo.btVector3(0, 0, 0));
 	var motionState = new Ammo.btDefaultMotionState(startTransform);
 	var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, sphereShape, localInertia);
-	var sphereAmmo = new Ammo.btRigidBody(rbInfo);
-	sphereAmmo.mesh = this.sphereMesh;
-	sphereAmmo.setLinearFactor(new Ammo.btVector3(1, 0, 1));
-	this.sceneCtrl.btWorld.addRigidBody(sphereAmmo);
-	this.collider = sphereAmmo;
+	this.sphereAmmo = new Ammo.btRigidBody(rbInfo);
+	this.sphereAmmo.mesh = this.sphereMesh;
+	this.sphereAmmo.setLinearFactor(new Ammo.btVector3(1, 0, 1));
+	this.sphereAmmo.setRestitution(1);
+	this.sceneCtrl.btWorld.addRigidBody(this.sphereAmmo);
+	this.collider = this.sphereAmmo;
 	var btV3 = new Ammo.btVector3(1, 0, 1);
 	this.collider.setLinearVelocity(btV3);
 

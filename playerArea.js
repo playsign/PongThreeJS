@@ -156,7 +156,8 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	this.sceneCtrl.btWorld.addCollisionObject(boxAmmo);
 	boxAmmo.mesh = mesh;
 	// set it as ghost object
-	boxAmmo.setCollisionFlags(4);
+	// boxAmmo.setCollisionFlags(4);
+	boxAmmo.setRestitution(1);
 	mesh.collider = boxAmmo;
 };
 
