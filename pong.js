@@ -19,8 +19,8 @@ var app;
 
 function init() {
 	app = new PongApp();
-	app.host = "10.10.2.13"; // IP to the Tundra server
-	app.port = 2345; // and port to the server
+	app.host = "10.10.2.13"; // IP of the Tundra server
+	app.port = 2345; // and port of the server
 
 
 	function getRandomInt(min, max) {
@@ -61,6 +61,8 @@ PongApp.prototype.logicInit = function() {
 	// CONTROLS
 	// this.controls.userZoom = false;
 };
+
+function sign(x) { return x > 0 ? 1 : x < 0 ? -1 : 0; }
 
 PongApp.prototype.logicUpdate = function(dt) {
 
@@ -124,10 +126,17 @@ PongApp.prototype.logicUpdate = function(dt) {
 				newValue.z = this.racketSpeed * racketForward;
 			}
 
-			// // Touch
-			// if (this.touchController.swiping) {
-			// 	newValue.pos.z += deltaMovement;
-			// }
+			// Touch
+			if (this.touchController.swiping) {
+				// newValue.pos.z += deltaMovement;
+				newValue.z = this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed;
+
+				if(Math.abs(newValue.z) > this.racketSpeed){
+					newValue.z = this.racketSpeed * sign(newValue.z);
+				}
+
+				newValue.z *= -1;
+			}
 
 			// Set a new velocity for the entity
 			this.reservedRacket.rigidBody.linearVelocity.set(newValue, 0);
