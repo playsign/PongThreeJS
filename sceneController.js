@@ -1,6 +1,6 @@
 "use strict";
 /*
- * 	@author Tapani Jamsa
+ *	@author Tapani Jamsa
  */
 
 function SceneController() {
@@ -38,6 +38,13 @@ function SceneController() {
 	});
 	var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
 	this.scene.add(skyBox);
+
+	// RACKET GEOMETRY
+	var jsonLoader = new THREE.JSONLoader();
+	var scope = this;
+	jsonLoader.load("newRacket.js", function(geometry) {
+		scope.racketGeometry = geometry;
+	});
 
 	// AMMO.JS
 	var collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
@@ -152,7 +159,7 @@ SceneController.prototype.generateScene = function() {
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
 
-		var pa = new PlayerArea(new THREE.Vector3(x, 0, z), radians, i);
+		var pa = new PlayerArea(new THREE.Vector3(x, 0, z), radians, i, this.racketGeometry);
 
 		this.playerAreas.push(pa);
 

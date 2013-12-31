@@ -1,6 +1,6 @@
 "use strict";
 /*
- * 	@author Tapani Jamsa
+ *	@author Tapani Jamsa
  */
 
 function Ball(sceneCtrl, material) {
@@ -10,18 +10,16 @@ function Ball(sceneCtrl, material) {
 	this.keyboard = keyboard;
 
 	this.speed = 80;
+	this.speedTweak = 100;
 	this.radius = 5;
 
-	// this.sphereGeometry = new THREE.SphereGeometry(this.radius, 16, 16);
-	this.sphereGeometry = new THREE.CubeGeometry(10, 10, 10, 1, 1, 1);
+	this.sphereGeometry = new THREE.SphereGeometry(this.radius, 16, 16);
+	// this.sphereGeometry = new THREE.CubeGeometry(10, 10, 10, 1, 1, 1);
 
 	this.sphereMesh = new THREE.Mesh(this.sphereGeometry, material);
 	this.sphereMesh.position.set(0, 0, 0);
 	this.sphereMesh.name = "ball";
 	this.sphereMesh.type = "ball";
-
-	// For fixing collision duplicate problems
-	this.lastCollider = null;
 
 	// Create sphere physics model
 	var mass = 10 * 10 * 10;
@@ -41,14 +39,10 @@ function Ball(sceneCtrl, material) {
 	this.sphereAmmo.setLinearFactor(new Ammo.btVector3(1, 0, 1));
 	this.sphereAmmo.setRestitution(1);
 	this.sphereAmmo.setFriction(0);
-	// this.sphereAmmo.setDamping(0,0); // (lin, ang)
 	this.sceneCtrl.btWorld.addRigidBody(this.sphereAmmo);
 	this.collider = this.sphereAmmo;
 	var btV3 = new Ammo.btVector3(1, 0, 1);
 	this.collider.setLinearVelocity(btV3);
-
-	// Glitch fix
-	this.reversed = false;
 }
 
 Ball.prototype.update = function(delta) // Define Method
@@ -64,30 +58,27 @@ Ball.prototype.update = function(delta) // Define Method
 		var transform = this.collider.getCenterOfMassTransform();
 		transform.setOrigin(new Ammo.btVector3(0, 0, 0));
 		this.collider.setCenterOfMassTransform(transform);
-		this.reversed = false;
-		this.lastCollider = null;
 	}
 
 	// Debug ball controls
 	if (this.keyboard.pressed("u")) {
-		var btV3 = new Ammo.btVector3(0, 0, -1);
-		this.collider.setLinearVelocity(btV3);
-	} else if (this.keyboard.pressed("j")) {
 		var btV3 = new Ammo.btVector3(0, 0, 1);
 		this.collider.setLinearVelocity(btV3);
+	} else if (this.keyboard.pressed("j")) {
+		var btV3 = new Ammo.btVector3(0, 0, -1);
+		this.collider.setLinearVelocity(btV3);
 	} else if (this.keyboard.pressed("h")) {
-		var btV3 = new Ammo.btVector3(-1, 0, 0);
+		var btV3 = new Ammo.btVector3(1, 0, 0);
 		this.collider.setLinearVelocity(btV3);
 	} else if (this.keyboard.pressed("k")) {
-		var btV3 = new Ammo.btVector3(1, 0, 0);
+		var btV3 = new Ammo.btVector3(-1, 0, 0);
 		this.collider.setLinearVelocity(btV3);
 	}
 
 	// keep the speed of 1 (* delta)
 	var btVelo = this.collider.getLinearVelocity();
 	btVelo = btVelo.normalized();
-	var tweak = 100; // TODO remove magic number
-	var btV3 = new Ammo.btVector3(btVelo.getX() * this.speed * tweak * delta, 0, btVelo.getZ() * this.speed * tweak * delta);
+	var btV3 = new Ammo.btVector3(btVelo.getX() * this.speed * this.speedTweak * delta, 0, btVelo.getZ() * this.speed * this.speedTweak * delta);
 	this.collider.setLinearVelocity(btV3);
 
 	var transform = new Ammo.btTransform();
@@ -124,8 +115,6 @@ Ball.prototype.onCollision = function(border, collisionPoint) {
 		direction.normalize();
 
 		var newVelocity = direction;
-		this.lastCollider = null;
-		this.reversed = false;
 
 		// Three.js vector3 to Ammo.js vector3
 		var btV3 = new Ammo.btVector3(newVelocity.x, newVelocity.y, newVelocity.z);

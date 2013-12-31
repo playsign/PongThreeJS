@@ -7,7 +7,7 @@
 /* global window, THREE, console,
    Player, Ammo, keyboard */
 
-function PlayerArea(position, rotation, id) {
+function PlayerArea(position, rotation, id, racketGeometry) {
 	// Pointers to globals
 	this.p2pCtrl = p2pCtrl;
 	this.sceneCtrl = sceneCtrl;
@@ -53,9 +53,8 @@ function PlayerArea(position, rotation, id) {
 	this.borderBottom.name = "bottom";
 	this.borderBottom.type = "box";
 
-	// Create box physics model
+	// Create a physics model
 	this.createPhysicsModel(this.bottomTopWidth, this.bottomTopHeight, this.borderBottom, false);
-
 
 	// BORDER LEFT
 	this.borderLeft = new THREE.Mesh(this.leftGeometry, this.material);
@@ -65,8 +64,10 @@ function PlayerArea(position, rotation, id) {
 	this.borderLeft.type = "box";
 	this.borderLeft.parentNode = this;
 
-	// Create box physics model
+	// Create a physics model
 	this.createPhysicsModel(this.leftWidth, this.leftHeight, this.borderLeft, false);
+	// set it as ghost object
+	this.borderLeft.collider.setCollisionFlags(4);
 
 	// BORDER TOP
 	this.borderTop = new THREE.Mesh(this.bottomTopGeometry, this.material);
@@ -75,23 +76,22 @@ function PlayerArea(position, rotation, id) {
 	this.borderTop.name = "top";
 	this.borderTop.type = "box";
 
-	// Create box physics model
+	// Create a physics model
 	this.createPhysicsModel(this.bottomTopWidth, this.bottomTopHeight, this.borderTop, false);
 
 	// PLAYER RACKET
 	this.racketWidth = 30;
 	this.racketHeight = 20;
-	this.racketGeometry = new THREE.CubeGeometry(this.racketHeight / 2, this.racketHeight / 2, this.racketWidth, 1, 1, 1);
-	this.racketMesh = new THREE.Mesh(this.racketGeometry, this.material);
+	this.racketMesh = new THREE.Mesh(racketGeometry, this.material);
 	this.racketMesh.position.set(76, 0, 4);
 	this.racketMesh.rotation.y = 180 * (Math.PI / 180);
 	this.racketMesh.name = "racket";
 	this.racketMesh.type = "box";
+
+	// Create a physics model
 	this.racketSpeed = 80;
 	this.racketTopStop = this.borderTop.position.z + (this.racketWidth / 2);
 	this.racketBottomStop = this.borderBottom.position.z - (this.racketWidth / 2);
-
-	// Create box physics model
 	this.createPhysicsModel(this.racketWidth, this.racketHeight, this.racketMesh, true);
 
 	// GROUP
@@ -124,14 +124,18 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 		visible: false
 	});
 
-	var boxShape = null;
+	var shape = null;
 	if (racket) {
-		boxShape = new Ammo.btBoxShape(new Ammo.btVector3(h, h, w));
-		this.meshClone.position.x += 5;
+		var point, shape = new Ammo.btConvexHullShape;
+		for (var i = 0; i < mesh.geometry.vertices.length; i++) {
+			point = mesh.geometry.vertices[i];
+
+			shape.addPoint(new Ammo.btVector3(point.x, point.y, point.z));
+		}
 	} else {
-		boxShape = new Ammo.btBoxShape(new Ammo.btVector3(w, h, h));
+		shape = new Ammo.btBoxShape(new Ammo.btVector3(w, h, h));
 	}
-	boxShape.calculateLocalInertia(mass, localInertia);
+	shape.calculateLocalInertia(mass, localInertia);
 
 	// Local to world pos
 	this.group.add(mesh);
@@ -152,11 +156,9 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	// Create collision object
 	var boxAmmo = new Ammo.btCollisionObject();
 	boxAmmo.setWorldTransform(startTransform);
-	boxAmmo.setCollisionShape(boxShape);
+	boxAmmo.setCollisionShape(shape);
 	this.sceneCtrl.btWorld.addCollisionObject(boxAmmo);
 	boxAmmo.mesh = mesh;
-	// set it as ghost object
-	// boxAmmo.setCollisionFlags(4);
 	boxAmmo.setRestitution(1);
 	boxAmmo.setFriction(0);
 	mesh.collider = boxAmmo;
@@ -214,7 +216,7 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 	}
 	// Touch / Mouse
 	else {
-		var touchSpeedModifier = checkTouch(this,this.p2pCtrl.serverID, this.player.id);
+		var touchSpeedModifier = checkTouch(this, this.p2pCtrl.serverID, this.player.id);
 		if (touchSpeedModifier !== 0) {
 			racketForward.multiplyScalar(touchSpeedModifier);
 
