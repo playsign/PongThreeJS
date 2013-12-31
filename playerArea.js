@@ -158,6 +158,7 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	// set it as ghost object
 	// boxAmmo.setCollisionFlags(4);
 	boxAmmo.setRestitution(1);
+	boxAmmo.setFriction(0);
 	mesh.collider = boxAmmo;
 };
 

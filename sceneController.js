@@ -70,69 +70,38 @@ function SceneController() {
 SceneController.prototype.btWorldUpdate = function(delta) {
 	this.btWorld.stepSimulation(this.timeStep, this.maxSubSteps, this.fixedTimeStep);
 
-	// // ammo.js check collisions
-	// var numManifolds = this.btWorld.getDispatcher().getNumManifolds();
-	// // if(numManifolds > 0) {
-	// // 	console.log("numManifolds: "+numManifolds);
-	// // }
+	// ammo.js check collisions
+	var numManifolds = this.btWorld.getDispatcher().getNumManifolds();
 
-	// for (var i = 0; i < numManifolds; i++) {
-	// 	var contactManifold = this.btWorld.getDispatcher().getManifoldByIndexInternal(i);
-	// 	var obA = contactManifold.getBody0();
-	// 	var obB = contactManifold.getBody1();
+	for (var i = 0; i < numManifolds; i++) {
+		var contactManifold = this.btWorld.getDispatcher().getManifoldByIndexInternal(i);
+		var obA = contactManifold.getBody0();
+		var obB = contactManifold.getBody1();
 
-	// 	var numContacts = contactManifold.getNumContacts();
-	// 	for (var j = 0; j < numContacts; j++) {
-	// 		var pt = contactManifold.getContactPoint(j);
+		var numContacts = contactManifold.getNumContacts();
+		for (var j = 0; j < numContacts; j++) {
+			var pt = contactManifold.getContactPoint(j);
 
-	// 		// console.log("pt.getDistance(): " + pt.getDistance());
+			var ptB = pt.getPositionWorldOnB();
 
-	// 		if (pt.getDistance() <= 2) { // If the value is too high then it looks like the ball reflects from air
+			var rbA = Ammo.wrapPointer(obA, Ammo.btRigidBody);
+			var rbB = Ammo.wrapPointer(obB, Ammo.btCollisionObject);
 
+			if (rbA.mesh !== null && rbB.mesh !== null) {
+				if (rbA.mesh.name === "ball" && rbB.mesh.type === "box") {
+					// console.log("ball collides a border 1");
 
-	// 			// var ptA = pt.getPositionWorldOnA();
-	// 			var ptB = pt.getPositionWorldOnB();
-	// 			// console.log("i________________ :" + i);
-	// 			// console.log("ptA.getZ() :" + ptA.getZ());
-	// 			// console.log("ptB.getZ() :" + ptB.getZ());
+					// rbB is a border
+					this.ball.onCollision(rbB.mesh, ptB);
+				} else if (rbB.mesh.name === "ball" && rbA.mesh.type === "box") {
+					// console.log("ball collides a border 2");
 
-	// 			// var lpA = pt.get_m_localPointA();
-	// 			var lpB = pt.get_m_localPointB();
-	// 			var hitsEnd = false;
-	// 			if (lpB.getX() >= 49.999 || lpB.getX() <= -49.999) {
-	// 				hitsEnd = true;
-	// 			}
-	// 			// var mind0 = pt.get_m_index0();
-	// 			// var mind1 = pt.get_m_index1();
-	// 			// var normalOnA = pt.get_m_normalWorldOnA();
-	// 			// var normalOnB = pt.get_m_normalWorldOnB();
-	// 			// console.log("lpA " + lpA.getX() + " " + lpA.getZ());
-	// 			// console.log("lpB " + lpB.getX() + " " + lpB.getZ());
-	// 			// console.log("mind0 " + mind0);
-	// 			// console.log("mind1 " + mind1);
-	// 			// console.log("normalOnB " + normalOnB.getX() + " " + normalOnB.getZ());
-
-	// 			var rbA = Ammo.wrapPointer(obA, Ammo.btRigidBody);
-	// 			var rbB = Ammo.wrapPointer(obB, Ammo.btCollisionObject);
-
-	// 			if (rbA.mesh !== null && rbB.mesh !== null) {
-	// 				// console.log("rbA " + rbA.mesh.name);
-	// 				// console.log("rbB " + rbB.mesh.name);
-	// 				if (rbA.mesh.name === "ball" && rbB.mesh.type === "box") {
-	// 					// console.log("ball collides a border 1");
-
-	// 					// rbB is a border
-	// 					this.ball.onCollision(rbB.mesh, ptB, hitsEnd);
-	// 				} else if (rbB.mesh.name === "ball" && rbA.mesh.type === "box") {
-	// 					// console.log("ball collides a border 2");
-
-	// 					// rbA is a border
-	// 					this.ball.onCollision(rbA.mesh, ptB, hitsEnd);
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
+					// rbA is a border
+					this.ball.onCollision(rbA.mesh, ptB);
+				}
+			}
+		}
+	}
 	this.ball.update(delta);
 };
 
