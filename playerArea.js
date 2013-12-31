@@ -118,11 +118,6 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	var localInertia = new Ammo.btVector3(0, 0, 0);
 	var w = width / 2;
 	var h = height / 2;
-	// quickfix. The collider needs to be slightly bigger(makes ball aiming less hard) than the mesh so we need to copy the visible mesh and tweak it's x-position +5 . TODO
-	this.meshClone = mesh.clone();
-	this.meshClone.material = new THREE.MeshBasicMaterial({
-		visible: false
-	});
 
 	var shape = null;
 	if (racket) {
@@ -139,10 +134,9 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 
 	// Local to world pos
 	this.group.add(mesh);
-	this.group.add(this.meshClone);
 	this.group.updateMatrixWorld();
 	var worldPos = new THREE.Vector3();
-	worldPos.getPositionFromMatrix(this.meshClone.matrixWorld);
+	worldPos.getPositionFromMatrix(mesh.matrixWorld);
 	var startTransform = new Ammo.btTransform();
 	startTransform.setIdentity();
 	startTransform.setOrigin(new Ammo.btVector3(worldPos.x, 0, worldPos.z));
@@ -167,7 +161,6 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 // ONLINE game mode
 PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch, playerID, i) {
 	var lastPosition = this.racketMesh.position.clone();
-	var cloneLastPosition = this.meshClone.position.clone();
 
 	function checkPressed(scope, keyname, serverID, areaPlayerID) {
 		if (keyname === null)
@@ -209,10 +202,8 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 
 	if (checkPressed(this, left_key, this.p2pCtrl.serverID, this.player.id)) {
 		this.racketMesh.position.add(racketForward);
-		this.meshClone.position.add(racketForward);
 	} else if (checkPressed(this, right_key, this.p2pCtrl.serverID, this.player.id)) {
 		this.racketMesh.position.sub(racketForward);
-		this.meshClone.position.sub(racketForward);
 	}
 	// Touch / Mouse
 	else {
@@ -221,20 +212,18 @@ PlayerArea.prototype.serverUpdate = function(delta, clientKeyboard, clientTouch,
 			racketForward.multiplyScalar(touchSpeedModifier);
 
 			this.racketMesh.position.add(racketForward);
-			this.meshClone.position.add(racketForward);
 		}
 	}
 
 	// Local to world position
 	var worldPos = new THREE.Vector3();
-	worldPos.getPositionFromMatrix(this.meshClone.matrixWorld);
+	worldPos.getPositionFromMatrix(this.racketMesh.matrixWorld);
 	var transform = this.racketMesh.collider.getWorldTransform();
 	transform.setOrigin(new Ammo.btVector3(worldPos.x, 0, worldPos.z));
 	this.racketMesh.collider.setWorldTransform(transform);
 
 	if (this.racketMesh.position.z < this.racketTopStop || this.racketMesh.position.z > this.racketBottomStop) {
 		this.racketMesh.position = lastPosition;
-		this.meshClone.position = cloneLastPosition;
 	}
 };
 
@@ -251,7 +240,6 @@ PlayerArea.prototype.clientUpdate = function(msg) {
 PlayerArea.prototype.offlineUpdate = function(delta) {
 
 	var lastPosition = this.racketMesh.position.clone();
-	var cloneLastPosition = this.meshClone.position.clone();
 
 	// Racket controls
 	if (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || (this.touchController.swiping && delta.x !== 0)) {
@@ -279,39 +267,33 @@ PlayerArea.prototype.offlineUpdate = function(delta) {
 		if (this.player.id == 1) {
 			if (this.keyboard.pressed("left")) {
 				this.racketMesh.position.add(racketForward);
-				this.meshClone.position.add(racketForward);
 			}
 			if (this.keyboard.pressed("right")) {
 				this.racketMesh.position.sub(racketForward);
-				this.meshClone.position.sub(racketForward);
 			}
 
 			// Touch
 			if (this.touchController.swiping) {
 				this.racketMesh.position.add(racketForward);
-				this.meshClone.position.add(racketForward);
 			}
 		} else {
 			if (this.keyboard.pressed("a")) {
 				this.racketMesh.position.add(racketForward);
-				this.meshClone.position.add(racketForward);
 			}
 			if (this.keyboard.pressed("d")) {
 				this.racketMesh.position.sub(racketForward);
-				this.meshClone.position.sub(racketForward);
 			}
 		}
 
 		// Local to world position
 		var worldPos = new THREE.Vector3();
-		worldPos.getPositionFromMatrix(this.meshClone.matrixWorld);
+		worldPos.getPositionFromMatrix(this.racketMesh.matrixWorld);
 		var transform = this.racketMesh.collider.getWorldTransform();
 		transform.setOrigin(new Ammo.btVector3(worldPos.x, 0, worldPos.z));
 		this.racketMesh.collider.setWorldTransform(transform);
 
 		if (this.racketMesh.position.z < this.racketTopStop || this.racketMesh.position.z > this.racketBottomStop) {
 			this.racketMesh.position = lastPosition;
-			this.meshClone.position = cloneLastPosition;
 		}
 	}
 
