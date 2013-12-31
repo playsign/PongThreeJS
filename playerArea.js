@@ -2,7 +2,7 @@
 /* -*- js-indent-level: 8 -*- */
 /* jshint -W097, -W040 */
 /*
- * 	@author Tapani Jamsa
+ *	@author Tapani Jamsa
  */
 /* global window, THREE, console,
    Player, Ammo, keyboard */
@@ -104,9 +104,6 @@ function PlayerArea(position, rotation, id, racketGeometry) {
 	if (this.p2pCtrl.netRole && this.p2pCtrl.playerArray[id] && this.p2pCtrl.serverID == this.player.id) {
 		var worldPos = new THREE.Vector3();
 		worldPos.getPositionFromMatrix(this.borderLeft.matrixWorld);
-		// console.log("set camera position");
-		// console.log("position.x: " + worldPos.x);
-		// console.log("position.z: " + worldPos.z);
 		this.sceneCtrl.camera.position.x = worldPos.x;
 		this.sceneCtrl.camera.position.z = worldPos.z;
 		this.sceneCtrl.camera.lookAt(position);
@@ -121,9 +118,9 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 
 	var shape = null;
 	if (racket) {
-		var point, shape = new Ammo.btConvexHullShape;
+		shape = new Ammo.btConvexHullShape();
 		for (var i = 0; i < mesh.geometry.vertices.length; i++) {
-			point = mesh.geometry.vertices[i];
+			var point = mesh.geometry.vertices[i];
 
 			shape.addPoint(new Ammo.btVector3(point.x, point.y, point.z));
 		}
@@ -147,15 +144,15 @@ PlayerArea.prototype.createPhysicsModel = function(width, height, mesh, racket) 
 	quat.setEuler(worldRot, 0, 0); //or quat.setEulerZYX depending on the ordering you want
 	startTransform.setRotation(quat);
 
-	// Create collision object
-	var boxAmmo = new Ammo.btCollisionObject();
-	boxAmmo.setWorldTransform(startTransform);
-	boxAmmo.setCollisionShape(shape);
-	this.sceneCtrl.btWorld.addCollisionObject(boxAmmo);
-	boxAmmo.mesh = mesh;
-	boxAmmo.setRestitution(1);
-	boxAmmo.setFriction(0);
-	mesh.collider = boxAmmo;
+	// Create a collision object
+	var collisionObject = new Ammo.btCollisionObject();
+	collisionObject.setWorldTransform(startTransform);
+	collisionObject.setCollisionShape(shape);
+	this.sceneCtrl.btWorld.addCollisionObject(collisionObject);
+	collisionObject.mesh = mesh;
+	collisionObject.setRestitution(1);
+	collisionObject.setFriction(0);
+	mesh.collider = collisionObject;
 };
 
 // ONLINE game mode
