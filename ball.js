@@ -37,7 +37,7 @@ function Ball(sceneCtrl, material) {
 	this.sphereAmmo.mesh = this.sphereMesh;
 	this.sphereAmmo.setAngularFactor(new Ammo.btVector3(0, 1, 0));
 	this.sphereAmmo.setLinearFactor(new Ammo.btVector3(1, 0, 1));
-	this.sphereAmmo.setRestitution(1);
+	this.sphereAmmo.setRestitution(0.5);
 	this.sphereAmmo.setFriction(0);
 	this.sceneCtrl.btWorld.addRigidBody(this.sphereAmmo);
 	this.collider = this.sphereAmmo;
