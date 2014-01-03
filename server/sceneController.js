@@ -29,7 +29,7 @@ t.rot.x = -90;
 cam.placeable.transform = t;
 
 // PLAYERS
-var playerAmount = 6;
+var playerAmount = 3;
 var clientPlayerAmount = 0;
 var oldPlayerAmount = playerAmount;
 var playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
@@ -37,9 +37,6 @@ for (var i = 0; i < playerAreas.length; i++) {
 	console.LogInfo("player: " + playerAreas[i].player);
 }
 var playerAreaWidth = 100;
-
-// For fixing collision duplicate problems
-var lastCollider = null;
 
 // BALL
 var ball = scene.GetEntityByName("Sphere");
@@ -62,7 +59,7 @@ generateScene();
 function generateScene() {
 	deleteScene();
 
-	// TODO reser ball position
+	// TODO reset ball position
 
 	// Angle in radians
 	var radians = pi * 2 / this.playerAmount;
@@ -100,15 +97,13 @@ function generateScene() {
 		t.rot.y = degree;
 		areaParent.placeable.transform = t;
 
-		// TODO rotation 
-
 		// TODO this.playerAreas.push(pa);
 	}
-	console.LogInfo("entities length: " + entities.length);
+	// console.LogInfo("entities length: " + entities.length);
 }
 
 function deleteScene() {
-	console.LogInfo("entities length: " + entities.length);
+	// console.LogInfo("entities length: " + entities.length);
 	for (var i = 0; i < entities.length; i++) {
 		scene.RemoveEntity(entities[i].id);
 	}
@@ -128,8 +123,18 @@ function loadPart(partfile) {
 		// console.LogInfo(ents[i]);
 	}
 
+	// Set racket ref in parent entity
+	var parentEntity = ents[0];
+
+	var children = parentEntity.placeable.Children();
+	// console.LogInfo(children[1].id);
+
+	// var attrs = parentEntity.dynamiccomponent;
+	// console.LogInfo(attrs.GetAttribute("racketRef"));
+	// attrs.SetAttribute("racketRef", new EntityReference(ents[2].id));
+
 	// Return parent
-	return ents[0];
+	return parentEntity;
 }
 
 function ServerHandleUserConnected(userConnection, responseData) {

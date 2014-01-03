@@ -15,7 +15,7 @@
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
   <component typeId="25" type="DynamicComponent" sync="true" name="PlayerArea">
-   <attribute value="10" type="EntityReference" id="racketRef" name="racketRef"/>
+   <attribute value="" type="EntityReference" id="racketRef" name="racketRef"/>
    <attribute value="" type="string" id="playerID" name="playerID"/>
    <attribute value="-4791" type="int" id="playerBalls" name="playerBalls"/>
   </component>
@@ -89,7 +89,7 @@
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
   </component>
   <component typeId="23" type="RigidBody" sync="true">
-   <attribute value="10000.000000" type="real" id="mass" name="Mass"/>
+   <attribute value="99999.000000" type="real" id="mass" name="Mass"/>
    <attribute value="6" type="int" id="shapeType" name="Shape type"/>
    <attribute value="1.000000 1.000000 1.000000" type="float3" id="size" name="Size"/>
    <attribute value="" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
@@ -97,7 +97,7 @@
    <attribute value="1.000000" type="real" id="restitution" name="Restitution"/>
    <attribute value="0.990000" type="real" id="linearDamping" name="Linear damping"/>
    <attribute value="0.000000" type="real" id="angularDamping" name="Angular damping"/>
-   <attribute value="0.000000 0.000000 1.000000" type="float3" id="linearFactor" name="Linear factor"/>
+   <attribute value="1.000000 0.000000 1.000000" type="float3" id="linearFactor" name="Linear factor"/>
    <attribute value="0.000000 0.000000 0.000000" type="float3" id="angularFactor" name="Angular factor"/>
    <attribute value="false" type="bool" id="kinematic" name="Kinematic"/>
    <attribute value="false" type="bool" id="phantom" name="Phantom"/>

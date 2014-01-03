@@ -24,7 +24,7 @@
    <attribute value="false" type="bool" id="useInstancing" name="Use instancing"/>
   </component>
   <component typeId="23" type="RigidBody" sync="true">
-   <attribute value="1000.000000" type="real" id="mass" name="Mass"/>
+   <attribute value="1.000000" type="real" id="mass" name="Mass"/>
    <attribute value="2" type="int" id="shapeType" name="Shape type"/>
    <attribute value="10.000000 10.000000 10.000000" type="float3" id="size" name="Size"/>
    <attribute value="local://Sphere.mesh" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
