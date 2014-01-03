@@ -32,10 +32,6 @@ cam.placeable.transform = t;
 var playerAmount = 3;
 var clientPlayerAmount = 0;
 var oldPlayerAmount = playerAmount;
-var playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
-for (var i = 0; i < playerAreas.length; i++) {
-	console.LogInfo("player: " + playerAreas[i].player);
-}
 var playerAreaWidth = 100;
 
 // BALL
@@ -96,9 +92,13 @@ function generateScene() {
 		t.pos.z = z;
 		t.rot.y = degree;
 		areaParent.placeable.transform = t;
-
-		// TODO this.playerAreas.push(pa);
 	}
+
+	var playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
+	// for (var i = 0; i < playerAreas.length; i++) {
+	// console.LogInfo("player: " + playerAreas[i].player);
+	// }
+
 	// console.LogInfo("entities length: " + entities.length);
 }
 

@@ -19,7 +19,7 @@ var app;
 
 function init() {
 	app = new PongApp();
-	app.host = "10.10.2.13"; // IP of the Tundra server
+	app.host = "10.10.3.28"; // IP of the Tundra server
 	app.port = 2345; // and port of the server
 
 
