@@ -118,6 +118,7 @@ function loadPart(partfile) {
 	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
 	// entities.concat(entities,ents);
 
+console.LogInfo("ents:");
 	for (var i = 0; i < ents.length; i++) {
 		entities.push(ents[i]);
 		// console.LogInfo(ents[i]);
@@ -127,10 +128,32 @@ function loadPart(partfile) {
 	var parentEntity = ents[0];
 
 	var children = parentEntity.placeable.Children();
+
+	// console.LogInfo("children:");
 	// console.LogInfo(children[1].id);
 
-	// var attrs = parentEntity.dynamiccomponent;
-	// console.LogInfo(attrs.GetAttribute("racketRef"));
+	// empty entityReference
+	var attrs = parentEntity.dynamiccomponent;
+	// var racketRef = attrs.GetAttribute("racketRef");
+	// console.LogInfo("racketRef:");
+	// console.LogInfo(racketRef);
+	// console.LogInfo("racketRef.ref:");
+	// console.LogInfo(racketRef.ref);
+	
+	// set entityReference
+	attrs.SetAttribute("racketRef", children[1].id);
+	// racketRef.ref = children[1];
+	// console.LogInfo("racketRef:");
+	// console.LogInfo(racketRef);
+	// console.LogInfo("racketRef.ref:");
+	// console.LogInfo(racketRef.ref);
+	// attrs.SetAttribute("racketRef", racketRef);
+	
+	// racketRef = attrs.GetAttribute("racketRef");
+	// console.LogInfo("2 racketRef:");
+	// console.LogInfo(racketRef);
+	// console.LogInfo("2 racketRef.ref:");
+	// console.LogInfo(racketRef.ref);
 	// attrs.SetAttribute("racketRef", new EntityReference(ents[2].id));
 
 	// Return parent
