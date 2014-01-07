@@ -48,6 +48,8 @@ ball.rigidbody.SetAngularVelocity(zeroVec);
 ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
 
 // PLAYER AREAS
+var sceneController = scene.GetEntityByName("SceneController");
+var playerAreas = [];
 var entities = [];
 var partfile = "playerArea.txml";
 generateScene();
@@ -94,131 +96,139 @@ function generateScene() {
 		areaParent.placeable.transform = t;
 	}
 
-	var playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
-	// for (var i = 0; i < playerAreas.length; i++) {
-	// console.LogInfo("player: " + playerAreas[i].player);
-	// }
+	playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
 
-	// console.LogInfo("entities length: " + entities.length);
-}
-
-function deleteScene() {
-	// console.LogInfo("entities length: " + entities.length);
-	for (var i = 0; i < entities.length; i++) {
-		scene.RemoveEntity(entities[i].id);
-	}
-}
-
-function pathForAsset(assetref) {
-	return asset.GetAsset(assetref).DiskSource();
-}
-
-function loadPart(partfile) {
-	// console.LogInfo("load part");
-	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
-	// entities.concat(entities,ents);
-
-console.LogInfo("ents:");
-	for (var i = 0; i < ents.length; i++) {
-		entities.push(ents[i]);
-		// console.LogInfo(ents[i]);
-	}
-
-	// Set racket ref in parent entity
-	var parentEntity = ents[0];
-
-	var children = parentEntity.placeable.Children();
-
-	// console.LogInfo("children:");
-	// console.LogInfo(children[1].id);
-
-	// empty entityReference
-	var attrs = parentEntity.dynamiccomponent;
-	// var racketRef = attrs.GetAttribute("racketRef");
-	// console.LogInfo("racketRef:");
-	// console.LogInfo(racketRef);
-	// console.LogInfo("racketRef.ref:");
-	// console.LogInfo(racketRef.ref);
-	
-	// set entityReference
-	attrs.SetAttribute("racketRef", children[1].id);
-	// racketRef.ref = children[1];
-	// console.LogInfo("racketRef:");
-	// console.LogInfo(racketRef);
-	// console.LogInfo("racketRef.ref:");
-	// console.LogInfo(racketRef.ref);
-	// attrs.SetAttribute("racketRef", racketRef);
-	
-	// racketRef = attrs.GetAttribute("racketRef");
-	// console.LogInfo("2 racketRef:");
-	// console.LogInfo(racketRef);
-	// console.LogInfo("2 racketRef.ref:");
-	// console.LogInfo(racketRef.ref);
-	// attrs.SetAttribute("racketRef", new EntityReference(ents[2].id));
-
-	// Return parent
-	return parentEntity;
-}
-
-function ServerHandleUserConnected(userConnection, responseData) {
-	console.LogInfo("userConnection.id: " + userConnection.id);
-	console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
-
+	var attrs = sceneController.dynamiccomponent;
+	var playerAreaList = attrs.GetAttribute("playerAreas");
 
 	for (var i = 0; i < playerAreas.length; i++) {
-		if (playerAreas[i].player === undefined) {
-			var attrs = playerAreas[i].dynamiccomponent;
-			console.LogInfo("set to: " + userConnection.Property("name"));
-			playerAreas[i].player = userConnection.Property("name");
-			attrs.SetAttribute("playerID", userConnection.Property("name"));
-			break;
-		} else {
-			console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
+		playerAreaList.push(playerAreas[i].id);
+		// attrs
+	}
+	attrs.SetAttribute("playerAreas", playerAreaList);
+
+	playerAreaList = attrs.GetAttribute("playerAreas"); console.LogInfo("playerAreaList[0]: " + playerAreaList[0]);
+
+	// console.LogInfo("entities length: " + entities.length);
+	}
+
+	function deleteScene() {
+		// console.LogInfo("entities length: " + entities.length);
+		for (var i = 0; i < entities.length; i++) {
+			scene.RemoveEntity(entities[i].id);
 		}
 	}
-}
 
-function ServerHandleUserDisconnected(userConnection) {
-	console.LogInfo("user disconnected:");
-	console.LogInfo("userConnection.id: " + userConnection.id);
-	console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
+	function pathForAsset(assetref) {
+		return asset.GetAsset(assetref).DiskSource();
+	}
+
+	function loadPart(partfile) {
+		// console.LogInfo("load part");
+		var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
+		// entities.concat(entities,ents);
+
+		console.LogInfo("ents:");
+		for (var i = 0; i < ents.length; i++) {
+			entities.push(ents[i]);
+			// console.LogInfo(ents[i]);
+		}
+
+		// Set racket ref in parent entity
+		var parentEntity = ents[0];
+
+		var children = parentEntity.placeable.Children();
+
+		// console.LogInfo("children:");
+		// console.LogInfo(children[1].id);
+
+		// empty entityReference
+		var attrs = parentEntity.dynamiccomponent;
+		// var racketRef = attrs.GetAttribute("racketRef");
+		// console.LogInfo("racketRef:");
+		// console.LogInfo(racketRef);
+		// console.LogInfo("racketRef.ref:");
+		// console.LogInfo(racketRef.ref);
+
+		// set entityReference
+		attrs.SetAttribute("racketRef", children[1].id);
+		// racketRef.ref = children[1];
+		// console.LogInfo("racketRef:");
+		// console.LogInfo(racketRef);
+		// console.LogInfo("racketRef.ref:");
+		// console.LogInfo(racketRef.ref);
+		// attrs.SetAttribute("racketRef", racketRef);
+
+		// racketRef = attrs.GetAttribute("racketRef");
+		// console.LogInfo("2 racketRef:");
+		// console.LogInfo(racketRef);
+		// console.LogInfo("2 racketRef.ref:");
+		// console.LogInfo(racketRef.ref);
+		// attrs.SetAttribute("racketRef", new EntityReference(ents[2].id));
+
+		// Return parent
+		return parentEntity;
+	}
+
+	function ServerHandleUserConnected(userConnection, responseData) {
+		console.LogInfo("userConnection.id: " + userConnection.id);
+		console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
 
 
-	for (var i = 0; i < playerAreas.length; i++) {
-		if (playerAreas[i].player === userConnection.Property("name")) {
-			var attrs = playerAreas[i].dynamiccomponent;
-			console.LogInfo("set to undefined");
-			playerAreas[i].player = undefined;
-			attrs.SetAttribute("playerID", undefined);
-			break;
-		} else {
-			console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
+		for (var i = 0; i < playerAreas.length; i++) {
+			if (playerAreas[i].player === undefined) {
+				var attrs = playerAreas[i].dynamiccomponent;
+				console.LogInfo("set to: " + userConnection.Property("name"));
+				playerAreas[i].player = userConnection.Property("name");
+				attrs.SetAttribute("playerID", userConnection.Property("name"));
+				break;
+			} else {
+				console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
+			}
 		}
 	}
-}
 
-function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {
-	// console.LogInfo(ent.name);
-	if (ent.name == "borderLeft ") {
-		ball.placeable.transform = ballt;
+	function ServerHandleUserDisconnected(userConnection) {
+		console.LogInfo("user disconnected:");
+		console.LogInfo("userConnection.id: " + userConnection.id);
+		console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
 
-		// console.LogInfo(ent.placeable.parentRef.ref);
-		var parent = scene.EntityById(ent.placeable.parentRef.ref);
-		// console.LogInfo(parent);
-		var attrs = parent.dynamiccomponent;
-		// console.LogInfo(attrs);
-		attrs.SetAttribute("playerBalls", attrs.GetAttribute("playerBalls") - 1);
+
+		for (var i = 0; i < playerAreas.length; i++) {
+			if (playerAreas[i].player === userConnection.Property("name")) {
+				var attrs = playerAreas[i].dynamiccomponent;
+				console.LogInfo("set to undefined");
+				playerAreas[i].player = undefined;
+				attrs.SetAttribute("playerID", undefined);
+				break;
+			} else {
+				console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
+			}
+		}
 	}
-}
 
-function update(dt) {
-	var rigidbody = ball.rigidbody;
+	function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {
+		// console.LogInfo(ent.name);
+		if (ent.name == "borderLeft ") {
+			ball.placeable.transform = ballt;
 
-	var velvec = rigidbody.GetLinearVelocity();
-	var curdir = velvec.Normalized();
-	//console.LogInfo(curdir);
-	velvec = curdir.Mul(ballSpeed);
-	rigidbody.SetLinearVelocity(velvec);
-}
+			// console.LogInfo(ent.placeable.parentRef.ref);
+			var parent = scene.EntityById(ent.placeable.parentRef.ref);
+			// console.LogInfo(parent);
+			var attrs = parent.dynamiccomponent;
+			// console.LogInfo(attrs);
+			attrs.SetAttribute("playerBalls", attrs.GetAttribute("playerBalls") - 1);
+		}
+	}
 
-frame.Updated.connect(update);
+	function update(dt) {
+		var rigidbody = ball.rigidbody;
+
+		var velvec = rigidbody.GetLinearVelocity();
+		var curdir = velvec.Normalized();
+		//console.LogInfo(curdir);
+		velvec = curdir.Mul(ballSpeed);
+		rigidbody.SetLinearVelocity(velvec);
+	}
+
+	frame.Updated.connect(update);
