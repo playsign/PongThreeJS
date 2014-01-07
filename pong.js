@@ -36,6 +36,7 @@ function init() {
 	app.racketSpeed = 80;
 	// app.playerAreaReserved = undefined;
 	app.reservedRacket = undefined;
+	app.reservedPlayerArea = undefined;
 
 	app.dataConnection.loginData = {
 		"name": Date.now().toString() + getRandomInt(0, 2000000).toString()
@@ -63,19 +64,22 @@ PongApp.prototype.logicInit = function() {
 	// this.controls.userZoom = false;
 };
 
-function sign(x) { return x > 0 ? 1 : x < 0 ? -1 : 0; }
+function sign(x) {
+	return x > 0 ? 1 : x < 0 ? -1 : 0;
+}
 
 PongApp.prototype.logicUpdate = function(dt) {
 
 	if (this.connected) {
 
 		if (!this.reservedRacket && this.dataConnection.scene.entityByName("SceneController")) {
-			for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributeByName("playerAreas").valueInternal.length; i++) {
-				var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributeByName("playerAreas").valueInternal[i];
+			for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributeByName("playerAreas").value.length; i++) {
+				var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributeByName("playerAreas").value[i];
 				var entity = this.dataConnection.scene.entityById(entityID);
 				if (entity.dynamicComponent.attributeByName("playerID").value == this.dataConnection.loginData.name) {
 					var racketRef = entity.dynamicComponent.attributeById("racketRef").value;
 					this.reservedRacket = this.dataConnection.scene.entityById(racketRef);
+					this.reservedPlayerArea = entity;
 					console.log("reserved racket: " + this.reservedRacket);
 					break;
 				}
@@ -85,68 +89,41 @@ PongApp.prototype.logicUpdate = function(dt) {
 		// RACKET CONTROL
 		if (this.reservedRacket !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
 
-			// var racketForward = new THREE.Vector3();
-			var racketForward = 1;
+			// Radian
+			var rotation = (this.reservedPlayerArea.placeable.transform.value.rot.y + 90) * (Math.PI / 180);
 
-			// TODO
-			if (this.reservedRacket.id === 10) {
-				racketForward = -1;
+			var racketForward = new THREE.Vector3();
+
+			// Radian to vector3
+			racketForward.x = Math.cos(rotation * -1);
+			racketForward.z = Math.sin(rotation * -1);
+
+			racketForward.normalize();
+
+			// Racket's speed
+			if (this.touchController.swiping) {
+				// Touch / Mouse
+				racketForward.multiplyScalar(this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed * -1);
+				if (Math.abs(racketForward.length()) > this.racketSpeed) {
+					racketForward.normalize();
+					racketForward.multiplyScalar(this.racketSpeed);
+				}
+			} else {
+				// Keyboard
+				racketForward.multiplyScalar(this.racketSpeed);
 			}
-
-			// Get the original linear velocity of the rigidbody
-			var newValue = this.reservedRacket.rigidBody.attributeByName("Linear velocity").value;
-
-			// var rotation = this.racketMesh.rotation.y + (90 * (Math.PI / 180));
-
-			// // Angle to vector3
-			// racketForward.x = Math.cos(rotation * -1);
-			// racketForward.z = Math.sin(rotation * -1);
-
-
-			// racketForward.normalize();
-
-			// // Racket's speed
-			// if (this.touchController.swiping) {
-			// 	// Touch / Mouse
-			// 	racketForward.multiplyScalar(this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed * dt);
-			// } else {
-			// 	// Keyboard
-			// 	racketForward.multiplyScalar(this.racketSpeed * dt);
-			// }
-
-			// var deltaMovement = this.racketSpeed * dt;
 
 			// Read keyboard
 			if (this.keyboard.pressed("left") || this.keyboard.pressed("a")) {
-				// newValue.pos.z += deltaMovement;
-				newValue.z = -this.racketSpeed * racketForward;
-
-			}
-			if (this.keyboard.pressed("right") || this.keyboard.pressed("d")) {
-				// newValue.pos.z -= deltaMovement;
-				newValue.z = this.racketSpeed * racketForward;
-			}
-
-			// Touch
-			if (this.touchController.swiping) {
-				// newValue.pos.z += deltaMovement;
-				newValue.z = this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed;
-
-				if(Math.abs(newValue.z) > this.racketSpeed){
-					newValue.z = this.racketSpeed * sign(newValue.z);
-				}
-
-				newValue.z *= -1;
+				racketForward.multiplyScalar(-1);
 			}
 
 			// Set a new velocity for the entity
-			this.reservedRacket.rigidBody.linearVelocity.set(newValue, 0);
+			this.reservedRacket.rigidBody.linearVelocity.set(racketForward, 0);
 			// Inform the server about the change
 			this.dataConnection.syncManager.sendChanges();
 		}
 	}
-
-
 };
 
 init();
