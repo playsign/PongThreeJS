@@ -29,7 +29,8 @@ cam.placeable.transform = camPos;
 var camPosModifier = 110;
 
 // PLAYERS
-var playerAmount = 3;
+var playerAmount = 0;
+var players = [];
 // var clientPlayerAmount = 0;
 // var oldPlayerAmount = playerAmount;
 // var playerAreaWidth = 100;
@@ -48,9 +49,11 @@ var sceneController = scene.GetEntityByName("SceneController");
 var playerAreas = [];
 var entities = [];
 var partfile = "playerArea.txml";
-generateScene();
+// generateScene();
 
 function generateScene() {
+	console.LogInfo("generetate scene");
+
 	deleteScene();
 
 	ballSpeed = ballSpeedModifier * playerAmount;
@@ -92,6 +95,15 @@ function generateScene() {
 		t.pos.z = z;
 		t.rot.y = degree;
 		areaParent.placeable.transform = t;
+
+		var attrs = areaParent.dynamiccomponent;
+		attrs.SetAttribute("playerID", players[i]);
+
+		console.LogInfo("___");
+		console.LogInfo(i);
+		console.LogInfo(players[i]);
+		console.LogInfo(players.length);
+
 	}
 
 	playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
@@ -105,21 +117,29 @@ function generateScene() {
 	}
 	attrs.SetAttribute("playerAreas", playerAreaList);
 
-	playerAreaList = attrs.GetAttribute("playerAreas");
-	console.LogInfo("playerAreaList[0]: " + playerAreaList[0]);
+	// playerAreaList = attrs.GetAttribute("playerAreas");
+	// console.LogInfo("playerAreaList[0]: " + playerAreaList[0]);
 
 	// console.LogInfo("entities length: " + entities.length);
 
 	// Camera position
 	camPos.pos.y = playerAmount * camPosModifier;
 	cam.placeable.transform = camPos;
+
+	sceneController.Exec(4, "sceneGenerated");
 }
 
 function deleteScene() {
 	// console.LogInfo("entities length: " + entities.length);
+	// Clear playerAreas list
+	var attrs = sceneController.dynamiccomponent;
+	attrs.SetAttribute("playerAreas", []);
+
 	for (var i = 0; i < entities.length; i++) {
 		scene.RemoveEntity(entities[i].id);
 	}
+
+	entities = [];
 }
 
 function resetBall() {
@@ -136,7 +156,7 @@ function pathForAsset(assetref) {
 }
 
 function loadPart(partfile) {
-	// console.LogInfo("load part");
+	console.LogInfo("load part");
 	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
 	// entities.concat(entities,ents);
 
@@ -162,22 +182,24 @@ function ServerHandleUserConnected(userConnection, responseData) {
 	console.LogInfo("userConnection.id: " + userConnection.id);
 	console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
 
+	players.push(userConnection.Property("name"));
 
-	for (var i = 0; i < playerAreas.length; i++) {
-		if (playerAreas[i].player === undefined) {
-			playerAmount++;
+	// for (var i = 0; i < playerAreas.length; i++) {
+	// 	if (playerAreas[i].player === undefined) {
+	playerAmount++;
 
-			var attrs = playerAreas[i].dynamiccomponent;
-			playerAreas[i].player = userConnection.Property("name");
-			attrs.SetAttribute("playerID", userConnection.Property("name"));
+	generateScene();
 
-			generateScene();
+	var pa = playerAreas[playerAreas.length - 1];
+	var attrs = pa.dynamiccomponent;
+	pa.player = userConnection.Property("name");
+	attrs.SetAttribute("playerID", userConnection.Property("name"));
 
-			break;
-		} else {
-			console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
-		}
-	}
+	// break;
+	// 	} else {
+	// 		console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
+	// 	}
+	// }
 }
 
 function ServerHandleUserDisconnected(userConnection) {
@@ -189,6 +211,11 @@ function ServerHandleUserDisconnected(userConnection) {
 	for (var i = 0; i < playerAreas.length; i++) {
 		if (playerAreas[i].player === userConnection.Property("name")) {
 			playerAmount--;
+			for (var i = 0; i < players.length; i++) {
+				if (players[i] === userConnection.id) {
+					players.splice(i, 0);
+				}
+			}
 
 			var attrs = playerAreas[i].dynamiccomponent;
 			console.LogInfo("set to undefined");

@@ -52,6 +52,12 @@ function PongApp() {
 PongApp.prototype = new Application();
 PongApp.prototype.constructor = PongApp;
 
+PongApp.prototype.onConnected = function() {
+	console.log("connected");
+	this.connected = true;
+	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
+};
+
 PongApp.prototype.logicInit = function() {
 
 	// TOUCH
@@ -72,12 +78,13 @@ PongApp.prototype.logicUpdate = function(dt) {
 
 	if (this.connected) {
 
-		if (!this.reservedRacket && this.dataConnection.scene.entityByName("SceneController")) {
-			for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.playerAreas.value.length; i++) {
-				var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.playerAreas.value[i];
+		var serverSceneCtrl = this.dataConnection.scene.entityByName("SceneController");
+		if (!this.reservedRacket && serverSceneCtrl) {
+			for (var i = 0; i < serverSceneCtrl.dynamicComponent.playerAreas.length; i++) {
+				var entityID = serverSceneCtrl.dynamicComponent.playerAreas[i];
 				var entity = this.dataConnection.scene.entityById(entityID);
-				if (entity.dynamicComponent.playerID.value == this.dataConnection.loginData.name) {
-					var racketRef = entity.dynamicComponent.racketRef.value;
+				if (entity && entity.dynamicComponent.playerID == this.dataConnection.loginData.name) {
+					var racketRef = entity.dynamicComponent.racketRef;
 					this.reservedRacket = this.dataConnection.scene.entityById(racketRef);
 					this.reservedPlayerArea = entity;
 					console.log("reserved racket: " + this.reservedRacket);
@@ -126,6 +133,10 @@ PongApp.prototype.logicUpdate = function(dt) {
 			this.dataConnection.syncManager.sendChanges();
 		}
 	}
+};
+
+PongApp.prototype.onSceneGenerated = function() {
+	this.reservedRacket = undefined;
 };
 
 init();
