@@ -1,6 +1,4 @@
 var zeroVec = new float3(0, 0, 0);
-var pi = 3.14159265359;
-
 
 console.LogInfo(server);
 if (server.IsRunning()) {
@@ -21,28 +19,26 @@ if (server.IsRunning()) {
 
 // CAMERA
 var cam = scene.GetEntityByName("FreeLookCamera");
-var t = cam.placeable.transform;
-t.pos.x = 0;
-t.pos.y = 300;
-t.pos.z = 0;
-t.rot.x = -90;
-cam.placeable.transform = t;
+cam.farPlane = 50000;
+var camPos = cam.placeable.transform;
+camPos.pos.x = 0;
+camPos.pos.y = 300;
+camPos.pos.z = 0;
+camPos.rot.x = -90;
+cam.placeable.transform = camPos;
+var camPosModifier = 110;
 
 // PLAYERS
 var playerAmount = 3;
-var clientPlayerAmount = 0;
-var oldPlayerAmount = playerAmount;
-var playerAreaWidth = 100;
+// var clientPlayerAmount = 0;
+// var oldPlayerAmount = playerAmount;
+// var playerAreaWidth = 100;
 
 // BALL
 var ball = scene.GetEntityByName("Sphere");
 var ballSpeed = 80.0;
-var ballt = ball.placeable.transform;
-ballt.pos = zeroVec;
-ballt.rot = zeroVec;
-ball.placeable.transform = ballt;
-ball.rigidbody.SetLinearVelocity(new float3(1, 0, 1));
-ball.rigidbody.SetAngularVelocity(zeroVec);
+var ballSpeedModifier = 50.0;
+resetBall();
 // ball.rigidbody.SetLinearVelocity(zeroVec);
 // trigger
 ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
@@ -57,10 +53,12 @@ generateScene();
 function generateScene() {
 	deleteScene();
 
-	// TODO reset ball position
+	ballSpeed = ballSpeedModifier * playerAmount;
+
+	resetBall();
 
 	// Angle in radians
-	var radians = pi * 2 / this.playerAmount;
+	var radians = Math.PI * 2 / this.playerAmount;
 
 	var radius = this.playerAmount;
 	var pivotPoint = 9; // 10 Push player area forward by width of the area
@@ -83,8 +81,8 @@ function generateScene() {
 	for (var i = 0; i < playerAmount; i++) {
 		var areaParent = loadPart(partfile);
 
-		radians = pi * 2 / this.playerAmount * (i + 1);
-		var degree = 360 - (radians * (180 / pi));
+		radians = Math.PI * 2 / this.playerAmount * (i + 1);
+		var degree = 360 - (radians * (180 / Math.PI));
 
 		var x = Math.cos(radians) * radius * pivotPoint;
 		var z = Math.sin(radians) * radius * pivotPoint;
@@ -107,128 +105,124 @@ function generateScene() {
 	}
 	attrs.SetAttribute("playerAreas", playerAreaList);
 
-	playerAreaList = attrs.GetAttribute("playerAreas"); console.LogInfo("playerAreaList[0]: " + playerAreaList[0]);
+	playerAreaList = attrs.GetAttribute("playerAreas");
+	console.LogInfo("playerAreaList[0]: " + playerAreaList[0]);
 
 	// console.LogInfo("entities length: " + entities.length);
+
+	// Camera position
+	camPos.pos.y = playerAmount * camPosModifier;
+	cam.placeable.transform = camPos;
+}
+
+function deleteScene() {
+	// console.LogInfo("entities length: " + entities.length);
+	for (var i = 0; i < entities.length; i++) {
+		scene.RemoveEntity(entities[i].id);
+	}
+}
+
+function resetBall() {
+	var ballt = ball.placeable.transform;
+	ballt.pos = zeroVec;
+	ballt.rot = zeroVec;
+	ball.placeable.transform = ballt;
+	ball.rigidbody.SetLinearVelocity(new float3(1, 0, 0.88));
+	ball.rigidbody.SetAngularVelocity(zeroVec);
+}
+
+function pathForAsset(assetref) {
+	return asset.GetAsset(assetref).DiskSource();
+}
+
+function loadPart(partfile) {
+	// console.LogInfo("load part");
+	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
+	// entities.concat(entities,ents);
+
+	console.LogInfo("ents:");
+	for (var i = 0; i < ents.length; i++) {
+		entities.push(ents[i]);
+		// console.LogInfo(ents[i]);
 	}
 
-	function deleteScene() {
-		// console.LogInfo("entities length: " + entities.length);
-		for (var i = 0; i < entities.length; i++) {
-			scene.RemoveEntity(entities[i].id);
+	// Set racket ref in parent entity
+	var parentEntity = ents[0];
+
+	var children = parentEntity.placeable.Children();
+
+	var attrs = parentEntity.dynamiccomponent;
+	attrs.SetAttribute("racketRef", children[1].id);
+
+	// Return parent
+	return parentEntity;
+}
+
+function ServerHandleUserConnected(userConnection, responseData) {
+	console.LogInfo("userConnection.id: " + userConnection.id);
+	console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
+
+
+	for (var i = 0; i < playerAreas.length; i++) {
+		if (playerAreas[i].player === undefined) {
+			playerAmount++;
+
+			var attrs = playerAreas[i].dynamiccomponent;
+			playerAreas[i].player = userConnection.Property("name");
+			attrs.SetAttribute("playerID", userConnection.Property("name"));
+
+			generateScene();
+
+			break;
+		} else {
+			console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
 		}
 	}
+}
 
-	function pathForAsset(assetref) {
-		return asset.GetAsset(assetref).DiskSource();
-	}
-
-	function loadPart(partfile) {
-		// console.LogInfo("load part");
-		var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
-		// entities.concat(entities,ents);
-
-		console.LogInfo("ents:");
-		for (var i = 0; i < ents.length; i++) {
-			entities.push(ents[i]);
-			// console.LogInfo(ents[i]);
-		}
-
-		// Set racket ref in parent entity
-		var parentEntity = ents[0];
-
-		var children = parentEntity.placeable.Children();
-
-		// console.LogInfo("children:");
-		// console.LogInfo(children[1].id);
-
-		// empty entityReference
-		var attrs = parentEntity.dynamiccomponent;
-		// var racketRef = attrs.GetAttribute("racketRef");
-		// console.LogInfo("racketRef:");
-		// console.LogInfo(racketRef);
-		// console.LogInfo("racketRef.ref:");
-		// console.LogInfo(racketRef.ref);
-
-		// set entityReference
-		attrs.SetAttribute("racketRef", children[1].id);
-		// racketRef.ref = children[1];
-		// console.LogInfo("racketRef:");
-		// console.LogInfo(racketRef);
-		// console.LogInfo("racketRef.ref:");
-		// console.LogInfo(racketRef.ref);
-		// attrs.SetAttribute("racketRef", racketRef);
-
-		// racketRef = attrs.GetAttribute("racketRef");
-		// console.LogInfo("2 racketRef:");
-		// console.LogInfo(racketRef);
-		// console.LogInfo("2 racketRef.ref:");
-		// console.LogInfo(racketRef.ref);
-		// attrs.SetAttribute("racketRef", new EntityReference(ents[2].id));
-
-		// Return parent
-		return parentEntity;
-	}
-
-	function ServerHandleUserConnected(userConnection, responseData) {
-		console.LogInfo("userConnection.id: " + userConnection.id);
-		console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
+function ServerHandleUserDisconnected(userConnection) {
+	console.LogInfo("user disconnected:");
+	console.LogInfo("userConnection.id: " + userConnection.id);
+	console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
 
 
-		for (var i = 0; i < playerAreas.length; i++) {
-			if (playerAreas[i].player === undefined) {
-				var attrs = playerAreas[i].dynamiccomponent;
-				console.LogInfo("set to: " + userConnection.Property("name"));
-				playerAreas[i].player = userConnection.Property("name");
-				attrs.SetAttribute("playerID", userConnection.Property("name"));
-				break;
-			} else {
-				console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
-			}
+	for (var i = 0; i < playerAreas.length; i++) {
+		if (playerAreas[i].player === userConnection.Property("name")) {
+			playerAmount--;
+
+			var attrs = playerAreas[i].dynamiccomponent;
+			console.LogInfo("set to undefined");
+			playerAreas[i].player = undefined;
+			attrs.SetAttribute("playerID", undefined);
+			break;
+		} else {
+			console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
 		}
 	}
+}
 
-	function ServerHandleUserDisconnected(userConnection) {
-		console.LogInfo("user disconnected:");
-		console.LogInfo("userConnection.id: " + userConnection.id);
-		console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
+function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {
+	// console.LogInfo(ent.name);
+	if (ent.name == "borderLeft ") {
+		ball.placeable.transform = ballt;
 
-
-		for (var i = 0; i < playerAreas.length; i++) {
-			if (playerAreas[i].player === userConnection.Property("name")) {
-				var attrs = playerAreas[i].dynamiccomponent;
-				console.LogInfo("set to undefined");
-				playerAreas[i].player = undefined;
-				attrs.SetAttribute("playerID", undefined);
-				break;
-			} else {
-				console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
-			}
-		}
+		// console.LogInfo(ent.placeable.parentRef.ref);
+		var parent = scene.EntityById(ent.placeable.parentRef.ref);
+		// console.LogInfo(parent);
+		var attrs = parent.dynamiccomponent;
+		// console.LogInfo(attrs);
+		attrs.SetAttribute("playerBalls", attrs.GetAttribute("playerBalls") - 1);
 	}
+}
 
-	function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {
-		// console.LogInfo(ent.name);
-		if (ent.name == "borderLeft ") {
-			ball.placeable.transform = ballt;
+function update(dt) {
+	var rigidbody = ball.rigidbody;
 
-			// console.LogInfo(ent.placeable.parentRef.ref);
-			var parent = scene.EntityById(ent.placeable.parentRef.ref);
-			// console.LogInfo(parent);
-			var attrs = parent.dynamiccomponent;
-			// console.LogInfo(attrs);
-			attrs.SetAttribute("playerBalls", attrs.GetAttribute("playerBalls") - 1);
-		}
-	}
+	var velvec = rigidbody.GetLinearVelocity();
+	var curdir = velvec.Normalized();
+	//console.LogInfo(curdir);
+	velvec = curdir.Mul(ballSpeed);
+	rigidbody.SetLinearVelocity(velvec);
+}
 
-	function update(dt) {
-		var rigidbody = ball.rigidbody;
-
-		var velvec = rigidbody.GetLinearVelocity();
-		var curdir = velvec.Normalized();
-		//console.LogInfo(curdir);
-		velvec = curdir.Mul(ballSpeed);
-		rigidbody.SetLinearVelocity(velvec);
-	}
-
-	frame.Updated.connect(update);
+frame.Updated.connect(update);

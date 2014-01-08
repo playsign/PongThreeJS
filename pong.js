@@ -73,11 +73,11 @@ PongApp.prototype.logicUpdate = function(dt) {
 	if (this.connected) {
 
 		if (!this.reservedRacket && this.dataConnection.scene.entityByName("SceneController")) {
-			for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributeByName("playerAreas").value.length; i++) {
-				var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.attributeByName("playerAreas").value[i];
+			for (var i = 0; i < this.dataConnection.scene.entityByName("SceneController").dynamicComponent.playerAreas.value.length; i++) {
+				var entityID = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.playerAreas.value[i];
 				var entity = this.dataConnection.scene.entityById(entityID);
-				if (entity.dynamicComponent.attributeByName("playerID").value == this.dataConnection.loginData.name) {
-					var racketRef = entity.dynamicComponent.attributeById("racketRef").value;
+				if (entity.dynamicComponent.playerID.value == this.dataConnection.loginData.name) {
+					var racketRef = entity.dynamicComponent.racketRef.value;
 					this.reservedRacket = this.dataConnection.scene.entityById(racketRef);
 					this.reservedPlayerArea = entity;
 					console.log("reserved racket: " + this.reservedRacket);
@@ -90,7 +90,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 		if (this.reservedRacket !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
 
 			// Radian
-			var rotation = (this.reservedPlayerArea.placeable.transform.value.rot.y + 90) * (Math.PI / 180);
+			var rotation = (this.reservedPlayerArea.placeable.transform.rot.y + 90) * (Math.PI / 180);
 
 			var racketForward = new THREE.Vector3();
 
@@ -119,7 +119,9 @@ PongApp.prototype.logicUpdate = function(dt) {
 			}
 
 			// Set a new velocity for the entity
-			this.reservedRacket.rigidBody.linearVelocity.set(racketForward, 0);
+			this.reservedRacket.rigidBody.linearVelocity = racketForward;
+			// console.log(racketForward);
+
 			// Inform the server about the change
 			this.dataConnection.syncManager.sendChanges();
 		}
