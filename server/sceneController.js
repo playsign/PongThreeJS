@@ -21,7 +21,7 @@ if (server.IsRunning()) {
 var cam = scene.GetEntityByName("FreeLookCamera");
 cam.farPlane = 50000;
 var camPosModifier = 110;
-var minPlayerPosY = 300;
+var minCameraPosY = 300;
 var camPos = cam.placeable.transform;
 camPos.pos.x = 0;
 camPos.pos.y = minCameraPosY;
@@ -122,7 +122,7 @@ function generateScene() {
 	camPos.pos.y = Math.max(playerAmount * camPosModifier, minCameraPosY);
 	cam.placeable.transform = camPos;
 
-	sceneController.Exec(4, "sceneGenerated");
+	sceneController.Exec(4, "sceneGenerated", "sceneGenerated", this.playerAmount);
 }
 
 function deleteScene() {
