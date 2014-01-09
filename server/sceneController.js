@@ -20,13 +20,14 @@ if (server.IsRunning()) {
 // CAMERA
 var cam = scene.GetEntityByName("FreeLookCamera");
 cam.farPlane = 50000;
+var camPosModifier = 110;
+var minPlayerPosY = 300;
 var camPos = cam.placeable.transform;
 camPos.pos.x = 0;
-camPos.pos.y = 300;
+camPos.pos.y = minCameraPosY;
 camPos.pos.z = 0;
 camPos.rot.x = -90;
 cam.placeable.transform = camPos;
-var camPosModifier = 110;
 
 // PLAYERS
 var playerAmount = 0;
@@ -52,7 +53,7 @@ var partfile = "playerArea.txml";
 // generateScene();
 
 function generateScene() {
-	console.LogInfo("generetate scene");
+	console.LogInfo("generate scene");
 
 	deleteScene();
 
@@ -99,11 +100,6 @@ function generateScene() {
 		var attrs = areaParent.dynamiccomponent;
 		attrs.SetAttribute("playerID", players[i]);
 
-		console.LogInfo("___");
-		console.LogInfo(i);
-		console.LogInfo(players[i]);
-		console.LogInfo(players.length);
-
 	}
 
 	playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
@@ -123,7 +119,7 @@ function generateScene() {
 	// console.LogInfo("entities length: " + entities.length);
 
 	// Camera position
-	camPos.pos.y = playerAmount * camPosModifier;
+	camPos.pos.y = Math.max(playerAmount * camPosModifier, minCameraPosY);
 	cam.placeable.transform = camPos;
 
 	sceneController.Exec(4, "sceneGenerated");
@@ -208,24 +204,32 @@ function ServerHandleUserDisconnected(userConnection) {
 	console.LogInfo("userConnection.LoginData(): " + userConnection.Property("name"));
 
 
-	for (var i = 0; i < playerAreas.length; i++) {
-		if (playerAreas[i].player === userConnection.Property("name")) {
+	// for (var i = 0; i < playerAreas.length; i++) {
+	// 	if (playerAreas[i].player === userConnection.Property("name")) {
 			playerAmount--;
 			for (var i = 0; i < players.length; i++) {
-				if (players[i] === userConnection.id) {
-					players.splice(i, 0);
+				console.LogInfo("players"+i);
+					console.LogInfo(players[i]);
+				if (players[i] === userConnection.Property("name")) {
+					var spliced = players.splice(i, 1);
+					console.LogInfo("spliced: ");
+					console.LogInfo(spliced);
+					console.LogInfo(i);
 				}
 			}
 
-			var attrs = playerAreas[i].dynamiccomponent;
-			console.LogInfo("set to undefined");
-			playerAreas[i].player = undefined;
-			attrs.SetAttribute("playerID", undefined);
-			break;
-		} else {
-			console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
-		}
-	}
+			// var attrs = playerAreas[i].dynamiccomponent;
+			// console.LogInfo("set to undefined");
+			// playerAreas[i].player = undefined;
+			// attrs.SetAttribute("playerID", undefined);
+
+			generateScene();
+
+	// 		break;
+	// 	} else {
+	// 		console.LogInfo("this playerArea had a player: " + playerAreas[i].player);
+	// 	}
+	// }
 }
 
 function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {
