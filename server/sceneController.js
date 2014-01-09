@@ -170,6 +170,9 @@ function loadPart(partfile) {
 	var attrs = parentEntity.dynamiccomponent;
 	attrs.SetAttribute("racketRef", children[1].id);
 
+	attrs.SetAttribute("borderLeftRef", children[2].id);
+
+
 	// Return parent
 	return parentEntity;
 }
@@ -206,24 +209,24 @@ function ServerHandleUserDisconnected(userConnection) {
 
 	// for (var i = 0; i < playerAreas.length; i++) {
 	// 	if (playerAreas[i].player === userConnection.Property("name")) {
-			playerAmount--;
-			for (var i = 0; i < players.length; i++) {
-				console.LogInfo("players"+i);
-					console.LogInfo(players[i]);
-				if (players[i] === userConnection.Property("name")) {
-					var spliced = players.splice(i, 1);
-					console.LogInfo("spliced: ");
-					console.LogInfo(spliced);
-					console.LogInfo(i);
-				}
-			}
+	playerAmount--;
+	for (var i = 0; i < players.length; i++) {
+		console.LogInfo("players" + i);
+		console.LogInfo(players[i]);
+		if (players[i] === userConnection.Property("name")) {
+			var spliced = players.splice(i, 1);
+			console.LogInfo("spliced: ");
+			console.LogInfo(spliced);
+			console.LogInfo(i);
+		}
+	}
 
-			// var attrs = playerAreas[i].dynamiccomponent;
-			// console.LogInfo("set to undefined");
-			// playerAreas[i].player = undefined;
-			// attrs.SetAttribute("playerID", undefined);
+	// var attrs = playerAreas[i].dynamiccomponent;
+	// console.LogInfo("set to undefined");
+	// playerAreas[i].player = undefined;
+	// attrs.SetAttribute("playerID", undefined);
 
-			generateScene();
+	generateScene();
 
 	// 		break;
 	// 	} else {

@@ -9,17 +9,6 @@ function SceneController() {
 	// // SCENE
 	// this.scene = new THREE.Scene();
 
-	// // CAMERA
-	// var SCREEN_WIDTH = window.innerWidth;
-	// var SCREEN_HEIGHT = window.innerHeight;
-	// var NEAR = -20000;
-	// var FAR = 20000;
-
-	// this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
-	// this.scene.add(this.camera);
-	// this.camera.position.set(0, 300, 100); // (0, 1000, -375);
-	// this.camera.lookAt(this.scene.position);
-
 	// // LIGHT
 	// var light;
 
@@ -54,7 +43,7 @@ function SceneController() {
 	// this.clientPlayerAmount = 0;
 	// this.oldPlayerAmount = this.playerAmount;
 	// this.playerAreas = [];
-	// this.playerAreaWidth = 100;
+	this.playerAreaWidth = 100;
 
 	// // BALL
 	// var borderMaterial = new THREE.MeshLambertMaterial({
@@ -148,81 +137,67 @@ function SceneController() {
 // 	}
 // };
 
-// SceneController.prototype.generateScene = function() {
-// 	// delete previous scene
-// 	this.deleteScene();
+SceneController.prototype.onSceneGenerated = function(playerAmount) {
+	// // delete previous scene
+	// // this.deleteScene();
 
-// 	this.playerAmount = Math.round(this.playerAmount);
+	// playerAmount = Math.round(playerAmount);
 
-// 	this.ball.lastCollider = null;
+	// // this.ball.lastCollider = null;
 
-// 	// ammo.js . Reset positions
-// 	var transform = this.ball.collider.getCenterOfMassTransform();
-// 	transform.setOrigin(new Ammo.btVector3(0, 0, 0));
-// 	this.ball.collider.setCenterOfMassTransform(transform);
+	// // // ammo.js . Reset positions
+	// // var transform = this.ball.collider.getCenterOfMassTransform();
+	// // transform.setOrigin(new Ammo.btVector3(0, 0, 0));
+	// // this.ball.collider.setCenterOfMassTransform(transform);
 
-// 	// Angle in radians
-// 	var radians = Math.PI * 2 / this.playerAmount;
+	// // Angle in radians
+	// var radians = Math.PI * 2 / playerAmount;
 
-// 	var radius = this.playerAmount; // * radiusTweak;
-// 	var pivotPoint = 9; // 10 Push player area forward by width of the area
+	// var radius = playerAmount; // * radiusTweak;
+	// var pivotPoint = 9; // 10 Push player area forward by width of the area
 
-// 	// Two player tweak to remove gaps between player areas
-// 	if (this.playerAmount === 2) {
-// 		pivotPoint -= 5; // 4.5 , 5,5
-// 	} else if (this.playerAmount === 3) {
-// 		pivotPoint -= 0.5; //-0,5
-// 	}
+	// // Two player tweak to remove gaps between player areas
+	// if (playerAmount === 2) {
+	// 	pivotPoint -= 5; // 4.5 , 5,5
+	// } else if (playerAmount === 3) {
+	// 	pivotPoint -= 0.5; //-0,5
+	// }
 
-// 	// Calculate player area offset
-// 	var tHypotenuse = radius;
-// 	var tAngle = radians / 2;
-// 	var tAdjacent = Math.cos(tAngle) * tHypotenuse;
-// 	var playerAreaOffset = radius - tAdjacent;
+	// // Calculate player area offset
+	// var tHypotenuse = radius;
+	// var tAngle = radians / 2;
+	// var tAdjacent = Math.cos(tAngle) * tHypotenuse;
+	// var playerAreaOffset = radius - tAdjacent;
 
-// 	radius += radius - playerAreaOffset;
+	// radius += radius - playerAreaOffset;
 
-// 	for (var i = 0; i < this.playerAmount; i++) {
-// 		radians = Math.PI * 2 / this.playerAmount * (i + 1);
-// 		// var degree = 360 - (radians * (180 / Math.PI));
+	// // update the camera
+	// var gameAreaDiameter = (radius * 25 + (this.playerAreaWidth * 2)); // TODO 25 the magic number
+	// // console.log("gameAreaDiameter: " + gameAreaDiameter);
 
-// 		var x = Math.cos(radians) * radius * pivotPoint;
-// 		var z = Math.sin(radians) * radius * -1 * pivotPoint;
+	// var SCREEN_WIDTH = window.innerWidth;
+	// var SCREEN_HEIGHT = window.innerHeight;
+	// var ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
 
-// 		var pa = new PlayerArea(new THREE.Vector3(x, 0, z), radians, i);
+	// if (SCREEN_HEIGHT < SCREEN_WIDTH) {
+	// 	this.camera.left = ASPECT * -gameAreaDiameter / 2;
+	// 	this.camera.right = ASPECT * gameAreaDiameter / 2;
+	// 	this.camera.top = gameAreaDiameter / 2;
+	// 	this.camera.bottom = -gameAreaDiameter / 2;
+	// } else {
+	// 	this.camera.left = -gameAreaDiameter / 2;
+	// 	this.camera.right = gameAreaDiameter / 2;
+	// 	this.camera.top = gameAreaDiameter / 2 / ASPECT;
+	// 	this.camera.bottom = -gameAreaDiameter / 2 / ASPECT;
+	// }
 
-// 		this.playerAreas.push(pa);
+	// this.camera.updateProjectionMatrix();
 
-// 		this.scene.add(pa.group);
-// 	}
+	// // Players info
+	// // this.refreshPlayersInfo();
 
-// 	// update the camera
-// 	var gameAreaDiameter = (radius * 25 + (this.playerAreaWidth * 2)); // TODO 25 the magic number
-// 	// console.log("gameAreaDiameter: " + gameAreaDiameter);
-
-// 	var SCREEN_WIDTH = window.innerWidth;
-// 	var SCREEN_HEIGHT = window.innerHeight;
-// 	var ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
-
-// 	if (SCREEN_HEIGHT < SCREEN_WIDTH) {
-// 		this.camera.left = ASPECT * -gameAreaDiameter / 2;
-// 		this.camera.right = ASPECT * gameAreaDiameter / 2;
-// 		this.camera.top = gameAreaDiameter / 2;
-// 		this.camera.bottom = -gameAreaDiameter / 2;
-// 	} else {
-// 		this.camera.left = -gameAreaDiameter / 2;
-// 		this.camera.right = gameAreaDiameter / 2;
-// 		this.camera.top = gameAreaDiameter / 2 / ASPECT;
-// 		this.camera.bottom = -gameAreaDiameter / 2 / ASPECT;
-// 	}
-
-// 	this.camera.updateProjectionMatrix();
-
-// 	// Players info
-// 	this.refreshPlayersInfo();
-
-// 	this.oldPlayerAmount = this.playerAmount;
-// };
+	// // this.oldPlayerAmount = playerAmount;
+};
 
 // SceneController.prototype.deleteScene = function() {
 

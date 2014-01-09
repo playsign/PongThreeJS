@@ -17,6 +17,7 @@
   <component typeId="25" type="DynamicComponent" sync="true" name="PlayerArea">
    <attribute value="0" type="int" id="racketRef" name="racketRef"/>
    <attribute value="" type="string" id="playerID" name="playerID"/>
+    <attribute value="0" type="int" id="borderLeftRef" name="borderLeftRef"/>
    <attribute value="-4791" type="int" id="playerBalls" name="playerBalls"/>
   </component>
  </entity>
