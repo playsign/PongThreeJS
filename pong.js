@@ -29,7 +29,6 @@ function init() {
 
 	app.start();
 
-	app.viewer.useCubes = true; // Use wireframe cube material for all objects
 	useSignals = true;
 
 	// Custom app properties
@@ -55,7 +54,33 @@ PongApp.prototype.constructor = PongApp;
 PongApp.prototype.onConnected = function() {
 	console.log("connected");
 	this.connected = true;
+
 	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
+};
+
+PongApp.prototype.onDisconnected = function() {
+	console.log("disconnected");
+	this.connected = false;
+
+	// Destroy scene objects
+	var removables = [];
+	var i = 0;
+	for (i = 0; i < this.scene.children.length; i++) {
+		if (this.scene.children[i] instanceof THREE.Object3D) {
+			removables.push(this.scene.children[i]);
+		}
+	}
+
+	for (i = 0; i < removables.length; i++) {
+		if (!(removables[i] instanceof THREE.PointLight || removables[i] instanceof THREE.PerspectiveCamera)) {
+			removables[i].parent.remove(removables[i]);
+		}
+	}
+
+	this.reservedRacket = undefined;
+	this.reservedPlayerArea = undefined;
+	this.dataConnection.scene.entities = {};
+
 };
 
 PongApp.prototype.logicInit = function() {
@@ -137,6 +162,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 
 PongApp.prototype.onSceneGenerated = function() {
 	this.reservedRacket = undefined;
+	this.reservedPlayerArea = undefined;
 };
 
 init();
