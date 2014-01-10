@@ -22,7 +22,6 @@ function init() {
 	app.host = "10.10.3.28"; // IP of the Tundra server
 	app.port = 2345; // and port of the server
 
-
 	function getRandomInt(min, max) {
 		return Math.floor(Math.random() * (max - min + 1) + min);
 	}
@@ -33,7 +32,6 @@ function init() {
 
 	// Custom app properties
 	app.racketSpeed = 80;
-	// app.playerAreaReserved = undefined;
 	app.reservedRacket = undefined;
 	app.reservedPlayerArea = undefined;
 	app.reservedBorderLeft = undefined;
@@ -43,7 +41,7 @@ function init() {
 		"name": Date.now().toString() + getRandomInt(0, 2000000).toString()
 	}
 
-	console.log("name: " + app.dataConnection.loginData.name);
+	console.log("name(id): " + app.dataConnection.loginData.name);
 }
 
 function PongApp() {
@@ -51,22 +49,22 @@ function PongApp() {
 }
 
 PongApp.prototype = new Application();
+
 PongApp.prototype.constructor = PongApp;
 
 PongApp.prototype.onConnected = function() {
 	console.log("connected");
 	this.connected = true;
 
+	// Set callback function to know when the scene is (re)generated
 	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
-
-	// this.onSceneGenerated();
 };
 
 PongApp.prototype.onDisconnected = function() {
 	console.log("disconnected");
 	this.connected = false;
 
-	// Destroy scene objects
+	// DESTROY SCENE OBJECTS
 	var removables = [];
 	var i = 0;
 	for (i = 0; i < this.scene.children.length; i++) {
@@ -81,6 +79,7 @@ PongApp.prototype.onDisconnected = function() {
 		}
 	}
 
+	// Reset entity references
 	this.reservedRacket = undefined;
 	this.reservedPlayerArea = undefined;
 	this.reservedBorderLeft = undefined;
@@ -99,13 +98,14 @@ PongApp.prototype.logicInit = function() {
 	var NEAR = -20000;
 	var FAR = 20000;
 
+	// override camera
 	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
-	// this.scene.add(this.camera);
-	this.camera.position.set(0, 200, 100); // (0, 1000, -375);
+	this.camera.position.set(0, 200, 100);
 	this.camera.lookAt(this.scene.position);
 	this.viewer.camera = this.camera;
 
-	// LIGHT
+	// LIGHTS
+	// override point light
 	this.viewer.pointLight.position.set(-300, 300, -300);
 
 	// White directional light at half intensity shining from the top.
@@ -113,18 +113,14 @@ PongApp.prototype.logicInit = function() {
 	this.directionalLight.position.set(300, 300, 300);
 	this.scene.add(this.directionalLight);
 
-	// DIRECTOR
+	// DIRECTOR (gui)
 	this.gameDirector = new Director();
 
 	// SCENE
 	this.sceneCtrl = new SceneController();
 
 	// CONTROLS
-	// this.controls.userZoom = false;
-
-
-	// OTHER
-	// this.playerAmount = 0;
+	this.controls.userZoom = false;
 };
 
 function sign(x) {
@@ -135,21 +131,21 @@ PongApp.prototype.logicUpdate = function(dt) {
 
 	if (this.connected) {
 
+		// Find a player area that matches with the player
 		var serverSceneCtrl = this.dataConnection.scene.entityByName("SceneController");
 		if (!this.reservedRacket && serverSceneCtrl) {
 			for (var i = 0; i < serverSceneCtrl.dynamicComponent.playerAreas.length; i++) {
 				var entityID = serverSceneCtrl.dynamicComponent.playerAreas[i];
 				var entity = this.dataConnection.scene.entityById(entityID);
 				if (entity && entity.dynamicComponent.playerID == this.dataConnection.loginData.name) {
-
+					// Set player area entity references
 					var racketRef = entity.dynamicComponent.racketRef;
 					var borderLeftRef = entity.dynamicComponent.borderLeftRef;
 					this.reservedRacket = this.dataConnection.scene.entityById(racketRef);
 					this.reservedBorderLeft = this.dataConnection.scene.entityById(borderLeftRef);
 					this.reservedPlayerArea = entity;
-					// console.log("reserved racket: " + this.reservedRacket);
 
-					// this.playerAmount = serverSceneCtrl.dynamicComponent.playerAreas.length;
+					// Set camera position and angle
 					this.setCameraPosition(serverSceneCtrl.dynamicComponent.playerAreas.length);
 
 					break;
@@ -158,7 +154,8 @@ PongApp.prototype.logicUpdate = function(dt) {
 		}
 
 		// RACKET CONTROL
-		if (this.reservedRacket !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
+		if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
+			// Get racket's direction vector
 
 			// Radian
 			var rotation = (this.reservedPlayerArea.placeable.transform.rot.y + 90) * (Math.PI / 180);
@@ -199,20 +196,10 @@ PongApp.prototype.logicUpdate = function(dt) {
 	}
 };
 
+// Set camera position and angle
 PongApp.prototype.setCameraPosition = function(playerAmount) {
-	console.log("playerAmount" + playerAmount);
-
-	// delete previous scene
-	// this.deleteScene();
 
 	playerAmount = Math.round(playerAmount);
-
-	// this.ball.lastCollider = null;
-
-	// // ammo.js . Reset positions
-	// var transform = this.ball.collider.getCenterOfMassTransform();
-	// transform.setOrigin(new Ammo.btVector3(0, 0, 0));
-	// this.ball.collider.setCenterOfMassTransform(transform);
 
 	// Angle in radians
 	var radians = Math.PI * 2 / playerAmount;
@@ -237,7 +224,6 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 
 	// update the camera
 	var gameAreaDiameter = (radius * 25 + (this.playerAreaWidth * 2)); // TODO 25 the magic number
-	// console.log("gameAreaDiameter: " + gameAreaDiameter);
 
 	var SCREEN_WIDTH = window.innerWidth;
 	var SCREEN_HEIGHT = window.innerHeight;
@@ -260,32 +246,19 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 	// Players info
 	// this.refreshPlayersInfo();
 
-	// this.oldPlayerAmount = playerAmount;
-
 	var playerAreaPos = new THREE.Vector3(this.reservedPlayerArea.placeable.transform.pos.x, this.reservedPlayerArea.placeable.transform.pos.y, this.reservedPlayerArea.placeable.transform.pos.z);
-	var borderLeftPos = new THREE.Vector3(this.reservedBorderLeft.placeable.transform.pos.x, this.reservedBorderLeft.placeable.transform.pos.y, this.reservedBorderLeft.placeable.transform.pos.z);
-	console.log(playerAreaPos);
-	console.log(borderLeftPos);
-
+	// var borderLeftPos = new THREE.Vector3(this.reservedBorderLeft.placeable.transform.pos.x, this.reservedBorderLeft.placeable.transform.pos.y, this.reservedBorderLeft.placeable.transform.pos.z);
 
 	this.camera.position.x = playerAreaPos.x;
 	this.camera.position.z = playerAreaPos.z;
 	this.camera.lookAt(new THREE.Vector3());
 };
 
+// Scene generated callback
 PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 	console.log("onSceneGenerated");
 
-	// debugger;
-	// var playerAmount = this.dataConnection.scene.entityByName("SceneController").dynamicComponent.playerAreas.length;
-	// var playerAmount = 1;
-	// if (action) {
-	// 	this.playerAmount = action[1];
-	// }
-
 	this.setCameraPosition(action[1]);
-
-	this.sceneCtrl.onSceneGenerated(this.playerAmount);
 	this.reservedRacket = undefined;
 	this.reservedPlayerArea = undefined;
 };

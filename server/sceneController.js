@@ -1,5 +1,8 @@
+// For conditions of distribution and use, see copyright notice in LICENSE
 /*
- * 	@author Tapani Jamsa
+ *	SceneController
+ *	@author Tapani Jamsa
+ *	Date: 2013
  */
 
 var zeroVec = new float3(0, 0, 0);
