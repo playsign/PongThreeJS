@@ -14,7 +14,6 @@
 /* jshint -W097, -W040 */
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens */
 
-var sceneCtrl;
 var app;
 
 function init() {
@@ -39,7 +38,7 @@ function init() {
 
 	app.dataConnection.loginData = {
 		"name": Date.now().toString() + getRandomInt(0, 2000000).toString()
-	}
+	};
 
 	console.log("name(id): " + app.dataConnection.loginData.name);
 }
