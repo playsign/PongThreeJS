@@ -214,7 +214,10 @@ function ServerHandleUserDisconnected(userConnection) {
 
 function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) {
 	// console.LogInfo(ent.name);
-	if (ent.name == "borderLeft ") {
+	if (ent.name == "borderLeft") {
+		var ballt = ball.placeable.transform;
+		ballt.pos = zeroVec;
+		ballt.rot = zeroVec;
 		ball.placeable.transform = ballt;
 
 		// console.LogInfo(ent.placeable.parentRef.ref);
