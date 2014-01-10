@@ -76,7 +76,7 @@ PongApp.prototype.onDisconnected = function() {
 	}
 
 	for (i = 0; i < removables.length; i++) {
-		if (!(removables[i] instanceof THREE.PointLight || removables[i] instanceof THREE.PerspectiveCamera || removables[i] instanceof THREE.OrthographicCamera)) {
+		if (!(removables[i] instanceof THREE.PointLight || removables[i] instanceof THREE.DirectionalLight || removables[i] instanceof THREE.PerspectiveCamera || removables[i] instanceof THREE.OrthographicCamera)) {
 			removables[i].parent.remove(removables[i]);
 		}
 	}
@@ -101,7 +101,7 @@ PongApp.prototype.logicInit = function() {
 
 	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
 	// this.scene.add(this.camera);
-	this.camera.position.set(0, 300, 100); // (0, 1000, -375);
+	this.camera.position.set(0, 200, 100); // (0, 1000, -375);
 	this.camera.lookAt(this.scene.position);
 	this.viewer.camera = this.camera;
 
@@ -200,6 +200,8 @@ PongApp.prototype.logicUpdate = function(dt) {
 };
 
 PongApp.prototype.setCameraPosition = function(playerAmount) {
+	console.log("playerAmount" + playerAmount);
+
 	// delete previous scene
 	// this.deleteScene();
 
@@ -266,9 +268,9 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 	console.log(borderLeftPos);
 
 
-	this.camera.position.x = borderLeftPos.x;
-	this.camera.position.z = borderLeftPos.z;
-	this.camera.lookAt(playerAreaPos);
+	this.camera.position.x = playerAreaPos.x;
+	this.camera.position.z = playerAreaPos.z;
+	this.camera.lookAt(new THREE.Vector3());
 };
 
 PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
