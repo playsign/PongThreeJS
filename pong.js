@@ -99,7 +99,8 @@ PongApp.prototype.logicInit = function() {
 
 	// override camera
 	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
-	this.camera.position.set(0, 200, 100);
+	this.cameraPos = new THREE.Vector3( 0, 300, 100 );
+	this.camera.position = this.cameraPos.clone();
 	this.camera.lookAt(this.scene.position);
 	this.viewer.camera = this.camera;
 
@@ -197,6 +198,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 
 // Set camera position and angle
 PongApp.prototype.setCameraPosition = function(playerAmount) {
+	console.log("setCameraPosition");
 
 	playerAmount = Math.round(playerAmount);
 
@@ -242,12 +244,24 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 
 	this.camera.updateProjectionMatrix();
 
-	var playerAreaPos = new THREE.Vector3(this.reservedPlayerArea.placeable.transform.pos.x, this.reservedPlayerArea.placeable.transform.pos.y, this.reservedPlayerArea.placeable.transform.pos.z);
-	// var borderLeftPos = new THREE.Vector3(this.reservedBorderLeft.placeable.transform.pos.x, this.reservedBorderLeft.placeable.transform.pos.y, this.reservedBorderLeft.placeable.transform.pos.z);
+	// Get corresponding three objects
+	var borderThreeObject = this.viewer.o3dByEntityId[this.reservedBorderLeft.id];
+	var playerAreaThreeObject = this.viewer.o3dByEntityId[this.reservedPlayerArea.id];
 
-	this.camera.position.x = playerAreaPos.x;
-	this.camera.position.z = playerAreaPos.z;
-	this.camera.lookAt(new THREE.Vector3());
+	playerAreaThreeObject.updateMatrixWorld();
+	borderThreeObject.updateMatrixWorld();
+	var worldPos = new THREE.Vector3();
+	worldPos.getPositionFromMatrix(borderThreeObject.matrixWorld);
+
+	// Change camera position temporarily so we get a correct camera angle
+	this.camera.position.x = worldPos.x;
+	this.camera.position.y = this.cameraPos.y;
+	this.camera.position.z = worldPos.z;
+	this.camera.lookAt(playerAreaThreeObject.position);
+
+	// Move camera back to the center
+	this.camera.position = new THREE.Vector3(0,10,0);
+
 };
 
 // Scene generated callback

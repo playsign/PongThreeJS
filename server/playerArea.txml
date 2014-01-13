@@ -18,7 +18,7 @@
    <attribute value="0" type="int" id="racketRef" name="racketRef"/>
    <attribute value="" type="string" id="playerID" name="playerID"/>
     <attribute value="0" type="int" id="borderLeftRef" name="borderLeftRef"/>
-   <attribute value="-4791" type="int" id="playerBalls" name="playerBalls"/>
+   <attribute value="0" type="int" id="playerBalls" name="playerBalls"/>
   </component>
  </entity>
  <entity id="2" sync="true">
