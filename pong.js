@@ -242,9 +242,6 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 
 	this.camera.updateProjectionMatrix();
 
-	// Players info
-	// this.refreshPlayersInfo();
-
 	var playerAreaPos = new THREE.Vector3(this.reservedPlayerArea.placeable.transform.pos.x, this.reservedPlayerArea.placeable.transform.pos.y, this.reservedPlayerArea.placeable.transform.pos.z);
 	// var borderLeftPos = new THREE.Vector3(this.reservedBorderLeft.placeable.transform.pos.x, this.reservedBorderLeft.placeable.transform.pos.y, this.reservedBorderLeft.placeable.transform.pos.z);
 
@@ -257,9 +254,14 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 	console.log("onSceneGenerated");
 
-	this.setCameraPosition(action[1]);
+	var playerAmount = action[1];
+
+	this.setCameraPosition(playerAmount);
 	this.reservedRacket = undefined;
 	this.reservedPlayerArea = undefined;
+
+	// Players info
+	this.sceneCtrl.refreshPlayersInfo(playerAmount);
 };
 
 init();
