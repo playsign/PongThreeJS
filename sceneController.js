@@ -12,13 +12,11 @@ SceneController.prototype.getRandomColor = function() {
 };
 
 SceneController.prototype.refreshPlayersInfo = function(playerAmount) {
-		console.log("playerAmount: " + playerAmount);
 
 	$("#playersInfo").empty();
 
 	var serverSceneCtrl = app.dataConnection.scene.entityByName("SceneController");
 	for (var i = 0; i < playerAmount; i++) {
-console.log("i: " + playerAmount);
 
 		if (serverSceneCtrl) {
 			var entityID = serverSceneCtrl.dynamicComponent.playerAreas[i];

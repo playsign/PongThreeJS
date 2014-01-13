@@ -99,7 +99,7 @@ PongApp.prototype.logicInit = function() {
 
 	// override camera
 	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
-	this.cameraPos = new THREE.Vector3( 0, 300, 100 );
+	this.cameraPos = new THREE.Vector3(0, 300, 100);
 	this.camera.position = this.cameraPos.clone();
 	this.camera.lookAt(this.scene.position);
 	this.viewer.camera = this.camera;
@@ -193,6 +193,12 @@ PongApp.prototype.logicUpdate = function(dt) {
 			// Inform the server about the change
 			this.dataConnection.syncManager.sendChanges();
 		}
+
+		// Players info
+		if (serverSceneCtrl) {
+			this.sceneCtrl.refreshPlayersInfo(serverSceneCtrl.dynamicComponent.playerAreas.length);
+		}
+
 	}
 };
 
@@ -260,7 +266,7 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 	this.camera.lookAt(playerAreaThreeObject.position);
 
 	// Move camera back to the center
-	this.camera.position = new THREE.Vector3(0,10,0);
+	this.camera.position = new THREE.Vector3(0, 10, 0);
 
 };
 
@@ -273,9 +279,6 @@ PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 	this.setCameraPosition(playerAmount);
 	this.reservedRacket = undefined;
 	this.reservedPlayerArea = undefined;
-
-	// Players info
-	this.sceneCtrl.refreshPlayersInfo(playerAmount);
 };
 
 init();
