@@ -102,6 +102,9 @@ function generateScene() {
 
 		var attrs = areaParent.dynamiccomponent;
 		attrs.SetAttribute("playerID", players[i]);
+
+		// Color
+		attrs.SetAttribute("color", getRandomColor());
 	}
 
 	// List of player areas
@@ -122,6 +125,10 @@ function generateScene() {
 
 	// Notify clients that the scene is now genereted
 	sceneController.Exec(4, "sceneGenerated", "sceneGenerated", this.playerAmount);
+}
+
+function getRandomColor() {
+	return '#' + '000000'.concat(Math.floor(Math.random() * 16777215).toString(16)).substr(-6);
 }
 
 // Delete the current scene but leave the scene controller and the ball

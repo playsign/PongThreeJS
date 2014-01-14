@@ -19,6 +19,7 @@
    <attribute value="" type="string" id="playerID" name="playerID"/>
     <attribute value="0" type="int" id="borderLeftRef" name="borderLeftRef"/>
    <attribute value="0" type="int" id="playerBalls" name="playerBalls"/>
+   <attribute value="#FFFFFF" type="string" id="color" name="color"/>
   </component>
  </entity>
  <entity id="2" sync="true">
