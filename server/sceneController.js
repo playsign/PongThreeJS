@@ -51,6 +51,9 @@ var playerAreas = [];
 var entities = [];
 var partfile = "playerArea.txml";
 
+// OTHER
+var initialBallCount = 2; // how many times a player may let ball in?
+
 function generateScene() {
 	console.LogInfo("generate scene");
 
@@ -64,15 +67,15 @@ function generateScene() {
 	ballSpeed = ballSpeedModifier * playerAmount;
 
 	// Angle in radians
-	var radians = Math.PI * 2 / this.playerAmount;
+	var radians = Math.PI * 2 / playerAmount;
 
-	var radius = this.playerAmount;
+	var radius = playerAmount;
 	var pivotPoint = 9; // 10 Push player area forward by width of the area
 
 	// Two player tweak to remove gaps between player areas
-	if (this.playerAmount === 2) {
+	if (playerAmount === 2) {
 		pivotPoint -= 5; // 4.5 , 5,5
-	} else if (this.playerAmount === 3) {
+	} else if (playerAmount === 3) {
 		pivotPoint -= 0.5; //-0,5
 	}
 
@@ -88,7 +91,7 @@ function generateScene() {
 	for (var i = 0; i < playerAmount; i++) {
 		var areaParent = loadPart(partfile);
 
-		radians = Math.PI * 2 / this.playerAmount * (i + 1);
+		radians = Math.PI * 2 / playerAmount * (i + 1);
 		var degree = 360 - (radians * (180 / Math.PI));
 
 		var x = Math.cos(radians) * radius * pivotPoint;
@@ -105,6 +108,9 @@ function generateScene() {
 
 		// Color
 		attrs.SetAttribute("color", getRandomColor());
+
+		// Balls 
+		attrs.SetAttribute("playerBalls", initialBallCount);
 	}
 
 	// List of player areas
@@ -231,6 +237,23 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 		var parent = scene.EntityById(ent.placeable.parentRef.ref);
 		var attrs = parent.dynamiccomponent;
 		attrs.SetAttribute("playerBalls", attrs.GetAttribute("playerBalls") - 1);
+
+		if (attrs.GetAttribute("playerBalls") <= 0) {
+			console.LogInfo("a player is out of balls");
+
+			// Remove the player but don't disconnect
+
+			var playerID = attrs.GetAttribute("playerID");
+
+			playerAmount--;
+			for (var i = 0; i < players.length; i++) {
+				if (players[i] === playerID) {
+					players.splice(i, 1);
+				}
+			}
+
+			generateScene();
+		}
 	}
 }
 
