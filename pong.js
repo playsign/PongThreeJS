@@ -36,7 +36,7 @@ function init() {
 	app.reservedPlayerArea = undefined;
 	app.reservedBorderLeft = undefined;
 	app.playerAreaWidth = 100;
-	app.timeoutDelay = 2000;
+	app.timeoutDelay = 1000;
 	app.timeoutID = undefined;
 
 	app.dataConnection.loginData = {

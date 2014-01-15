@@ -35,6 +35,7 @@ cam.placeable.transform = camPos;
 
 // PLAYERS
 var playerAmount = 0;
+var spectatorAmount = 0;
 var players = [];
 
 // BALL
@@ -53,9 +54,11 @@ var partfile = "playerArea.txml";
 
 // OTHER
 var initialBallCount = 2; // how many times a player may let ball in?
+var generateNewScene = false;
 
 function generateScene() {
 	console.LogInfo("generate scene");
+	console.LogInfo("player amount: " + playerAmount);
 
 	// First we need to delete old scene if available
 	deleteScene();
@@ -131,6 +134,8 @@ function generateScene() {
 
 	// Notify clients that the scene is now genereted
 	sceneController.Exec(4, "sceneGenerated", "sceneGenerated", this.playerAmount);
+
+	generateNewScene = false;
 }
 
 function getRandomColor() {
@@ -194,6 +199,7 @@ function loadPart(partfile) {
 function ServerHandleUserConnected(userConnection, responseData) {
 	// console.LogInfo("user id: " + userConnection.id);
 	console.LogInfo("user name: " + userConnection.Property("name"));
+	console.LogInfo("player amount: " + playerAmount);
 
 	players.push(userConnection.Property("name"));
 
@@ -215,7 +221,12 @@ function ServerHandleUserDisconnected(userConnection) {
 	// console.LogInfo("userConnection.id: " + userConnection.id);
 	console.LogInfo("user name: " + userConnection.Property("name"));
 
-	playerAmount--;
+	if (spectatorAmount === 0) {
+		playerAmount--;
+	} else {
+		spectatorAmount--;
+	}
+
 	for (var i = 0; i < players.length; i++) {
 		if (players[i] === userConnection.Property("name")) {
 			players.splice(i, 1);
@@ -246,18 +257,23 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 			var playerID = attrs.GetAttribute("playerID");
 
 			playerAmount--;
+			spectatorAmount++;
 			for (var i = 0; i < players.length; i++) {
 				if (players[i] === playerID) {
 					players.splice(i, 1);
 				}
 			}
 
-			generateScene();
+			generateNewScene = true;
 		}
 	}
 }
 
 function update(dt) {
+	if (generateNewScene) {
+		generateScene();
+	}
+
 	var rigidbody = ball.rigidbody;
 	var velvec = rigidbody.GetLinearVelocity();
 	var curdir = velvec.Normalized();
