@@ -30,11 +30,14 @@ function init() {
 	useSignals = true;
 
 	// Custom app properties
+	app.serverSceneCtrl = undefined;
 	app.racketSpeed = 80;
 	app.reservedRacket = undefined;
 	app.reservedPlayerArea = undefined;
 	app.reservedBorderLeft = undefined;
 	app.playerAreaWidth = 100;
+	app.timeoutDelay = 2000;
+	app.timeoutID = undefined;
 
 	app.dataConnection.loginData = {
 		"name": Date.now().toString() + getRandomInt(0, 2000000).toString()
@@ -47,13 +50,19 @@ function init() {
 		console.log("custom onMeshLoaded")
 		var newMaterial = new THREE.MeshFaceMaterial(material);
 
-		var parentPlayerAreaID = meshComp.parentEntity.placeable.parentRef;
-		if (parentPlayerAreaID !== "") {
-			// var entity = this.dataConnection.scene.entityById(parentPlayerAreaID);
-			var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
-			newMaterial = new THREE.MeshLambertMaterial({
-				color: entity.dynamicComponent.color
-			});
+		if (meshComp.parentEntity.placeable === undefined) {
+			console.log("placeable undefined");
+		} else {
+			var parentPlayerAreaID = meshComp.parentEntity.placeable.parentRef;
+			if (parentPlayerAreaID !== "") {
+				// var entity = this.dataConnection.scene.entityById(parentPlayerAreaID);
+				var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
+				newMaterial = new THREE.MeshLambertMaterial({
+					color: entity.dynamicComponent.color
+				});
+			} else {
+				console.log("this entity doesn't have a parent");
+			}
 		}
 
 		if (geometry === undefined) {
@@ -92,6 +101,12 @@ PongApp.prototype.onConnected = function() {
 
 	// Set callback function to know when the scene is (re)generated
 	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
+
+	if (this.timeoutID) {
+		console.log("clear timeout");
+		window.clearTimeout(this.timeoutID);
+	}
+	this.timeoutID = window.setTimeout(this.getEntities.bind(this), this.timeoutDelay);
 };
 
 PongApp.prototype.onDisconnected = function() {
@@ -114,6 +129,7 @@ PongApp.prototype.onDisconnected = function() {
 	}
 
 	// Reset entity references
+	this.serverSceneCtrl = undefined;
 	this.reservedRacket = undefined;
 	this.reservedPlayerArea = undefined;
 	this.reservedBorderLeft = undefined;
@@ -166,28 +182,6 @@ PongApp.prototype.logicUpdate = function(dt) {
 
 	if (this.connected) {
 
-		// Find a player area that matches with the player
-		var serverSceneCtrl = this.dataConnection.scene.entityByName("SceneController");
-		if (!this.reservedRacket && serverSceneCtrl) {
-			for (var i = 0; i < serverSceneCtrl.dynamicComponent.playerAreas.length; i++) {
-				var entityID = serverSceneCtrl.dynamicComponent.playerAreas[i];
-				var entity = this.dataConnection.scene.entityById(entityID);
-				if (entity && entity.dynamicComponent.playerID == this.dataConnection.loginData.name) {
-					// Set player area entity references
-					var racketRef = entity.dynamicComponent.racketRef;
-					var borderLeftRef = entity.dynamicComponent.borderLeftRef;
-					this.reservedRacket = this.dataConnection.scene.entityById(racketRef);
-					this.reservedBorderLeft = this.dataConnection.scene.entityById(borderLeftRef);
-					this.reservedPlayerArea = entity;
-
-					// Set camera position and angle
-					this.setCameraPosition(serverSceneCtrl.dynamicComponent.playerAreas.length);
-
-					break;
-				}
-			}
-		}
-
 		// RACKET CONTROL
 		if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
 			// Get racket's direction vector
@@ -230,8 +224,8 @@ PongApp.prototype.logicUpdate = function(dt) {
 		}
 
 		// Players info
-		if (serverSceneCtrl) {
-			this.sceneCtrl.refreshPlayersInfo(serverSceneCtrl.dynamicComponent.playerAreas.length);
+		if (this.serverSceneCtrl) {
+			this.sceneCtrl.refreshPlayersInfo(this.serverSceneCtrl.dynamicComponent.playerAreas.length);
 		}
 
 	}
@@ -309,11 +303,45 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 	console.log("onSceneGenerated");
 
-	var playerAmount = action[1];
+	// var playerAmount = action[1];
 
-	this.setCameraPosition(playerAmount);
+	if (this.timeoutID) {
+		console.log("clear timeout");
+		window.clearTimeout(this.timeoutID);
+	}
+	this.timeoutID = window.setTimeout(this.getEntities.bind(this), this.timeoutDelay);
+};
+
+PongApp.prototype.getEntities = function() {
+	console.log("getEntities");
+
+	this.timeoutID = undefined;
+
 	this.reservedRacket = undefined;
 	this.reservedPlayerArea = undefined;
+
+	// Find a player area that matches with the player
+	this.serverSceneCtrl = this.dataConnection.scene.entityByName("SceneController");
+	var playerAmount = this.serverSceneCtrl.dynamicComponent.playerAreas.length;
+	for (var i = 0; i < this.serverSceneCtrl.dynamicComponent.playerAreas.length; i++) {
+		var entityID = this.serverSceneCtrl.dynamicComponent.playerAreas[i];
+		var entity = this.dataConnection.scene.entityById(entityID);
+		if (!entity) {
+			throw "entity not found";
+		}
+		if (entity.dynamicComponent.playerID == this.dataConnection.loginData.name) {
+			// Set player area entity references
+			var racketRef = entity.dynamicComponent.racketRef;
+			var borderLeftRef = entity.dynamicComponent.borderLeftRef;
+			this.reservedRacket = this.dataConnection.scene.entityById(racketRef);
+			this.reservedBorderLeft = this.dataConnection.scene.entityById(borderLeftRef);
+			this.reservedPlayerArea = entity;
+
+			break;
+		}
+	}
+
+	this.setCameraPosition(playerAmount);
 };
 
 init();

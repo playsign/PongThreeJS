@@ -14,17 +14,13 @@ SceneController.prototype.getRandomColor = function() {
 SceneController.prototype.refreshPlayersInfo = function(playerAmount) {
 
 	$("#playersInfo").empty();
-
-	var serverSceneCtrl = app.dataConnection.scene.entityByName("SceneController");
 	for (var i = 0; i < playerAmount; i++) {
 
-		if (serverSceneCtrl) {
-			var entityID = serverSceneCtrl.dynamicComponent.playerAreas[i];
-			var entity = app.dataConnection.scene.entityById(entityID);
+		var entityID = app.serverSceneCtrl.dynamicComponent.playerAreas[i];
+		var entity = app.dataConnection.scene.entityById(entityID);
 
-			if (entity) {
-				$("#playersInfo").append("<font color = "+entity.dynamicComponent.color+">Player" + (i + 1) + ": " + entity.dynamicComponent.playerBalls + "</font><br>");
-			}
+		if (entity) {
+			$("#playersInfo").append("<font color = " + entity.dynamicComponent.color + ">Player" + (i + 1) + ": " + entity.dynamicComponent.playerBalls + "</font><br>");
 		}
 
 		// switch (this.playerAreas[i].player.balls) {
