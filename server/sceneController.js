@@ -261,6 +261,9 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 			for (var i = 0; i < players.length; i++) {
 				if (players[i] === playerID) {
 					players.splice(i, 1);
+
+					// Notify clients about the player game over
+					sceneController.Exec(4, "gameover", "gameover", playerID, playerAmount + 1);
 				}
 			}
 

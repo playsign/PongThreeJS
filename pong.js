@@ -102,6 +102,9 @@ PongApp.prototype.onConnected = function() {
 	// Set callback function to know when the scene is (re)generated
 	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
 
+	// Set callback function to know when any player loses
+	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this));
+
 	if (this.timeoutID) {
 		console.log("clear timeout");
 		window.clearTimeout(this.timeoutID);
@@ -310,6 +313,26 @@ PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 		window.clearTimeout(this.timeoutID);
 	}
 	this.timeoutID = window.setTimeout(this.getEntities.bind(this), this.timeoutDelay);
+};
+
+// Game over callback
+PongApp.prototype.onGameOver = function(scope, entity, action, params) {
+	var dialogText = "hello";
+	var playerID = action[1];
+	var placement = action[2];
+
+	if (playerID == this.dataConnection.loginData.name) {
+		console.log("onGameOver. placement: " + placement);
+
+		// jQuery dialog
+		var newDialog = 123321;
+		$("body").append("<div id="+newDialog+" title='Game Over'>" + placement + "</div>");
+		$("#" + newDialog).dialog({
+			width: 300,
+			height: "auto",
+		});
+	}
+
 };
 
 PongApp.prototype.getEntities = function() {
