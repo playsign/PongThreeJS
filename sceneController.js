@@ -22,7 +22,9 @@ SceneController.prototype.refreshPlayersInfo = function(playerAmount) {
 			var entityID = serverSceneCtrl.dynamicComponent.playerAreas[i];
 			var entity = app.dataConnection.scene.entityById(entityID);
 
-			$("#playersInfo").append("<font color = white>Player" + (i + 1) + ": " + entity.dynamicComponent.playerBalls + "</font><br>");
+			if (entity) {
+				$("#playersInfo").append("<font color = "+entity.dynamicComponent.color+">Player" + (i + 1) + ": " + entity.dynamicComponent.playerBalls + "</font><br>");
+			}
 		}
 
 		// switch (this.playerAreas[i].player.balls) {
