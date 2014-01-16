@@ -47,12 +47,12 @@
  </entity>
  <entity id="2" sync="true">
   <component typeId="26" type="Name" sync="true">
-   <attribute value="SceneController" type="string" id="name" name="Name"/>
+   <attribute value="GameController" type="string" id="name" name="Name"/>
    <attribute value="" type="string" id="description" name="Description"/>
    <attribute value="" type="string" id="group" name="Group"/>
   </component>
   <component typeId="5" type="Script" sync="true">
-   <attribute value="sceneController.js" type="AssetReferenceList" id="scriptRef" name="Script ref"/>
+   <attribute value="gameController.js" type="AssetReferenceList" id="scriptRef" name="Script ref"/>
    <attribute value="true" type="bool" id="runOnLoad" name="Run on load"/>
    <attribute value="0" type="int" id="runMode" name="Run mode"/>
    <attribute value="" type="string" id="applicationName" name="Script application name"/>

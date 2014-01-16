@@ -16,7 +16,7 @@ SceneController.prototype.refreshPlayersInfo = function(playerAmount) {
 	$("#playersInfo").empty();
 	for (var i = 0; i < playerAmount; i++) {
 
-		var entityID = app.serverSceneCtrl.dynamicComponent.playerAreas[i];
+		var entityID = app.serverGameCtrl.dynamicComponent.playerAreas[i];
 		var entity = app.dataConnection.scene.entityById(entityID);
 
 		if (entity) {

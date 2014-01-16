@@ -1,6 +1,6 @@
 // For conditions of distribution and use, see copyright notice in LICENSE
 /*
- *	SceneController
+ *	GameController
  *	@author Tapani Jamsa
  *	Date: 2013
  */
@@ -47,7 +47,7 @@ resetBall();
 ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
 
 // PLAYER AREAS
-var sceneController = scene.GetEntityByName("SceneController");
+var gameController = scene.GetEntityByName("GameController");
 var playerAreas = [];
 var entities = [];
 var partfile = "playerArea.txml";
@@ -120,7 +120,7 @@ function generateScene() {
 	playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
 
 	// Set the player area list to scene controller's dynamic component
-	var attrs = sceneController.dynamiccomponent;
+	var attrs = gameController.dynamiccomponent;
 	var playerAreaList = attrs.GetAttribute("playerAreas");
 
 	for (var i = 0; i < playerAreas.length; i++) {
@@ -133,7 +133,7 @@ function generateScene() {
 	cam.placeable.transform = camPos;
 
 	// Notify clients that the scene is now genereted
-	sceneController.Exec(4, "sceneGenerated", "sceneGenerated", this.playerAmount);
+	gameController.Exec(4, "sceneGenerated", "sceneGenerated", this.playerAmount);
 
 	generateNewScene = false;
 }
@@ -146,7 +146,7 @@ function getRandomColor() {
 
 function deleteScene() {
 	// Reset the player areas list
-	var attrs = sceneController.dynamiccomponent;
+	var attrs = gameController.dynamiccomponent;
 	attrs.SetAttribute("playerAreas", []);
 
 	for (var i = 0; i < entities.length; i++) {
@@ -263,7 +263,7 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 					players.splice(i, 1);
 
 					// Notify clients about the player game over
-					sceneController.Exec(4, "gameover", "gameover", playerID, playerAmount + 1);
+					gameController.Exec(4, "gameover", "gameover", playerID, playerAmount + 1);
 				}
 			}
 

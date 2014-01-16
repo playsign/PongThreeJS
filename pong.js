@@ -30,7 +30,7 @@ function init() {
 	useSignals = true;
 
 	// Custom app properties
-	app.serverSceneCtrl = undefined;
+	app.serverGameCtrl = undefined;
 	app.racketSpeed = 80;
 	app.reservedRacket = undefined;
 	app.reservedPlayerArea = undefined;
@@ -132,7 +132,7 @@ PongApp.prototype.onDisconnected = function() {
 	}
 
 	// Reset entity references
-	this.serverSceneCtrl = undefined;
+	this.serverGameCtrl = undefined;
 	this.reservedRacket = undefined;
 	this.reservedPlayerArea = undefined;
 	this.reservedBorderLeft = undefined;
@@ -227,8 +227,8 @@ PongApp.prototype.logicUpdate = function(dt) {
 		}
 
 		// Players info
-		if (this.serverSceneCtrl) {
-			this.sceneCtrl.refreshPlayersInfo(this.serverSceneCtrl.dynamicComponent.playerAreas.length);
+		if (this.serverGameCtrl) {
+			this.sceneCtrl.refreshPlayersInfo(this.serverGameCtrl.dynamicComponent.playerAreas.length);
 		}
 
 	}
@@ -347,10 +347,10 @@ PongApp.prototype.getEntities = function() {
 	this.reservedPlayerArea = undefined;
 
 	// Find a player area that matches with the player
-	this.serverSceneCtrl = this.dataConnection.scene.entityByName("SceneController");
-	var playerAmount = this.serverSceneCtrl.dynamicComponent.playerAreas.length;
-	for (var i = 0; i < this.serverSceneCtrl.dynamicComponent.playerAreas.length; i++) {
-		var entityID = this.serverSceneCtrl.dynamicComponent.playerAreas[i];
+	this.serverGameCtrl = this.dataConnection.scene.entityByName("GameController");
+	var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
+	for (var i = 0; i < this.serverGameCtrl.dynamicComponent.playerAreas.length; i++) {
+		var entityID = this.serverGameCtrl.dynamicComponent.playerAreas[i];
 		var entity = this.dataConnection.scene.entityById(entityID);
 		if (!entity) {
 			throw "entity not found";
