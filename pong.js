@@ -317,22 +317,25 @@ PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 
 // Game over callback
 PongApp.prototype.onGameOver = function(scope, entity, action, params) {
-	var dialogText = "hello";
 	var playerID = action[1];
 	var placement = action[2];
 
+	var createDialog = function(dialogText) {
+			// jQuery dialog
+			var newDialog = 123321;
+			$("body").append("<div id=" + newDialog + " title='Game Over'>" + dialogText + "</div>");
+			$("#" + newDialog).dialog({
+				width: 300,
+				height: "auto",
+			});
+		};
+
 	if (playerID == this.dataConnection.loginData.name) {
-		console.log("onGameOver. placement: " + placement);
-
-		// jQuery dialog
-		var newDialog = 123321;
-		$("body").append("<div id="+newDialog+" title='Game Over'>" + placement + "</div>");
-		$("#" + newDialog).dialog({
-			width: 300,
-			height: "auto",
-		});
+		createDialog("You're out of balls. Placement: "+ placement);
+	} else if (placement == 2) {
+		// We have a silver medalist and it's not you
+		createDialog("You won!");
 	}
-
 };
 
 PongApp.prototype.getEntities = function() {
