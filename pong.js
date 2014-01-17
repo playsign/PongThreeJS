@@ -172,9 +172,6 @@ PongApp.prototype.logicInit = function() {
 
 	// SCENE
 	this.sceneCtrl = new SceneController();
-
-	// CONTROLS
-	this.controls.userZoom = false;
 };
 
 function sign(x) {
