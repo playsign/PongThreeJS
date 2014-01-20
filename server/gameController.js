@@ -8,8 +8,8 @@
 var zeroVec = new float3(0, 0, 0);
 
 if (server.IsRunning()) {
-	websocketserver.UserConnected.connect(ServerHandleUserConnected);
-	websocketserver.UserDisconnected.connect(ServerHandleUserDisconnected);
+	server.UserConnected.connect(ServerHandleUserConnected);
+	server.UserDisconnected.connect(ServerHandleUserDisconnected);
 
 	// If there are connected users when this script was added, add av for all of them
 	var users = server.AuthenticatedUsers();
@@ -53,7 +53,7 @@ var entities = [];
 var partfile = "playerArea.txml";
 
 // OTHER
-var initialBallCount = 2; // how many times a player may let ball in?
+var initialBallCount = 5; // how many times a player may let ball in?
 var generateNewScene = false;
 
 function generateScene() {
@@ -196,8 +196,7 @@ function loadPart(partfile) {
 
 // Player connected
 
-function ServerHandleUserConnected(userConnection, responseData) {
-	// console.LogInfo("user id: " + userConnection.id);
+function ServerHandleUserConnected(userID, userConnection) {
 	console.LogInfo("user name: " + userConnection.Property("name"));
 	console.LogInfo("player amount: " + playerAmount);
 
@@ -216,7 +215,7 @@ function ServerHandleUserConnected(userConnection, responseData) {
 
 // Player disconnected
 
-function ServerHandleUserDisconnected(userConnection) {
+function ServerHandleUserDisconnected(userID, userConnection) {
 	console.LogInfo("user disconnected:");
 	// console.LogInfo("userConnection.id: " + userConnection.id);
 	console.LogInfo("user name: " + userConnection.Property("name"));

@@ -181,13 +181,8 @@ PongApp.prototype.logicUpdate = function(dt) {
 
 	if (this.connected) {
 
-		//experimental network / websocket keep-alive hack, to avoid delay in net reception when no local acts
-		if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined) {
-			this.reservedRacket.placeable.selectionLayer = 1;
-		}
-
 		// RACKET CONTROL
-		if ((this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined) && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
+		if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
 			// Get racket's direction vector
 
 			// Radian
@@ -224,8 +219,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 			// console.log(racketForward);
 
 			// Inform the server about the change
-			//this.dataConnection.syncManager.sendChanges();
-			//moved to bottom to enable websocket sync hack
+			this.dataConnection.syncManager.sendChanges();
 		}
 
 		// Players info
@@ -233,7 +227,6 @@ PongApp.prototype.logicUpdate = function(dt) {
 			this.sceneCtrl.refreshPlayersInfo(this.serverGameCtrl.dynamicComponent.playerAreas.length);
 		}
 
-		this.dataConnection.syncManager.sendChanges();
 	}
 };
 
