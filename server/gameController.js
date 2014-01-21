@@ -52,9 +52,6 @@ var playerAreas = [];
 var entities = [];
 var partfile = "playerArea.txml";
 
-// ACTION
-ball.Action("MousePress").Triggered.connect(this, ServerHandleMousePress);
-
 // OTHER
 var initialBallCount = 5; // how many times a player may let ball in?
 var generateNewScene = false;
@@ -272,10 +269,6 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 			generateNewScene = true;
 		}
 	}
-}
-
-function ServerHandleMousePress() {
-	console.LogInfo("ServerHandleMousePress");	
 }
 
 function update(dt) {
