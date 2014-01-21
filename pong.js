@@ -11,6 +11,8 @@
 *	Date: 2013
 */
 
+// This script is documented here: https://forge.fi-ware.eu/plugins/mediawiki/wiki/fi-ware-private/index.php/3D-UI_-_WebTundra_-_User_and_Programmers_Guide#Pong_Example
+
 /* jshint -W097, -W040 */
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens */
 
@@ -100,7 +102,7 @@ PongApp.prototype.onConnected = function() {
 	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
 
 	// Set callback function to know when any player loses
-	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this));
+	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this));  //(2)
 };
 
 PongApp.prototype.onDisconnected = function() {
@@ -128,7 +130,6 @@ PongApp.prototype.onDisconnected = function() {
 	this.reservedPlayerArea = undefined;
 	this.reservedBorderLeft = undefined;
 	this.dataConnection.scene.entities = {};
-
 };
 
 PongApp.prototype.logicInit = function() {
@@ -143,7 +144,7 @@ PongApp.prototype.logicInit = function() {
 	var FAR = 20000;
 
 	// override camera
-	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR);
+	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
 	this.cameraPos = new THREE.Vector3(0, 300, 100);
 	this.camera.position = this.cameraPos.clone();
 	this.camera.lookAt(this.scene.position);
@@ -174,6 +175,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 	if (this.connected) {
 
 		// RACKET CONTROL
+		//(1)
 		if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
 			// Get racket's direction vector
 
@@ -211,7 +213,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 			// console.log(racketForward);
 
 			// Inform the server about the change
-			this.dataConnection.syncManager.sendChanges();
+			this.dataConnection.syncManager.sendChanges();  //(2)
 		}
 
 		// Players info
@@ -298,7 +300,7 @@ PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 };
 
 // Game over callback
-PongApp.prototype.onGameOver = function(scope, entity, action, params) {
+PongApp.prototype.onGameOver = function(scope, entity, action, params) {    //(3)
 	var playerID = action[1];
 	var placement = action[2];
 
@@ -327,7 +329,7 @@ PongApp.prototype.getEntities = function() {
 	this.reservedPlayerArea = undefined;
 
 	// Find a player area that matches with the player
-	this.serverGameCtrl = this.dataConnection.scene.entityByName("GameController");
+	this.serverGameCtrl = this.dataConnection.scene.entityByName("GameController"); //(1)
 	var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
 	for (var i = 0; i < this.serverGameCtrl.dynamicComponent.playerAreas.length; i++) {
 		var entityID = this.serverGameCtrl.dynamicComponent.playerAreas[i];
@@ -337,9 +339,9 @@ PongApp.prototype.getEntities = function() {
 		}
 		if (entity.dynamicComponent.playerID == this.dataConnection.loginData.name) {
 			// Set player area entity references
-			var racketRef = entity.dynamicComponent.racketRef;
+			var racketRef = entity.dynamicComponent.racketRef; //(2)
 			var borderLeftRef = entity.dynamicComponent.borderLeftRef;
-			this.reservedRacket = this.dataConnection.scene.entityById(racketRef);
+			this.reservedRacket = this.dataConnection.scene.entityById(racketRef);  //(3)
 			this.reservedBorderLeft = this.dataConnection.scene.entityById(borderLeftRef);
 			this.reservedPlayerArea = entity;
 

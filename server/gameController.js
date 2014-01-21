@@ -262,7 +262,7 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 					players.splice(i, 1);
 
 					// Notify clients about the player game over
-					gameController.Exec(4, "gameover", "gameover", playerID, playerAmount + 1);
+					gameController.Exec(4, "gameover", "gameover", playerID, playerAmount + 1); //(1)
 				}
 			}
 
