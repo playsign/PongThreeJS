@@ -35,8 +35,6 @@ function init() {
 	app.reservedPlayerArea = undefined;
 	app.reservedBorderLeft = undefined;
 	app.playerAreaWidth = 100;
-	app.timeoutDelay = 1000;
-	app.timeoutID = undefined;
 
 	app.dataConnection.loginData = {
 		"name": Date.now().toString() + getRandomInt(0, 2000000).toString()
@@ -103,12 +101,6 @@ PongApp.prototype.onConnected = function() {
 
 	// Set callback function to know when any player loses
 	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this));
-
-	if (this.timeoutID) {
-		console.log("clear timeout");
-		window.clearTimeout(this.timeoutID);
-	}
-	this.timeoutID = window.setTimeout(this.getEntities.bind(this), this.timeoutDelay);
 };
 
 PongApp.prototype.onDisconnected = function() {
@@ -302,13 +294,7 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 	console.log("onSceneGenerated");
 
-	// var playerAmount = action[1];
-
-	if (this.timeoutID) {
-		console.log("clear timeout");
-		window.clearTimeout(this.timeoutID);
-	}
-	this.timeoutID = window.setTimeout(this.getEntities.bind(this), this.timeoutDelay);
+	this.getEntities();
 };
 
 // Game over callback
@@ -317,17 +303,17 @@ PongApp.prototype.onGameOver = function(scope, entity, action, params) {
 	var placement = action[2];
 
 	var createDialog = function(dialogText) {
-			// jQuery dialog
-			var newDialog = 123321;
-			$("body").append("<div id=" + newDialog + " title='Game Over'>" + dialogText + "</div>");
-			$("#" + newDialog).dialog({
-				width: 300,
-				height: "auto",
-			});
-		};
+		// jQuery dialog
+		var newDialog = 123321;
+		$("body").append("<div id=" + newDialog + " title='Game Over'>" + dialogText + "</div>");
+		$("#" + newDialog).dialog({
+			width: 300,
+			height: "auto",
+		});
+	};
 
 	if (playerID == this.dataConnection.loginData.name) {
-		createDialog("You're out of balls. Placement: "+ placement);
+		createDialog("You're out of balls. Placement: " + placement);
 	} else if (placement == 2) {
 		// We have a silver medalist and it's not you
 		createDialog("You won!");
@@ -336,8 +322,6 @@ PongApp.prototype.onGameOver = function(scope, entity, action, params) {
 
 PongApp.prototype.getEntities = function() {
 	console.log("getEntities");
-
-	this.timeoutID = undefined;
 
 	this.reservedRacket = undefined;
 	this.reservedPlayerArea = undefined;
@@ -363,7 +347,9 @@ PongApp.prototype.getEntities = function() {
 		}
 	}
 
-	this.setCameraPosition(playerAmount);
+	if (this.reservedPlayerArea !== undefined) {
+		this.setCameraPosition(playerAmount);
+	}
 };
 
 init();
