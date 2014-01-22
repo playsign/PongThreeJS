@@ -54,7 +54,6 @@ var partfile = "playerArea.txml";
 
 // OTHER
 var initialBallCount = 5; // how many times a player may let ball in?
-var generateNewScene = false;
 
 function generateScene() {
 	console.LogInfo("generate scene");
@@ -134,8 +133,6 @@ function generateScene() {
 
 	// Notify clients that the scene is now genereted
 	gameController.Exec(4, "sceneGenerated", "sceneGenerated", this.playerAmount);
-
-	generateNewScene = false;
 }
 
 function getRandomColor() {
@@ -266,16 +263,12 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 				}
 			}
 
-			generateNewScene = true;
+			generateScene();
 		}
 	}
 }
 
 function update(dt) {
-	if (generateNewScene) {
-		generateScene();
-	}
-
 	var rigidbody = ball.rigidbody;
 	var velvec = rigidbody.GetLinearVelocity();
 	var curdir = velvec.Normalized();

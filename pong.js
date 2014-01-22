@@ -46,12 +46,10 @@ function init() {
 
 	// Custom mesh loaded callback
 	app.viewer.onMeshLoaded = function(threeParent, meshComp, geometry, material) {
-		console.log("custom onMeshLoaded")
+		// console.log("custom onMeshLoaded")
 		var newMaterial = new THREE.MeshFaceMaterial(material);
 
-		if (meshComp.parentEntity.placeable === undefined) {
-			console.log("placeable undefined");
-		} else {
+		if (meshComp.parentEntity.placeable !== undefined) {
 			var parentPlayerAreaID = meshComp.parentEntity.placeable.parentRef;
 			if (parentPlayerAreaID !== "") {
 				// var entity = this.dataConnection.scene.entityById(parentPlayerAreaID);
@@ -102,7 +100,7 @@ PongApp.prototype.onConnected = function() {
 	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
 
 	// Set callback function to know when any player loses
-	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this));  //(2)
+	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this)); //(2)
 };
 
 PongApp.prototype.onDisconnected = function() {
@@ -213,7 +211,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 			// console.log(racketForward);
 
 			// Inform the server about the change
-			this.dataConnection.syncManager.sendChanges();  //(2)
+			this.dataConnection.syncManager.sendChanges(); //(2)
 		}
 
 		// Players info
@@ -300,7 +298,7 @@ PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 };
 
 // Game over callback
-PongApp.prototype.onGameOver = function(scope, entity, action, params) {    //(3)
+PongApp.prototype.onGameOver = function(scope, entity, action, params) { //(3)
 	var playerID = action[1];
 	var placement = action[2];
 
@@ -341,7 +339,7 @@ PongApp.prototype.getEntities = function() {
 			// Set player area entity references
 			var racketRef = entity.dynamicComponent.racketRef; //(2)
 			var borderLeftRef = entity.dynamicComponent.borderLeftRef;
-			this.reservedRacket = this.dataConnection.scene.entityById(racketRef);  //(3)
+			this.reservedRacket = this.dataConnection.scene.entityById(racketRef); //(3)
 			this.reservedBorderLeft = this.dataConnection.scene.entityById(borderLeftRef);
 			this.reservedPlayerArea = entity;
 
