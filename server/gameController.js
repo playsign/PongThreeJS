@@ -5,11 +5,13 @@
  *	Date: 2013
  */
 
+// This script is documented here: https://forge.fi-ware.eu/plugins/mediawiki/wiki/fi-ware-private/index.php/3D-UI_-_WebTundra_-_User_and_Programmers_Guide#Pong_Example
+
 var zeroVec = new float3(0, 0, 0);
 
 if (server.IsRunning()) {
-	server.UserConnected.connect(ServerHandleUserConnected);
-	server.UserDisconnected.connect(ServerHandleUserDisconnected);
+	server.UserConnected.connect(ServerHandleUserConnected); //(11a)
+	server.UserDisconnected.connect(ServerHandleUserDisconnected); //(11b)
 
 	// If there are connected users when this script was added, add av for all of them
 	var users = server.AuthenticatedUsers();
@@ -17,7 +19,7 @@ if (server.IsRunning()) {
 		console.LogInfo("[Pong Application] Application started.");
 
 	for (var i = 0; i < users.length; i++) {
-		ServerHandleUserConnected(users[i].id, users[i]);
+		ServerHandleUserConnected(users[i].id, users[i]); //(11c)
 	}
 }
 
@@ -54,6 +56,7 @@ var partfile = "playerArea.txml";
 
 // OTHER
 var initialBallCount = 5; // how many times a player may let ball in?
+// ball.Action("MousePress").Triggered.connect(this, function(){console.LogInfo("ball pressed");});
 
 function generateScene() {
 	console.LogInfo("generate scene");
@@ -91,7 +94,7 @@ function generateScene() {
 
 	// Create player areas
 	for (var i = 0; i < playerAmount; i++) {
-		var areaParent = loadPart(partfile);
+		var areaParent = loadPart(partfile); //(12)
 
 		radians = Math.PI * 2 / playerAmount * (i + 1);
 		var degree = 360 - (radians * (180 / Math.PI));
@@ -172,7 +175,7 @@ function pathForAsset(assetref) {
 
 // Load the scene txml (playerArea.txml)
 
-function loadPart(partfile) {
+function loadPart(partfile) { //(12)
 	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
 
 	for (var i = 0; i < ents.length; i++) {
@@ -184,6 +187,7 @@ function loadPart(partfile) {
 
 	var children = parentEntity.placeable.Children();
 
+	// Save entity references for later use
 	var attrs = parentEntity.dynamiccomponent;
 	attrs.SetAttribute("racketRef", children[1].id);
 	attrs.SetAttribute("borderLeftRef", children[2].id);
@@ -193,8 +197,8 @@ function loadPart(partfile) {
 
 // Player connected
 
-function ServerHandleUserConnected(userID, userConnection) {
-	console.LogInfo("user name: " + userConnection.Property("name"));
+function ServerHandleUserConnected(userID, userConnection) { //(11d)
+	console.LogInfo("username: " + userConnection.Property("name"));
 	console.LogInfo("player amount: " + playerAmount);
 
 	players.push(userConnection.Property("name"));
@@ -259,7 +263,7 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 					players.splice(i, 1);
 
 					// Notify clients about the player game over
-					gameController.Exec(4, "gameover", "gameover", playerID, playerAmount + 1); //(1)
+					gameController.Exec(4, "gameover", "gameover", playerID, playerAmount + 1); //(7)
 				}
 			}
 

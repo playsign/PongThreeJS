@@ -24,10 +24,8 @@ $(function() {
 		// if not already connected
 		app.sceneCtrl.showHelp();
 		if (app.connected == false) {
-			app.connect(app.host, app.port);
-		}
-		
-
+			app.connect(app.host, app.port); //(16)
+		}		
 	})
 	// .toggle()
 });

@@ -39,7 +39,7 @@ function init() {
 	app.playerAreaWidth = 100;
 
 	app.dataConnection.loginData = {
-		"name": Date.now().toString() + getRandomInt(0, 2000000).toString()
+		"name": Date.now().toString() + getRandomInt(0, 2000000).toString() //(15)
 	};
 
 	console.log("name(id): " + app.dataConnection.loginData.name);
@@ -100,7 +100,7 @@ PongApp.prototype.onConnected = function() {
 	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
 
 	// Set callback function to know when any player loses
-	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this)); //(2)
+	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this)); //(8)
 };
 
 PongApp.prototype.onDisconnected = function() {
@@ -173,7 +173,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 	if (this.connected) {
 
 		// RACKET CONTROL
-		//(1)
+		//(2)
 		if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
 			// Get racket's direction vector
 
@@ -207,11 +207,11 @@ PongApp.prototype.logicUpdate = function(dt) {
 			}
 
 			// Set a new velocity for the entity
-			this.reservedRacket.rigidBody.linearVelocity = racketForward;
+			this.reservedRacket.rigidBody.linearVelocity = racketForward; //(14)
 			// console.log(racketForward);
 
 			// Inform the server about the change
-			this.dataConnection.syncManager.sendChanges(); //(2)
+			this.dataConnection.syncManager.sendChanges(); //(3)
 		}
 
 		// Players info
@@ -298,11 +298,11 @@ PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
 };
 
 // Game over callback
-PongApp.prototype.onGameOver = function(scope, entity, action, params) { //(3)
+PongApp.prototype.onGameOver = function(scope, entity, action, params) { //(9)
 	var playerID = action[1];
 	var placement = action[2];
 
-	var createDialog = function(dialogText) {
+	var createDialog = function(dialogText) { //(10)
 		// jQuery dialog
 		var newDialog = 123321;
 		$("body").append("<div id=" + newDialog + " title='Game Over'>" + dialogText + "</div>");
@@ -327,7 +327,7 @@ PongApp.prototype.getEntities = function() {
 	this.reservedPlayerArea = undefined;
 
 	// Find a player area that matches with the player
-	this.serverGameCtrl = this.dataConnection.scene.entityByName("GameController"); //(1)
+	this.serverGameCtrl = this.dataConnection.scene.entityByName("GameController"); //(4)
 	var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
 	for (var i = 0; i < this.serverGameCtrl.dynamicComponent.playerAreas.length; i++) {
 		var entityID = this.serverGameCtrl.dynamicComponent.playerAreas[i];
@@ -337,9 +337,9 @@ PongApp.prototype.getEntities = function() {
 		}
 		if (entity.dynamicComponent.playerID == this.dataConnection.loginData.name) {
 			// Set player area entity references
-			var racketRef = entity.dynamicComponent.racketRef; //(2)
+			var racketRef = entity.dynamicComponent.racketRef; //(5)
 			var borderLeftRef = entity.dynamicComponent.borderLeftRef;
-			this.reservedRacket = this.dataConnection.scene.entityById(racketRef); //(3)
+			this.reservedRacket = this.dataConnection.scene.entityById(racketRef); //(6)
 			this.reservedBorderLeft = this.dataConnection.scene.entityById(borderLeftRef);
 			this.reservedPlayerArea = entity;
 
