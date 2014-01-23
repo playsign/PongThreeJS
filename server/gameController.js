@@ -13,7 +13,6 @@ if (server.IsRunning()) {
 	server.UserConnected.connect(ServerHandleUserConnected); //(11a)
 	server.UserDisconnected.connect(ServerHandleUserDisconnected); //(11b)
 
-	// If there are connected users when this script was added, add av for all of them
 	var users = server.AuthenticatedUsers();
 	if (users.length > 0)
 		console.LogInfo("[Pong Application] Application started.");
