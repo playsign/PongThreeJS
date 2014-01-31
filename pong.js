@@ -277,7 +277,7 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 	playerAreaThreeObject.updateMatrixWorld();
 	borderThreeObject.updateMatrixWorld();
 	var worldPos = new THREE.Vector3();
-	worldPos.getPositionFromMatrix(borderThreeObject.matrixWorld);
+	worldPos.setFromMatrixPosition(borderThreeObject.matrixWorld);
 
 	// Change camera position temporarily so we get a correct camera angle
 	this.camera.position.x = worldPos.x;
