@@ -44,44 +44,20 @@ function init() {
 
 	console.log("name(id): " + app.dataConnection.loginData.name);
 
-	// Custom mesh loaded callback
-	app.viewer.onMeshLoaded = function(threeParent, meshComp, geometry, material) {
-		// console.log("custom onMeshLoaded")
-		var newMaterial = new THREE.MeshFaceMaterial(material);
-
+	// Set mesh material colors
+	app.viewer.meshReadySig.add(function(meshComp, threeMesh) {
 		if (meshComp.parentEntity.placeable !== undefined) {
 			var parentPlayerAreaID = meshComp.parentEntity.placeable.parentRef;
 			if (parentPlayerAreaID !== "") {
-				// var entity = this.dataConnection.scene.entityById(parentPlayerAreaID);
 				var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
-				newMaterial = new THREE.MeshLambertMaterial({
+				threeMesh.material = new THREE.MeshLambertMaterial({
 					color: entity.dynamicComponent.color
 				});
 			} else {
 				console.log("this entity doesn't have a parent");
 			}
 		}
-
-		if (geometry === undefined) {
-			console.log("mesh load failed");
-			return;
-		}
-		checkDefined(geometry, material, meshComp, threeParent);
-		checkDefined(meshComp.parentEntity);
-		check(threeParent.userData.entityId === meshComp.parentEntity.id);
-		// console.log("Mesh loaded:", meshComp.meshRef.ref, "- adding to o3d of entity "+ threeParent.userData.entityId);
-		checkDefined(threeParent, meshComp, geometry, material);
-		var mesh = new THREE.Mesh(geometry, newMaterial);
-		meshComp.threeMesh = mesh;
-		//mesh.applyMatrix(threeParent.matrixWorld);
-		mesh.needsUpdate = 1;
-		threeParent.add(mesh);
-		// threeParent.needsUpdate = 1;
-
-		// do we need to set up signal that does
-		// mesh.applyMatrix(threeParent.matrixWorld) when placeable
-		// changes?
-	};
+	});
 }
 
 function PongApp() {
