@@ -124,6 +124,16 @@ PongApp.prototype.logicInit = function() {
 	this.camera.lookAt(this.scene.position);
 	this.viewer.camera = this.camera;
 
+	// Custom resize function because THREEx.windowResize doesn't support orthographic camera
+	$(window).on('resize', function() {
+		// notify the renderer of the size change
+		app.viewer.renderer.setSize(window.innerWidth, window.innerHeight);
+
+		if (app.serverGameCtrl) {
+			app.setCameraPosition(app.serverGameCtrl.dynamicComponent.playerAreas.length);
+		}
+	});
+
 	// LIGHTS
 	// override point light
 	this.viewer.pointLight.position.set(-300, 300, -300);
