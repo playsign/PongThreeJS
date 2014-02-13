@@ -55,7 +55,14 @@ function init() {
 	container.appendChild(renderer.domElement);
 
 	// EVENTS
-	THREEx.WindowResize(renderer, sceneCtrl.camera);
+	// Custom resize function because THREEx.windowResize doesn't support orthographic camera
+	$(window).on('resize', function() {
+		// notify the renderer of the size change
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+		sceneCtrl.updateCamera();
+	});
+
 	THREEx.FullScreen.bindKey({
 		charCode: 'm'.charCodeAt(0)
 	});

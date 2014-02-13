@@ -63,6 +63,7 @@ function SceneController() {
 	this.oldPlayerAmount = this.playerAmount;
 	this.playerAreas = [];
 	this.playerAreaWidth = 100;
+	this.gameAreaDiameter = undefined;
 
 	// BALL
 	var borderMaterial = new THREE.MeshLambertMaterial({
@@ -166,32 +167,34 @@ SceneController.prototype.generateScene = function() {
 		this.scene.add(pa.group);
 	}
 
-	// update the camera
-	var gameAreaDiameter = (radius * 25 + (this.playerAreaWidth * 2)); // TODO 25 the magic number
-	// console.log("gameAreaDiameter: " + gameAreaDiameter);
+	this.gameAreaDiameter = (radius * 25 + (this.playerAreaWidth * 2)); // TODO 25 the magic number
 
-	var SCREEN_WIDTH = window.innerWidth;
-	var SCREEN_HEIGHT = window.innerHeight;
-	var ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
-
-	if (SCREEN_HEIGHT < SCREEN_WIDTH) {
-		this.camera.left = ASPECT * -gameAreaDiameter / 2;
-		this.camera.right = ASPECT * gameAreaDiameter / 2;
-		this.camera.top = gameAreaDiameter / 2;
-		this.camera.bottom = -gameAreaDiameter / 2;
-	} else {
-		this.camera.left = -gameAreaDiameter / 2;
-		this.camera.right = gameAreaDiameter / 2;
-		this.camera.top = gameAreaDiameter / 2 / ASPECT;
-		this.camera.bottom = -gameAreaDiameter / 2 / ASPECT;
-	}
-
-	this.camera.updateProjectionMatrix();
+	this.updateCamera();
 
 	// Players info
 	refreshPlayersInfo();
 
 	this.oldPlayerAmount = this.playerAmount;
+};
+
+SceneController.prototype.updateCamera = function() {
+	var SCREEN_WIDTH = window.innerWidth;
+	var SCREEN_HEIGHT = window.innerHeight;
+	var ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
+
+	if (SCREEN_HEIGHT < SCREEN_WIDTH) {
+		this.camera.left = ASPECT * -this.gameAreaDiameter / 2;
+		this.camera.right = ASPECT * this.gameAreaDiameter / 2;
+		this.camera.top = this.gameAreaDiameter / 2;
+		this.camera.bottom = -this.gameAreaDiameter / 2;
+	} else {
+		this.camera.left = -this.gameAreaDiameter / 2;
+		this.camera.right = this.gameAreaDiameter / 2;
+		this.camera.top = this.gameAreaDiameter / 2 / ASPECT;
+		this.camera.bottom = -this.gameAreaDiameter / 2 / ASPECT;
+	}
+
+	this.camera.updateProjectionMatrix();
 };
 
 SceneController.prototype.deleteScene = function() {
