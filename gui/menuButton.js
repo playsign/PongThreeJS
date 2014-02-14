@@ -12,15 +12,17 @@ $(function() {
 			"width": width,
 			"height": width,
 		}) // adds CSS
-		.button({})
-			.click(function() {
-			app.dataConnection.client.disconnect();
-
-			app.sceneCtrl.gameDirector.setScreen(DirectorScreens.menu);
-
-		})
-			.append("<img width='" + width + "' height='" + width + "' src='images/menuIcon.png'/>")
+		.append("<img width='" + width + "' height='" + width + "' src='images/menuIcon.png'/>")
 	}
+
+	$("#menuButton")
+		.button({})
+		.click(function() {
+		app.dataConnection.client.disconnect();
+
+		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.menu);
+
+	})
 
 	$(window).on('resize', function() {
 		updateMenuButton();

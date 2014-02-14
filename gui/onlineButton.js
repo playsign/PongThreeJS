@@ -18,17 +18,19 @@ $(function() {
 			"font-size": fontSize,
 			"color": "white"
 		}) // adds CSS
-		.button({
-			label: "Connect"
-		})
-			.click(function() {
-			// if not already connected
-			app.sceneCtrl.showHelp();
-			if (app.connected == false) {
-				app.connect(app.host, app.port); //(16)
-			}
-		})
 	}
+
+	$("#onlineButton")
+		.button({
+		label: "Connect"
+	})
+		.click(function() {
+		// if not already connected
+		app.sceneCtrl.showHelp();
+		if (app.connected == false) {
+			app.connect(app.host, app.port); //(16)
+		}
+	})
 
 	$(window).on('resize', function() {
 		updateOnlineButton();

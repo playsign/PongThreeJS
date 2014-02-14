@@ -17,14 +17,16 @@ $(function() {
 			"font-size": fontSize,
 			"color": "white"
 		}) // adds CSS
-		.button({
-			label: "OK"
-		})
-			.click(function() {
-			app.sceneCtrl.gameDirector.doNextScreen();
-		})
-		// .hide()
 	}
+
+	$("#okButton")
+		.button({
+		label: "OK"
+	})
+		.click(function() {
+		app.sceneCtrl.gameDirector.doNextScreen();
+	})
+	// .hide()
 
 	$(window).on('resize', function() {
 		updateOkButton();

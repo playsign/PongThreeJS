@@ -12,12 +12,14 @@ $(function() {
 			"width": width,
 			"height": width,
 		}) // adds CSS
-		.button({})
-			.click(function() {
-			app.sceneCtrl.gameDirector.setScreen(DirectorScreens.game);
-		})
-			.append("<img width='" + width + "' height='" + width + "' src='images/playIcon.png'/>")
+		.append("<img width='" + width + "' height='" + width + "' src='images/playIcon.png'/>")
 	}
+
+	$("#continueButton")
+		.button({})
+		.click(function() {
+		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.game);
+	})
 
 	$(window).on('resize', function() {
 		updateContinueButton();

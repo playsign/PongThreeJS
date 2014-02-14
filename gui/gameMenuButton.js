@@ -12,13 +12,15 @@ $(function() {
 			"width": width,
 			"height": width,
 		}) // adds CSS
-		.button({})
-			.click(function() {
-			app.sceneCtrl.gameDirector.setScreen(DirectorScreens.gameMenu);
-		})
-			.append("<img width='" + width + "' height='auto' src='images/gameMenuIcon.png'/>")
+		.append("<img width='" + width + "' height='auto' src='images/gameMenuIcon.png'/>")
 		// .toggle()
 	}
+
+	$("#gameMenuButton")
+		.button({})
+		.click(function() {
+		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.gameMenu);
+	})
 
 	$(window).on('resize', function() {
 		updateGameMenuButton();
