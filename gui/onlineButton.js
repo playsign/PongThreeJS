@@ -17,19 +17,21 @@ $(function() {
 			"height": "auto",
 			"font-size": fontSize,
 			"color": "white"
-		}) // adds CSS
-		.button({
-			label: "online"
-		})
-			.click(function() {
-			// if not already connected
-			if (p2pCtrl.peerConnections.length === 0) {
-				p2pCtrl.initNet(updateClient);
-			} else {
-				showHelp();
-			}
-		})
+		}); // adds CSS
 	}
+
+	$("#onlineButton")
+		.button({
+		label: "online"
+	})
+		.click(function() {
+		// if not already connected
+		if (p2pCtrl.peerConnections.length === 0) {
+			p2pCtrl.initNet(updateClient);
+		} else {
+			showHelp();
+		}
+	});
 
 	$(window).on('resize', function() {
 		updateOnlineButton();

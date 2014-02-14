@@ -12,7 +12,7 @@ $(function() {
 			"top": posY,
 			"left": width / 2
 		}) // adds CSS
-		.append("<img width='" + width + "'' height='auto' src='images/title.png'/>")
+		.append("<img width='" + width + "'' height='auto' src='images/title.png'/>");
 		// .toggle()
 	}
 

@@ -17,16 +17,18 @@ $(function() {
 			"height": "auto",
 			"font-size": fontSize,
 			"color": "white"
-		}) // adds CSS
-		.button({
-			label: "offline"
-		})
-			.click(function() {
-			p2pCtrl.netRole = null;
-			gameDirector.setScreen(DirectorScreens.controls);
-		})
-		// .toggle()
+		}); // adds CSS
 	}
+
+	$("#offlineButton")
+		.button({
+		label: "offline"
+	})
+		.click(function() {
+		p2pCtrl.netRole = null;
+		gameDirector.setScreen(DirectorScreens.controls);
+	});
+	// .toggle()
 
 	$(window).on('resize', function() {
 		updateOfflineButton();

@@ -16,16 +16,18 @@ $(function() {
 			"height": "auto",
 			"font-size": fontSize,
 			"color": "white"
-		}) // adds CSS
-		.button({
-			label: "OK"
-		})
-			.click(function() {
-			gameDirector.doNextScreen();
-			sceneCtrl.generateScene();
-		})
-		// .hide()
+		}); // adds CSS
 	}
+
+	$("#okButton")
+		.button({
+		label: "OK"
+	})
+		.click(function() {
+		gameDirector.doNextScreen();
+		sceneCtrl.generateScene();
+	});
+	// .hide()
 
 	$(window).on('resize', function() {
 		updateOkButton();

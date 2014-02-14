@@ -13,7 +13,7 @@ $(function() {
 			"top": posY,
 			"left": posX
 		}) // adds CSS
-		.append("<img width='" + width + "' height='auto' src='images/helpOffline.png'/>")
+		.append("<img width='" + width + "' height='auto' src='images/helpOffline.png'/>");
 		// .toggle()
 	}
 

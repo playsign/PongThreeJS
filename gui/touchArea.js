@@ -14,7 +14,7 @@ $(function() {
 			"left": 0,
 			"width": width,
 			"height": height,
-		})
+		});
 	}
 
 	$(window).on('resize', function() {

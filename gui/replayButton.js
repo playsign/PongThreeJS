@@ -12,13 +12,15 @@ $(function() {
 			"width": width,
 			"height": width,
 		}) // adds CSS
-		.button({})
-			.click(function() {
-			gameDirector.setScreen(DirectorScreens.game);
-			sceneCtrl.generateScene();
-		})
-			.append("<img width='" + width + "' height='" + width + "' src='images/replayIcon.png'/>")
+		.append("<img width='" + width + "' height='" + width + "' src='images/replayIcon.png'/>");
 	}
+
+	$("#replayButton")
+		.button({})
+		.click(function() {
+		gameDirector.setScreen(DirectorScreens.game);
+		sceneCtrl.generateScene();
+	});
 
 	$(window).on('resize', function() {
 		updateReplayButton();

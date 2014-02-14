@@ -3,7 +3,7 @@ $(function() {
 		var width = window.innerWidth * 0.05;
 
 		$("#continueButton")
-		.empty().css({
+			.empty().css({
 			"z-index": "3",
 			"background-image": "url('images/smallButton.png')",
 			"position": "absolute",
@@ -12,12 +12,14 @@ $(function() {
 			"width": width,
 			"height": width,
 		}) // adds CSS
-		.button({})
-			.click(function() {
-			gameDirector.setScreen(DirectorScreens.game);
-		})
-			.append("<img width='" + width + "' height='" + width + "' src='images/playIcon.png'/>")
+		.append("<img width='" + width + "' height='" + width + "' src='images/playIcon.png'/>");
 	}
+
+	$("#continueButton")
+		.button({})
+		.click(function() {
+		gameDirector.setScreen(DirectorScreens.game);
+	});
 
 	$(window).on('resize', function() {
 		updateContinueButton();
