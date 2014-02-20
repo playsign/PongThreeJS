@@ -72,11 +72,8 @@ PongApp.prototype.onConnected = function() {
 	console.log("connected");
 	this.connected = true;
 
-	// Set callback function to know when the scene is (re)generated
-	this.dataConnection.scene.actionTriggered.add(this.onSceneGenerated.bind(this));
-
-	// Set callback function to know when any player loses
-	this.dataConnection.scene.actionTriggered.add(this.onGameOver.bind(this)); //(8)
+	// Set callback function
+	this.dataConnection.scene.actionTriggered.add(this.onActionTriggered.bind(this)); //(8)
 };
 
 PongApp.prototype.onDisconnected = function() {
@@ -277,17 +274,22 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 };
 
 // Scene generated callback
-PongApp.prototype.onSceneGenerated = function(scope, entity, action, params) {
-	console.log("onSceneGenerated");
+PongApp.prototype.onActionTriggered = function(scope, param2, param3, param4) {
+	console.log("onActionTriggered");
 
-	this.getEntities();
+	if (param2 === "sceneGenerated") {
+		// The scene is (re)generated
+		this.getEntities();
+	}
+
+	// Someone lost the game
+	else if (param2 === "gameover") {
+		this.gameOver(param3[1], param3[2]);
+	}
 };
 
 // Game over callback
-PongApp.prototype.onGameOver = function(scope, entity, action, params) { //(9)
-	var playerID = action[1];
-	var placement = action[2];
-
+PongApp.prototype.gameOver = function(playerID, placement) { //(9)
 	var createDialog = function(dialogText) { //(10)
 		// jQuery dialog
 		var newDialog = 123321;
