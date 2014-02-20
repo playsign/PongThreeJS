@@ -86,9 +86,9 @@ PongApp.prototype.onDisconnected = function() {
 	// DESTROY SCENE OBJECTS
 	var removables = [];
 	var i = 0;
-	for (i = 0; i < this.scene.children.length; i++) {
-		if (this.scene.children[i] instanceof THREE.Object3D) {
-			removables.push(this.scene.children[i]);
+	for (i = 0; i < this.viewer.scene.children.length; i++) {
+		if (this.viewer.scene.children[i] instanceof THREE.Object3D) {
+			removables.push(this.viewer.scene.children[i]);
 		}
 	}
 
@@ -121,7 +121,7 @@ PongApp.prototype.logicInit = function() {
 	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
 	this.cameraPos = new THREE.Vector3(0, 300, 100);
 	this.camera.position = this.cameraPos.clone();
-	this.camera.lookAt(this.scene.position);
+	this.camera.lookAt(this.viewer.scene.position);
 	this.viewer.camera = this.camera;
 
 	// Custom resize function because THREEx.windowResize doesn't support orthographic camera
@@ -141,7 +141,7 @@ PongApp.prototype.logicInit = function() {
 	// White directional light at half intensity shining from the top.
 	this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 	this.directionalLight.position.set(300, 300, 300);
-	this.scene.add(this.directionalLight);
+	this.viewer.scene.add(this.directionalLight);
 
 	// DIRECTOR (gui)
 	this.gameDirector = new Director();
