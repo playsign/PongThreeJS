@@ -108,13 +108,13 @@ function generateScene() {
 		areaParent.placeable.transform = t;
 
 		var areaComp = areaParent.Component("PlayerArea");
-		areaComp.SetAttribute("playerID", players[i]);
+		areaComp.playerID = players[i];
 
 		// Color
-		areaComp.SetAttribute("color", getRandomColor());
+		areaComp.color = getRandomColor();
 
 		// Balls 
-		areaComp.SetAttribute("playerBalls", initialBallCount);
+		areaComp.playerBalls = initialBallCount;
 	}
 
 	// List of player areas
@@ -122,12 +122,12 @@ function generateScene() {
 
 	// Set the player area list to scene controller's PlayerArea component
 	var areaListComp = gameController.Component("PlayerAreaList");
-	var areaListAttr = areaListComp.GetAttribute("areaList");
+	var areaListAttr = areaListComp.areaList;
 
 	for (var i = 0; i < playerAreas.length; i++) {
 		areaListAttr.push(playerAreas[i].id);
 	}
-	areaListComp.SetAttribute("areaList", areaListAttr);
+	areaListComp.areaList = areaListAttr;
 
 	// Camera position
 	camPos.pos.y = Math.max(playerAmount * camPosModifier, minCameraPosY);
@@ -146,9 +146,7 @@ function getRandomColor() {
 function deleteScene() {
 	// Reset the player areas list
 	var areaListComp = gameController.Component("PlayerAreaList");
-        print(areaListComp);
-        if (areaListComp !== undefined)
-	        areaListComp.SetAttribute("playerAreas", []);
+        areaListComp.areaList = [];
 
 	for (var i = 0; i < entities.length; i++) {
 		scene.RemoveEntity(entities[i].id);
@@ -190,8 +188,8 @@ function loadPart(partfile) { //(12)
 
 	// Save entity references for later use
 	var areaComp = parentEntity.Component("PlayerArea");
-	areaComp.SetAttribute("racketRef", children[1].id);
-	areaComp.SetAttribute("borderLeftRef", children[2].id);
+	areaComp.racketRef = children[1].id;
+	areaComp.borderLeftRef = children[2].id;
 
 	return parentEntity;
 }
@@ -201,7 +199,7 @@ function loadPart(partfile) { //(12)
 function ServerHandleUserConnected(userID, userConnection) { //(11d)
 	console.LogInfo("username: " + userConnection.Property("name"));
 	console.LogInfo("player amount: " + playerAmount);
-
+        
 	players.push(userConnection.Property("name"));
 
 	playerAmount++;
@@ -212,7 +210,7 @@ function ServerHandleUserConnected(userID, userConnection) { //(11d)
 	var pa = playerAreas[playerAreas.length - 1];
 	var areaComp = pa.Component("PlayerArea");
 	pa.player = userConnection.Property("name");
-	areaComp.SetAttribute("playerID", userConnection.Property("name"));
+	areaComp.playerID = userConnection.Property("name");
 }
 
 // Player disconnected
@@ -248,14 +246,14 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 		// console.LogInfo(ent.placeable.parentRef.ref);
 		var parent = scene.EntityById(ent.placeable.parentRef.ref);
 		var areaComp = parent.Component("PlayerArea");
-		areaComp.SetAttribute("playerBalls", areaComp.GetAttribute("playerBalls") - 1);
+		areaComp.playerBalls = areaComp.playerBalls - 1;
 
-		if (areaComp.GetAttribute("playerBalls") <= 0) {
+		if (areaComp.playerBalls <= 0) {
 			console.LogInfo("a player is out of balls");
 
 			// Remove the player but don't disconnect
 
-			var playerID = areaComp.GetAttribute("playerID");
+			var playerID = areaComp.playerID;
 
 			playerAmount--;
 			spectatorAmount++;
