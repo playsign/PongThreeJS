@@ -14,7 +14,7 @@
    <attribute value="" type="EntityReference" id="parentRef" name="Parent entity ref"/>
    <attribute value="" type="string" id="parentBone" name="Parent bone name"/>
   </component>
-  <component typeId="25" type="DynamicComponent" sync="true" name="PlayerArea">
+  <component typeId="6969" type="PlayerArea" sync="true" name="PlayerArea">
    <attribute value="0" type="int" id="racketRef" name="racketRef"/>
    <attribute value="" type="string" id="playerID" name="playerID"/>
     <attribute value="0" type="int" id="borderLeftRef" name="borderLeftRef"/>

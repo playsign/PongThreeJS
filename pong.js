@@ -20,7 +20,7 @@ var app;
 
 function init() {
 	app = new PongApp();
-	app.host = "10.10.3.28"; // IP of the Tundra server
+	app.host = "localhost"; // Address of the Tundra server
 	app.port = 2345; // and port of the server
 
 	function getRandomInt(min, max) {
@@ -51,7 +51,7 @@ function init() {
 			if (parentPlayerAreaID !== "") {
 				var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
 				threeMesh.material = new THREE.MeshLambertMaterial({
-					color: entity.dynamicComponent.color
+					color: entity.entityByType("PlayerArea").color
 				});
 			} else {
 				console.log("this entity doesn't have a parent");
@@ -127,7 +127,7 @@ PongApp.prototype.logicInit = function() {
 		app.viewer.renderer.setSize(window.innerWidth, window.innerHeight);
 
 		if (app.serverGameCtrl) {
-			app.setCameraPosition(app.serverGameCtrl.dynamicComponent.playerAreas.length);
+			app.setCameraPosition(app.serverGameCtrl.componentByType("PlayerAreaList").areaList.length);
 		}
 	});
 
@@ -199,7 +199,7 @@ PongApp.prototype.logicUpdate = function(dt) {
 
 		// Players info
 		if (this.serverGameCtrl) {
-			this.sceneCtrl.refreshPlayersInfo(this.serverGameCtrl.dynamicComponent.playerAreas.length);
+			this.sceneCtrl.refreshPlayersInfo(this.serverGameCtrl.componentByType("PlayerAreaList").areaList.length);
 		}
 
 	}
@@ -316,19 +316,21 @@ PongApp.prototype.getEntities = function() {
 
 	// Find a player area that matches with the player
 	this.serverGameCtrl = this.dataConnection.scene.entityByName("GameController"); //(4)
-	var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
-	for (var i = 0; i < this.serverGameCtrl.dynamicComponent.playerAreas.length; i++) {
-		var entityID = this.serverGameCtrl.dynamicComponent.playerAreas[i];
-		var entity = this.dataConnection.scene.entityById(entityID);
+	var areaList = this.serverGameCtrl.componentByType("PlayerAreaList").areaList;  
+        var scene = this.dataConnection.scene;
+	for (var i = 0; i < areaList.length; i++) {
+		var entityID = areaList[i];
+		var entity = scene.entityById(entityID);
 		if (!entity) {
 			throw "entity not found";
 		}
-		if (entity.dynamicComponent.playerID == this.dataConnection.loginData.name) {
+                var areaComp = entity.componentByType("PlayerArea");
+		if (areaComp.playerID == this.dataConnection.loginData.name) {
 			// Set player area entity references
-			var racketRef = entity.dynamicComponent.racketRef; //(5)
-			var borderLeftRef = entity.dynamicComponent.borderLeftRef;
-			this.reservedRacket = this.dataConnection.scene.entityById(racketRef); //(6)
-			this.reservedBorderLeft = this.dataConnection.scene.entityById(borderLeftRef);
+			var racketRef = areaComp.racketRef; //(5)
+			var borderLeftRef = areaComp.borderLeftRef;
+			this.reservedRacket = scene.entityById(racketRef); //(6)
+			this.reservedBorderLeft = scene.entityById(borderLeftRef);
 			this.reservedPlayerArea = entity;
 
 			break;
@@ -336,7 +338,7 @@ PongApp.prototype.getEntities = function() {
 	}
 
 	if (this.reservedPlayerArea !== undefined) {
-		this.setCameraPosition(playerAmount);
+		this.setCameraPosition(areaList.length);
 	}
 };
 

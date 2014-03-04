@@ -58,8 +58,8 @@
    <attribute value="" type="string" id="applicationName" name="Script application name"/>
    <attribute value="" type="string" id="className" name="Script class name"/>
   </component>
-  <component typeId="25" type="DynamicComponent" sync="true">
-   <attribute value="" type="QVariantList" id="playerAreas" name="playerAreas"/>
+  <component typeId="6970" type="PlayerAreaList" sync="true">
+   <attribute value="" type="QVariantList" id="areaList" name="areaList"/>
   </component>
  </entity>
 </scene>
