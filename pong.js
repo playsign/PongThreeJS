@@ -51,7 +51,7 @@ function init() {
 			if (parentPlayerAreaID !== "") {
 				var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
 				threeMesh.material = new THREE.MeshLambertMaterial({
-					color: entity.entityByType("PlayerArea").color
+					color: entity.componentByType("PlayerArea").color
 				});
 			} else {
 				console.log("this entity doesn't have a parent");
