@@ -50,7 +50,6 @@ ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
 // PLAYER AREAS
 var gameController = scene.GetEntityByName("GameController");
 var playerAreas = [];
-var entities = [];
 var partfile = "playerArea.txml";
 
 // OTHER
@@ -144,15 +143,16 @@ function getRandomColor() {
 // Delete the current scene but leave the scene controller and the ball
 
 function deleteScene() {
+	console.LogInfo("delete scene");
 	// Reset the player areas list
 	var areaListComp = gameController.Component("PlayerAreaList");
         areaListComp.areaList = [];
 
-	for (var i = 0; i < entities.length; i++) {
-		scene.RemoveEntity(entities[i].id);
+	for (var i = 0; i < playerAreas.length; i++) {
+		scene.RemoveEntity(playerAreas[i].id);
 	}
 
-	entities = [];
+	playerAreas = [];
 }
 
 // Reset the position of the ball
@@ -177,19 +177,15 @@ function pathForAsset(assetref) {
 function loadPart(partfile) { //(12)
 	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
 
-	for (var i = 0; i < ents.length; i++) {
-		entities.push(ents[i]);
-	}
-
 	// Set the racket ref in the parent entity
 	var parentEntity = ents[0];
 
-	var children = parentEntity.placeable.Children();
+	var children = parentEntity.Children();
 
 	// Save entity references for later use
 	var areaComp = parentEntity.Component("PlayerArea");
-	areaComp.racketRef = children[1].id;
-	areaComp.borderLeftRef = children[2].id;
+	areaComp.racketRef = children[2].id;
+	areaComp.borderLeftRef = children[1].id;
 
 	return parentEntity;
 }
@@ -243,8 +239,7 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 		ballt.rot = zeroVec;
 		ball.placeable.transform = ballt;
 
-		// console.LogInfo(ent.placeable.parentRef.ref);
-		var parent = scene.EntityById(ent.placeable.parentRef.ref);
+		var parent = ent.parent;
 		var areaComp = parent.Component("PlayerArea");
 		areaComp.playerBalls = areaComp.playerBalls - 1;
 

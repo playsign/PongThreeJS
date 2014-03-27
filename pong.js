@@ -49,7 +49,7 @@ function init() {
 		if (meshComp.parentEntity.placeable !== undefined) {
 			var parentPlayerAreaID = meshComp.parentEntity.placeable.parentRef;
 			if (parentPlayerAreaID !== "") {
-				var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
+				var entity = meshComp.parentEntity.parent;
 				threeMesh.material = new THREE.MeshLambertMaterial({
 					color: entity.componentByType("PlayerArea").color
 				});
