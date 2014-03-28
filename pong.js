@@ -154,6 +154,18 @@ function sign(x) {
 PongApp.prototype.logicUpdate = function(dt) {
 
 	if (this.connected) {
+		// HACK
+		if (this.reservedBorderLeft) {
+			var borderThreeObject = this.viewer.o3dByEntityId[this.reservedBorderLeft.id];
+			if (borderThreeObject) {
+				var worldPos = new THREE.Vector3();
+				worldPos.setFromMatrixPosition(borderThreeObject.matrixWorld);
+				if (this.previousWorldPos && !worldPos.equals(this.previousWorldPos)) {
+					this.setCameraPosition(app.serverGameCtrl.componentByType("PlayerAreaList").areaList.length);
+				}
+				this.previousWorldPos = worldPos.clone();
+			}
+		}
 
 		// RACKET CONTROL
 		//(2)
@@ -259,6 +271,7 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 
 	playerAreaThreeObject.updateMatrixWorld();
 	borderThreeObject.updateMatrixWorld();
+
 	var worldPos = new THREE.Vector3();
 	worldPos.setFromMatrixPosition(borderThreeObject.matrixWorld);
 
@@ -316,15 +329,15 @@ PongApp.prototype.getEntities = function() {
 
 	// Find a player area that matches with the player
 	this.serverGameCtrl = this.dataConnection.scene.entityByName("GameController"); //(4)
-	var areaList = this.serverGameCtrl.componentByType("PlayerAreaList").areaList;  
-        var scene = this.dataConnection.scene;
+	var areaList = this.serverGameCtrl.componentByType("PlayerAreaList").areaList;
+	var scene = this.dataConnection.scene;
 	for (var i = 0; i < areaList.length; i++) {
 		var entityID = areaList[i];
 		var entity = scene.entityById(entityID);
 		if (!entity) {
 			throw "entity not found";
 		}
-                var areaComp = entity.componentByType("PlayerArea");
+		var areaComp = entity.componentByType("PlayerArea");
 		if (areaComp.playerID == this.dataConnection.loginData.name) {
 			// Set player area entity references
 			var racketRef = areaComp.racketRef; //(5)
