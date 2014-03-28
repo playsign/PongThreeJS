@@ -121,6 +121,9 @@ PongApp.prototype.logicInit = function() {
 	this.camera.lookAt(this.viewer.scene.position);
 	this.viewer.camera = this.camera;
 
+	// Background color
+	this.viewer.renderer.setClearColor( 0x000000, 0 );
+
 	// Custom resize function because THREEx.windowResize doesn't support orthographic camera
 	$(window).on('resize', function() {
 		// notify the renderer of the size change
