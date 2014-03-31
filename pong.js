@@ -60,25 +60,22 @@ function init() {
 }
 
 function PongApp() {
-	Application.call(this); // Super class
+	Tundra.Application.call(this); // Super class
 }
 
-PongApp.prototype = new Application();
+PongApp.prototype = new Tundra.Application();
 
 PongApp.prototype.constructor = PongApp;
 
 PongApp.prototype.onConnected = function() {
-    Application.prototype.onConnected.call(this);
-	console.log("connected");
-	this.connected = true;
+    Tundra.Application.prototype.onConnected.call(this);
 
 	// Set callback function
 	this.dataConnection.scene.actionTriggered.add(this.onActionTriggered.bind(this)); //(8)
 };
 
 PongApp.prototype.onDisconnected = function() {
-	console.log("disconnected");
-	this.connected = false;
+    Tundra.Application.prototype.onDisconnected.call(this);
 
 	// DESTROY SCENE OBJECTS
 	var removables = [];
