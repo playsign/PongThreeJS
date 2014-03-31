@@ -47,8 +47,7 @@ function init() {
 	// Set mesh material colors
 	app.viewer.meshReadySig.add(function(meshComp, threeMesh) {
 		if (meshComp.parentEntity.placeable !== undefined) {
-			var parentPlayerAreaID = meshComp.parentEntity.placeable.parentRef;
-			if (parentPlayerAreaID !== "") {
+			if (meshComp.parentEntity.parent) {
 				var entity = meshComp.parentEntity.parent;
 				threeMesh.material = new THREE.MeshLambertMaterial({
 					color: entity.componentByType("PlayerArea").color
@@ -69,6 +68,7 @@ PongApp.prototype = new Application();
 PongApp.prototype.constructor = PongApp;
 
 PongApp.prototype.onConnected = function() {
+    Application.prototype.onConnected.call(this);
 	console.log("connected");
 	this.connected = true;
 
@@ -157,19 +157,6 @@ function sign(x) {
 PongApp.prototype.logicUpdate = function(dt) {
 
 	if (this.connected) {
-		// HACK
-		if (this.reservedBorderLeft) {
-			var borderThreeObject = this.viewer.o3dByEntityId[this.reservedBorderLeft.id];
-			if (borderThreeObject) {
-				var worldPos = new THREE.Vector3();
-				worldPos.setFromMatrixPosition(borderThreeObject.matrixWorld);
-				if (this.previousWorldPos && !worldPos.equals(this.previousWorldPos)) {
-					this.setCameraPosition(app.serverGameCtrl.componentByType("PlayerAreaList").areaList.length);
-				}
-				this.previousWorldPos = worldPos.clone();
-			}
-		}
-
 		// RACKET CONTROL
 		//(2)
 		if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
