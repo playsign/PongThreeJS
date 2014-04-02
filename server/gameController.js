@@ -50,7 +50,6 @@ ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
 // PLAYER AREAS
 var gameController = scene.GetEntityByName("GameController");
 var playerAreas = [];
-var entities = [];
 var partfile = "playerArea.txml";
 
 // OTHER
@@ -107,27 +106,27 @@ function generateScene() {
 		t.rot.y = degree;
 		areaParent.placeable.transform = t;
 
-		var attrs = areaParent.dynamiccomponent;
-		attrs.SetAttribute("playerID", players[i]);
+		var areaComp = areaParent.Component("PlayerArea");
+		areaComp.playerID = players[i];
 
 		// Color
-		attrs.SetAttribute("color", getRandomColor());
+		areaComp.color = getRandomColor();
 
 		// Balls 
-		attrs.SetAttribute("playerBalls", initialBallCount);
+		areaComp.playerBalls = initialBallCount;
 	}
 
 	// List of player areas
-	playerAreas = scene.EntitiesWithComponent("EC_DynamicComponent", "PlayerArea");
+	playerAreas = scene.EntitiesWithComponent("PlayerArea");
 
-	// Set the player area list to scene controller's dynamic component
-	var attrs = gameController.dynamiccomponent;
-	var playerAreaList = attrs.GetAttribute("playerAreas");
+	// Set the player area list to scene controller's PlayerArea component
+	var areaListComp = gameController.Component("PlayerAreaList");
+	var areaListAttr = areaListComp.areaList;
 
 	for (var i = 0; i < playerAreas.length; i++) {
-		playerAreaList.push(playerAreas[i].id);
+		areaListAttr.push(playerAreas[i].id);
 	}
-	attrs.SetAttribute("playerAreas", playerAreaList);
+	areaListComp.areaList = areaListAttr;
 
 	// Camera position
 	camPos.pos.y = Math.max(playerAmount * camPosModifier, minCameraPosY);
@@ -144,15 +143,16 @@ function getRandomColor() {
 // Delete the current scene but leave the scene controller and the ball
 
 function deleteScene() {
+	console.LogInfo("delete scene");
 	// Reset the player areas list
-	var attrs = gameController.dynamiccomponent;
-	attrs.SetAttribute("playerAreas", []);
+	var areaListComp = gameController.Component("PlayerAreaList");
+        areaListComp.areaList = [];
 
-	for (var i = 0; i < entities.length; i++) {
-		scene.RemoveEntity(entities[i].id);
+	for (var i = 0; i < playerAreas.length; i++) {
+		scene.RemoveEntity(playerAreas[i].id);
 	}
 
-	entities = [];
+	playerAreas = [];
 }
 
 // Reset the position of the ball
@@ -177,19 +177,15 @@ function pathForAsset(assetref) {
 function loadPart(partfile) { //(12)
 	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
 
-	for (var i = 0; i < ents.length; i++) {
-		entities.push(ents[i]);
-	}
-
 	// Set the racket ref in the parent entity
 	var parentEntity = ents[0];
 
-	var children = parentEntity.placeable.Children();
+	var children = parentEntity.Children();
 
 	// Save entity references for later use
-	var attrs = parentEntity.dynamiccomponent;
-	attrs.SetAttribute("racketRef", children[1].id);
-	attrs.SetAttribute("borderLeftRef", children[2].id);
+	var areaComp = parentEntity.Component("PlayerArea");
+	areaComp.racketRef = children[2].id;
+	areaComp.borderLeftRef = children[1].id;
 
 	return parentEntity;
 }
@@ -199,18 +195,18 @@ function loadPart(partfile) { //(12)
 function ServerHandleUserConnected(userID, userConnection) { //(11d)
 	console.LogInfo("username: " + userConnection.Property("name"));
 	console.LogInfo("player amount: " + playerAmount);
-
+        
 	players.push(userConnection.Property("name"));
 
 	playerAmount++;
 
 	generateScene();
 
-	// Set player's name(id) to player area's dynamic component
+	// Set player's name(id) to player area's PlayerArea component
 	var pa = playerAreas[playerAreas.length - 1];
-	var attrs = pa.dynamiccomponent;
+	var areaComp = pa.Component("PlayerArea");
 	pa.player = userConnection.Property("name");
-	attrs.SetAttribute("playerID", userConnection.Property("name"));
+	areaComp.playerID = userConnection.Property("name");
 }
 
 // Player disconnected
@@ -243,17 +239,16 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 		ballt.rot = zeroVec;
 		ball.placeable.transform = ballt;
 
-		// console.LogInfo(ent.placeable.parentRef.ref);
-		var parent = scene.EntityById(ent.placeable.parentRef.ref);
-		var attrs = parent.dynamiccomponent;
-		attrs.SetAttribute("playerBalls", attrs.GetAttribute("playerBalls") - 1);
+		var parent = ent.parent;
+		var areaComp = parent.Component("PlayerArea");
+		areaComp.playerBalls = areaComp.playerBalls - 1;
 
-		if (attrs.GetAttribute("playerBalls") <= 0) {
+		if (areaComp.playerBalls <= 0) {
 			console.LogInfo("a player is out of balls");
 
 			// Remove the player but don't disconnect
 
-			var playerID = attrs.GetAttribute("playerID");
+			var playerID = areaComp.playerID;
 
 			playerAmount--;
 			spectatorAmount++;

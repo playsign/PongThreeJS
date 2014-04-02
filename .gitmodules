@@ -1,3 +1,4 @@
 [submodule "WebTundra"]
 	path = WebTundra
 	url = https://github.com/realXtend/WebTundra.git
+	branch = dev
