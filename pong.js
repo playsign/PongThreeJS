@@ -273,7 +273,7 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 
 };
 
-// Scene generated callback
+// Action triggered callback
 PongApp.prototype.onActionTriggered = function(scope, param2, param3, param4) {
 	console.log("onActionTriggered");
 
