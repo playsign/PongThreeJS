@@ -31,82 +31,82 @@ require.config({
 });
 
 require([
-        // Core deps
-        "lib/three",
-        "lib/jquery",
-        "lib/jquery-ui",
-        "lib/jquery.mousewheel",                /// @todo Remove as core dependency (afaik UiAPI)
-        "lib/jquery.titlealert.min",            /// @todo Remove as core dependency (afaik UiAPI)
-        // Client
-        "core/framework/TundraClient",
-        // Renderer
-        "view/threejs/ThreeJsRenderer",
-        // Plugins
-        "plugins/scene-parser/SceneParserPlugin",
-        "plugins/asset-redirect/AssetRedirectPlugin"
-    ],
-    function(THREE, $, _jqueryUI, _jqueryMW, _jqueryTA,
-             Client,
-             ThreeJsRenderer,
-             SceneParserPlugin,
-             AssetRedirectPlugin)
-{
-    // Create client
-    var client = new Client({
-        container     : "#webtundra-container-custom",
-        renderSystem  : ThreeJsRenderer
-    });
+    // Core deps
+    "lib/three",
+    "lib/jquery",
+    "lib/jquery-ui",
+    "lib/jquery.mousewheel",                /// @todo Remove as core dependency (afaik UiAPI)
+    "lib/jquery.titlealert.min",            /// @todo Remove as core dependency (afaik UiAPI)
+    // Client
+    "core/framework/TundraClient",
+    // Renderer
+    "view/threejs/ThreeJsRenderer",
+    // Plugins
+    "plugins/scene-parser/SceneParserPlugin",
+    "plugins/asset-redirect/AssetRedirectPlugin"
+],
+        function(THREE, $, _jqueryUI, _jqueryMW, _jqueryTA,
+                 Client,
+                 ThreeJsRenderer,
+                 SceneParserPlugin,
+                 AssetRedirectPlugin)
+        {
+            // Create client
+            var client = new Client({
+                container     : "#webtundra-container-custom",
+                renderSystem  : ThreeJsRenderer
+            });
 
-    // Configure asset redirects.
-    var redirectPlugin = TundraSDK.plugin("AssetRedirectPlugin");
-    redirectPlugin.registerAssetTypeSwap(".mesh", ".json", "ThreeJsonMesh");
-    redirectPlugin.setupDefaultStorage();
+            // Configure asset redirects.
+            var redirectPlugin = TundraSDK.plugin("AssetRedirectPlugin");
+            redirectPlugin.registerAssetTypeSwap(".mesh", ".json", "ThreeJsonMesh");
+            redirectPlugin.setupDefaultStorage();
 
-    // App variables
-    var freecamera = null;
-//    var instructions = null;
+            // App variables
+            var freecamera = null;
+            //    var instructions = null;
 
-    // Start freecam app
-    $.getScript("../../src/application/freecamera.js")
-        .done(function( script, textStatus ) {
-            freecamera = new FreeCameraApplication();
-        })
-        .fail(function(jqxhr, settings, exception) {
-            console.error("Failed to load FreeCamera application:", exception);
-        }
-    );
+            // Start freecam app
+            $.getScript("../../src/application/freecamera.js")
+                .done(function( script, textStatus ) {
+                    freecamera = new FreeCameraApplication();
+                })
+                .fail(function(jqxhr, settings, exception) {
+                    console.error("Failed to load FreeCamera application:", exception);
+                }
+                     );
 
-/*
-    // Connected to server
-    client.onConnected(null, function() {
-        // Setup initial camera position
-        if (freecamera && freecamera.cameraEntity)
+            /*
+            // Connected to server
+            client.onConnected(null, function() {
+            // Setup initial camera position
+            if (freecamera && freecamera.cameraEntity)
             freecamera.cameraEntity.placeable.setPosition(0, 8.50, 28.50);
 
-        instructions = $("<div/>", { 
+            instructions = $("<div/>", { 
             text : "Click on the top sphere to start the physics simulation",
             css : {
-                "position": "absolute",
-                "width": 360,
-                "background-color": "white",
-                "top": 10,
-                "left": 10,
-                "padding": 10,
-                "border-radius": 10,
-                "text-align": "center"
+            "position": "absolute",
+            "width": 360,
+            "background-color": "white",
+            "top": 10,
+            "left": 10,
+            "padding": 10,
+            "border-radius": 10,
+            "text-align": "center"
             }
-        });
-        client.ui.addWidgetToScene(instructions);
-        instructions.hide();
-        instructions.fadeIn(5000);
-*/
-        var dirLight = new THREE.DirectionalLight();
-        client.renderer.scene.add(dirLight);
-//    });
+            });
+            client.ui.addWidgetToScene(instructions);
+            instructions.hide();
+            instructions.fadeIn(5000);
+            */
+            var dirLight = new THREE.DirectionalLight();
+            client.renderer.scene.add(dirLight);
+            //    });
 
-    var sceneParserPlugin = TundraSDK.plugin("SceneParserPlugin");
-    var xml3dParser = sceneParserPlugin.newXML3DParser(client.scene);
-    $(document).ready(function() {
-        xml3dParser.parseDocXml3D(document);
-    });
-});
+            var sceneParserPlugin = TundraSDK.plugin("SceneParserPlugin");
+            var xml3dParser = sceneParserPlugin.newXML3DParser(client.scene);
+            $(document).ready(function() {
+                xml3dParser.parseDocXml3D(document);
+            });
+        });
