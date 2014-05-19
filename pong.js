@@ -18,8 +18,9 @@
 
 var app;
 
-function init() {
-	app = new PongApp();
+function startPongApp(tundraClient) {
+	app = new PongApp(tundraClient);
+    
 	app.host = "localhost"; // Address of the Tundra server
 	app.port = 2345; // and port of the server
 
@@ -59,11 +60,9 @@ function init() {
 	});
 }
 
-function PongApp() {
-	Tundra.Application.call(this); // Super class
+function PongApp(tundraClient) {
+    this.tundraClient = tundraClient;
 }
-
-PongApp.prototype = new Tundra.Application();
 
 PongApp.prototype.constructor = PongApp;
 
@@ -342,4 +341,32 @@ PongApp.prototype.getEntities = function() {
 	}
 };
 
-init();
+/* copy-pasted from WebTundra core/main.js */
+
+require([
+        // Core deps
+        "lib/jquery",
+        "lib/jquery-ui",
+        "lib/jquery.mousewheel",                /// @todo Remove as core dependency (afaik UiAPI)
+        "lib/jquery.titlealert.min",            /// @todo Remove as core dependency (afaik UiAPI)
+        // Client
+        "core/framework/TundraClient",
+        // Renderer
+        "view/threejs/ThreeJsRenderer",
+        // Plugins
+        //"plugins/dom-integration/TundraDomIntegrationPlugin", // Disabled by default for performance reasons
+        "plugins/login-screen/LoginScreenPlugin"
+    ],
+    function($, _jqueryUI, _jqueryMW, _jqueryTA,
+             Client,
+             ThreeJsRenderer,
+             //TundraDomIntegrationPlugin, // Disabled by default for performance reasons
+             LoginScreenPlugin)
+{
+    // Create a new Web Rocket client
+    var tundraClient = new Client({
+        container     : "#webtundra-container-custom",
+        renderSystem  : ThreeJsRenderer
+    });
+    startPongApp(tundraClient);
+});
