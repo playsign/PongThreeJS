@@ -15,11 +15,13 @@
 
 var app;
 
-function startPongApp(tundraClient) {
+function startPongApp(tundraClient, serverHost, serverPort) {
     app = new PongApp(tundraClient);
-    
-    app.host = "localhost"; // Address of the Tundra server
-    app.port = 2345; // and port of the server
+    if (!serverHost)
+        serverHost = "localhost";
+    if (!serverPort)
+        serverPort = 2345;
+    app.tundraClient.connect("ws://" + serverHost + ":" + serverPort);
 
     function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
@@ -60,8 +62,6 @@ function startPongApp(tundraClient) {
 function PongApp(tundraClient) {
     this.tundraClient = tundraClient;
 }
-
-PongApp.prototype.constructor = PongApp;
 
 PongApp.prototype.onConnected = function() {
     Tundra.Application.prototype.onConnected.call(this);
@@ -338,32 +338,3 @@ PongApp.prototype.getEntities = function() {
     }
 };
 
-/* copy-pasted from WebTundra core/main.js */
-
-require([
-    // Core deps
-    "lib/jquery",
-    "lib/jquery-ui",
-    "lib/jquery.mousewheel",                /// @todo Remove as core dependency (afaik UiAPI)
-    "lib/jquery.titlealert.min",            /// @todo Remove as core dependency (afaik UiAPI)
-    // Client
-    "core/framework/TundraClient",
-    // Renderer
-    "view/threejs/ThreeJsRenderer",
-    // Plugins
-    //"plugins/dom-integration/TundraDomIntegrationPlugin", // Disabled by default for performance reasons
-    "plugins/login-screen/LoginScreenPlugin"
-],
-        function($, _jqueryUI, _jqueryMW, _jqueryTA,
-                 Client,
-                 ThreeJsRenderer,
-                 //TundraDomIntegrationPlugin, // Disabled by default for performance reasons
-                 LoginScreenPlugin)
-        {
-            // Create a new Web Rocket client
-            var tundraClient = new Client({
-                container     : "#webtundra-container-custom",
-                renderSystem  : ThreeJsRenderer
-            });
-            startPongApp(tundraClient);
-        });
