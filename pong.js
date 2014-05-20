@@ -11,68 +11,65 @@
 // This script is documented here: https://forge.fi-ware.eu/plugins/mediawiki/wiki/fi-ware-private/index.php/3D-UI_-_WebTundra_-_User_and_Programmers_Guide#Pong_Example
 
 /* jshint -W097, -W040 */
+/* jslint browser: true, debug: true, devel: true */
 /* global THREE, THREEx, Ammo, window, Director, DirectorScreens */
 
-var app;
+var PongApp = {};
 
-function startPongApp(tundraClient, serverHost, serverPort) {
-    app = new PongApp(tundraClient);
+PongApp.start = function(serverHost, serverPort) {
     if (!serverHost)
         serverHost = "localhost";
     if (!serverPort)
         serverPort = 2345;
-    app.tundraClient.connect("ws://" + serverHost + ":" + serverPort);
-
-    function getRandomInt(min, max) {
-	return Math.floor(Math.random() * (max - min + 1) + min);
-    }
-
-    // We have configured the app and so we are ready to start it
-    app.start();
-
-    // Custom app specific properties
-    app.serverGameCtrl = undefined;
-    app.racketSpeed = 80;
-    app.reservedRacket = undefined;
-    app.reservedPlayerArea = undefined;
-    app.reservedBorderLeft = undefined;
-    app.playerAreaWidth = 100;
-
-    app.dataConnection.loginData = {
-	"name": Date.now().toString() + getRandomInt(0, 2000000).toString() //(15)
+    var cparams = {
+        container     : "#webtundra-container-custom",
+        renderSystem  : ThreeJsRenderer
     };
+    this.tundraClient = new window.TundraClient(cparams);
+    this.tundraClient.connect("ws://" + serverHost + ":" + serverPort,
+                             loginData);
 
-    console.log("name(id): " + app.dataConnection.loginData.name);
-
-    // Set mesh material colors
-    app.viewer.meshReadySig.add(function(meshComp, threeMesh) {
-	if (meshComp.parentEntity.placeable !== undefined) {
-	    if (meshComp.parentEntity.parent) {
-		var entity = meshComp.parentEntity.parent;
-		threeMesh.material = new THREE.MeshLambertMaterial({
-		    color: entity.componentByType("PlayerArea").color
-		});
-	    } else {
-		console.log("this entity doesn't have a parent");
-	    }
-	}
-    });
-}
-
-function PongApp(tundraClient) {
-    this.tundraClient = tundraClient;
-}
-
-PongApp.prototype.onConnected = function() {
-    Tundra.Application.prototype.onConnected.call(this);
-
-    // Set callback function
-    this.dataConnection.scene.actionTriggered.add(this.onActionTriggered.bind(this)); //(8)
+    var loginData = {
+	"name": "PongPlayer_" + (Date.now() + Math.random()).toFixed(5)
+    };
+    this.threeScene = this.tundraClient.renderer.scene;
+    this.tundraClient.onConnected(null, this.handleConnected.bind(this));    
 };
 
-PongApp.prototype.onDisconnected = function() {
-    Tundra.Application.prototype.onDisconnected.call(this);
+PongApp.handleConnected = function() {
+    // Custom app specific properties
+    this.serverGameCtrl = undefined;
+    this.racketSpeed = 80;
+    this.reservedRacket = undefined;
+    this.reservedPlayerArea = undefined;
+    this.reservedBorderLeft = undefined;
+    this.playerAreaWidth = 100;
 
+    console.log("Connected, username: " + this.tundraClient.loginProperties.name);
+
+    // Set mesh material colors
+    // TBD: reimplement for WT2
+    //app.viewer.meshReadySig.add(function(meshComp, threeMesh) {
+    //     if (meshComp.parentEntity.placeable !== undefined) {
+    //         if (meshComp.parentEntity.parent) {
+    //          var entity = meshComp.parentEntity.parent;
+    //          threeMesh.material = new THREE.MeshLambertMaterial({
+    //                 color: entity.componentByType("PlayerArea").color
+    //          });
+    //         } else {
+    //          console.log("this entity doesn't have a parent");
+    //         }
+    //     }
+    // });        
+    
+    this.tundraClient.scene.onEntityAction(
+        null, this.handleEntityAction.bind(this)); // (8)
+    
+    this.tundraClient.onDisconnected(
+        null, this.handleDisconnected.bind(this));
+};
+
+PongApp.handleDisconnected = function() {
     // DESTROY SCENE OBJECTS
     var removables = [];
     var i = 0;
@@ -96,7 +93,7 @@ PongApp.prototype.onDisconnected = function() {
     this.dataConnection.scene.entities = {};
 };
 
-PongApp.prototype.logicInit = function() {
+PongApp.logicInit = function() {
 
     // TOUCH
     this.touchController = new TouchInputController();
@@ -147,9 +144,9 @@ function sign(x) {
     return x > 0 ? 1 : x < 0 ? -1 : 0;
 }
 
-PongApp.prototype.logicUpdate = function(dt) {
+PongApp.logicUpdate = function(dt) {
 
-    if (this.connected) {
+    if (this.tundraClient.IsConnected()) {
 	// RACKET CONTROL
 	//(2)
 	if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
