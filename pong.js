@@ -12,7 +12,7 @@
 
 /* jshint -W097, -W040 */
 /* jslint browser: true, debug: true, devel: true */
-/* global THREE, THREEx, Ammo, window, Director, DirectorScreens */
+/* global THREE, THREEx, Ammo, window, Director, DirectorScreens, TouchInputController */
 
 var PongApp = {};
 
@@ -25,13 +25,13 @@ PongApp.start = function(serverHost, serverPort) {
         container     : "#webtundra-container-custom",
         renderSystem  : ThreeJsRenderer
     };
+    var loginData = {
+	"name": "PongPlayer_" + (Date.now() + Math.random()).toFixed(5)
+    };
     this.tundraClient = new window.TundraClient(cparams);
     this.tundraClient.connect("ws://" + serverHost + ":" + serverPort,
                              loginData);
 
-    var loginData = {
-	"name": "PongPlayer_" + (Date.now() + Math.random()).toFixed(5)
-    };
     this.threeScene = this.tundraClient.renderer.scene;
     this.tundraClient.onConnected(null, this.handleConnected.bind(this));    
 };
@@ -116,12 +116,12 @@ PongApp.logicInit = function() {
 
     // Custom resize function because THREEx.windowResize doesn't support orthographic camera
     $(window).on('resize', function() {
-	// notify the renderer of the size change
-	app.viewer.renderer.setSize(window.innerWidth, window.innerHeight);
+        // notify the renderer of the size change
+        app.viewer.renderer.setSize(window.innerWidth, window.innerHeight);
 
-	if (app.serverGameCtrl) {
-	    app.setCameraPosition(app.serverGameCtrl.componentByType("PlayerAreaList").areaList.length);
-	}
+        if (app.serverGameCtrl) {
+            app.setCameraPosition(app.serverGameCtrl.componentByType("PlayerAreaList").areaList.length);
+        }
     });
 
     // LIGHTS
@@ -147,58 +147,58 @@ function sign(x) {
 PongApp.logicUpdate = function(dt) {
 
     if (this.tundraClient.IsConnected()) {
-	// RACKET CONTROL
-	//(2)
-	if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
-	    // Get racket's direction vector
+        // RACKET CONTROL
+        //(2)
+        if (this.reservedRacket !== undefined && this.reservedPlayerArea.placeable !== undefined && (this.keyboard.pressed("left") || this.keyboard.pressed("right") || this.keyboard.pressed("a") || this.keyboard.pressed("d") || this.touchController.swiping /*&& delta.x !== 0)*/ )) {
+            // Get racket's direction vector
 
-	    // Radian
-	    var rotation = (this.reservedPlayerArea.placeable.transform.rot.y + 90) * (Math.PI / 180);
+            // Radian
+            var rotation = (this.reservedPlayerArea.placeable.transform.rot.y + 90) * (Math.PI / 180);
 
-	    var racketForward = new THREE.Vector3();
+            var racketForward = new THREE.Vector3();
 
-	    // Radian to vector3
-	    racketForward.x = Math.cos(rotation * -1);
-	    racketForward.z = Math.sin(rotation * -1);
+            // Radian to vector3
+            racketForward.x = Math.cos(rotation * -1);
+            racketForward.z = Math.sin(rotation * -1);
 
-	    racketForward.normalize();
+            racketForward.normalize();
 
-	    // Racket's speed
-	    if (this.touchController.swiping) {
-		// Touch / Mouse
-		racketForward.multiplyScalar(this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed * -1);
-		if (Math.abs(racketForward.length()) > this.racketSpeed) {
-		    racketForward.normalize();
-		    racketForward.multiplyScalar(this.racketSpeed);
-		}
-	    } else {
-		// Keyboard
-		racketForward.multiplyScalar(this.racketSpeed);
-	    }
+            // Racket's speed
+            if (this.touchController.swiping) {
+                // Touch / Mouse
+                racketForward.multiplyScalar(this.racketSpeed * this.touchController.deltaPosition.x * this.touchController.swipeSpeed * -1);
+                if (Math.abs(racketForward.length()) > this.racketSpeed) {
+                    racketForward.normalize();
+                    racketForward.multiplyScalar(this.racketSpeed);
+                }
+            } else {
+                // Keyboard
+                racketForward.multiplyScalar(this.racketSpeed);
+            }
 
-	    // Read keyboard
-	    if (this.keyboard.pressed("left") || this.keyboard.pressed("a")) {
-		racketForward.multiplyScalar(-1);
-	    }
+            // Read keyboard
+            if (this.keyboard.pressed("left") || this.keyboard.pressed("a")) {
+                racketForward.multiplyScalar(-1);
+            }
 
-	    // Set a new velocity for the entity
-	    this.reservedRacket.rigidBody.linearVelocity = racketForward; //(14)
-	    // console.log(racketForward);
+            // Set a new velocity for the entity
+            this.reservedRacket.rigidBody.linearVelocity = racketForward; //(14)
+            // console.log(racketForward);
 
-	    // Inform the server about the change
-	    this.dataConnection.syncManager.sendChanges(); //(3)
-	}
+            // Inform the server about the change
+            this.dataConnection.syncManager.sendChanges(); //(3)
+        }
 
-	// Players info
-	if (this.serverGameCtrl) {
-	    this.sceneCtrl.refreshPlayersInfo(this.serverGameCtrl.componentByType("PlayerAreaList").areaList.length);
-	}
+        // Players info
+        if (this.serverGameCtrl) {
+            this.sceneCtrl.refreshPlayersInfo(this.serverGameCtrl.componentByType("PlayerAreaList").areaList.length);
+        }
 
     }
 };
 
 // Set camera position and angle
-PongApp.prototype.setCameraPosition = function(playerAmount) {
+PongApp.setCameraPosition = function(playerAmount) {
     console.log("setCameraPosition");
 
     playerAmount = Math.round(playerAmount);
@@ -266,9 +266,10 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 
 };
 
-// Action triggered callback
-PongApp.prototype.onActionTriggered = function(scope, param2, param3, param4) {
+
+PongApp.handleEntityAction = function(scope, param2, param3, param4) {
     console.log("onActionTriggered");
+    debugger; // fix param names
 
     if (param2 === "sceneGenerated") {
 	// The scene is (re)generated
@@ -282,7 +283,7 @@ PongApp.prototype.onActionTriggered = function(scope, param2, param3, param4) {
 };
 
 // Game over callback
-PongApp.prototype.gameOver = function(playerID, placement) { //(9)
+PongApp.gameOver = function(playerID, placement) { //(9)
     var createDialog = function(dialogText) { //(10)
 	// jQuery dialog
 	var newDialog = 123321;
@@ -301,7 +302,7 @@ PongApp.prototype.gameOver = function(playerID, placement) { //(9)
     }
 };
 
-PongApp.prototype.getEntities = function() {
+PongApp.getEntities = function() {
     console.log("getEntities");
 
     this.reservedRacket = undefined;
@@ -334,4 +335,7 @@ PongApp.prototype.getEntities = function() {
 	this.setCameraPosition(areaList.length);
     }
 };
+
+
+PongApp.start();
 
