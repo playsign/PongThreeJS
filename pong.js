@@ -29,6 +29,7 @@ PongApp.start = function(serverHost, serverPort) {
     var loginData = {
 	"name": "PongPlayer_" + (Date.now() + Math.random()).toFixed(5)
     };
+    this.areasExpected = {};
     this.tundraClient = new window.TundraClient(cparams);
     this.tundraClient.connect("ws://" + serverHost + ":" + serverPort,
                              loginData);
@@ -38,14 +39,16 @@ PongApp.start = function(serverHost, serverPort) {
     redirectPlugin.setupDefaultStorage();
 
     this.threeScene = this.tundraClient.renderer.scene;
+    this.threeRenderer = this.tundraClient.renderer.renderer;
     this.tundraClient.onConnected(null, this.handleConnected.bind(this));    
     this.tundraClient.scene.onEntityCreated(
         null, this.handleEntityCreated.bind(this));
 
-    this.monkeyPatchJsonLoading();
+    this.logicInit();
 };
 
-PongApp.monkeyPatchJsonLoading = function() {
+
+PongApp.setupCamera = function() {
 };
 
 PongApp.handleConnected = function() {
@@ -57,7 +60,7 @@ PongApp.handleConnected = function() {
     this.reservedBorderLeft = undefined;
     this.playerAreaWidth = 100;
     this.areasExpected = {};
-
+    this.freecamera.cameraEntity.placeable.setPosition(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
     console.log("Connected, username: " + this.tundraClient.loginProperties.name);
 
     // Set mesh material colors
@@ -104,15 +107,26 @@ PongApp.logicInit = function() {
     var NEAR = -20000;
     var FAR = 20000;
 
-    // override camera
-    this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
+    // Start freecam app
+    var thisIsThis = this;
+    $.getScript("js/freecamera.js")
+        .done(function( script, textStatus ) {
+            thisIsThis.freecamera = new FreeCameraApplication();
+            thisIsThis.camera = thisIsThis.tundraClient.renderer.camera;
+        })
+        .fail(function(jqxhr, settings, exception) {
+            console.error("Failed to load FreeCamera application:", exception);
+        }              
+    );
+
+    // // override camera
+    // this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
     this.cameraPos = new THREE.Vector3(0, 300, 100);
-    this.camera.position = this.cameraPos.clone();
-    this.camera.lookAt(this.viewer.scene.position);
-    this.viewer.camera = this.camera;
+    // this.camera.position = this.cameraPos.clone();
+    // this.camera.lookAt(this.threeScene.position);
 
     // Background color
-    this.viewer.renderer.setClearColor( 0x000000, 0 );
+    // this.threeRenderer.setClearColor( 0x000000, 0 );
 
     // Custom resize function because THREEx.windowResize doesn't support orthographic camera
     $(window).on('resize', function() {
@@ -124,14 +138,14 @@ PongApp.logicInit = function() {
         }
     });
 
-    // LIGHTS
-    // override point light
-    this.viewer.pointLight.position.set(-300, 300, -300);
+    // // LIGHTS
+    // // override point light
+    // this.viewer.pointLight.position.set(-300, 300, -300);
 
-    // White directional light at half intensity shining from the top.
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    this.directionalLight.position.set(300, 300, 300);
-    this.viewer.scene.add(this.directionalLight);
+    // // White directional light at half intensity shining from the top.
+    // this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    // this.directionalLight.position.set(300, 300, 300);
+    // this.viewer.scene.add(this.directionalLight);
 
     // DIRECTOR (gui)
     this.gameDirector = new Director();
@@ -339,7 +353,7 @@ PongApp.playearAreaEntityAppeared = function(areaEnt) {
     }
 };
 
-PongApp.handleEntityCreated = function(entity) {
+PongApp.handleEntityCreated = function(entity) {    
     var x = this.areasExpected;
     if (!x[entity.id])
         return;
