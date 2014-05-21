@@ -16,12 +16,11 @@ SceneController.prototype.refreshPlayersInfo = function(playerAmount) {
 	$("#playersInfo").empty();
 	for (var i = 0; i < playerAmount; i++) {
 
-		var entityID = app.serverGameCtrl.componentByType("PlayerAreaList").areaList[i];
+		var entityID = app.serverGameCtrl.dynamicComponent.playerAreas[i];
 		var entity = app.dataConnection.scene.entityById(entityID);
 
 		if (entity) {
-                        var areaComp = entity.componentByType("PlayerArea");
-			$("#playersInfo").append("<font color = " + areaComp.color + ">Player" + (i + 1) + ": " + areaComp.playerBalls + "</font><br>");
+			$("#playersInfo").append("<font color = " + entity.dynamicComponent.color + ">Player" + (i + 1) + ": " + entity.dynamicComponent.playerBalls + "</font><br>");
 		}
 
 		// switch (this.playerAreas[i].player.balls) {
