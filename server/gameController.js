@@ -50,6 +50,7 @@ ball.rigidbody.PhysicsCollision.connect(ball, handleBallCollision);
 // PLAYER AREAS
 var gameController = scene.GetEntityByName("GameController");
 var playerAreas = [];
+var entities = [];
 var partfile = "playerArea.txml";
 
 // OTHER
@@ -107,13 +108,13 @@ function generateScene() {
 		areaParent.placeable.transform = t;
 
 		var areaComp = areaParent.Component("PlayerArea");
-		areaComp.playerID = players[i];
+		areaComp.SetAttribute("playerID", players[i]);
 
 		// Color
-		areaComp.color = getRandomColor();
+		areaComp.SetAttribute("color", getRandomColor());
 
 		// Balls 
-		areaComp.playerBalls = initialBallCount;
+		areaComp.SetAttribute("playerBalls", initialBallCount);
 	}
 
 	// List of player areas
@@ -121,12 +122,12 @@ function generateScene() {
 
 	// Set the player area list to scene controller's PlayerArea component
 	var areaListComp = gameController.Component("PlayerAreaList");
-	var areaListAttr = areaListComp.areaList;
+	var areaListAttr = areaListComp.GetAttribute("areaList");
 
 	for (var i = 0; i < playerAreas.length; i++) {
 		areaListAttr.push(playerAreas[i].id);
 	}
-	areaListComp.areaList = areaListAttr;
+	areaListComp.SetAttribute("areaList", areaListAttr);
 
 	// Camera position
 	camPos.pos.y = Math.max(playerAmount * camPosModifier, minCameraPosY);
@@ -146,13 +147,15 @@ function deleteScene() {
 	console.LogInfo("delete scene");
 	// Reset the player areas list
 	var areaListComp = gameController.Component("PlayerAreaList");
-        areaListComp.areaList = [];
+        print(areaListComp);
+        if (areaListComp !== undefined)
+	        areaListComp.SetAttribute("playerAreas", []);
 
-	for (var i = 0; i < playerAreas.length; i++) {
-		scene.RemoveEntity(playerAreas[i].id);
+	for (var i = 0; i < entities.length; i++) {
+		scene.RemoveEntity(entities[i].id);
 	}
 
-	playerAreas = [];
+	entities = [];
 }
 
 // Reset the position of the ball
@@ -177,15 +180,19 @@ function pathForAsset(assetref) {
 function loadPart(partfile) { //(12)
 	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
 
+	for (var i = 0; i < ents.length; i++) {
+		entities.push(ents[i]);
+	}
+
 	// Set the racket ref in the parent entity
 	var parentEntity = ents[0];
 
-	var children = parentEntity.Children();
+	var children = parentEntity.placeable.Children();
 
 	// Save entity references for later use
 	var areaComp = parentEntity.Component("PlayerArea");
-	areaComp.racketRef = children[2].id;
-	areaComp.borderLeftRef = children[1].id;
+	areaComp.SetAttribute("racketRef", children[1].id);
+	areaComp.SetAttribute("borderLeftRef", children[2].id);
 
 	return parentEntity;
 }
@@ -195,7 +202,7 @@ function loadPart(partfile) { //(12)
 function ServerHandleUserConnected(userID, userConnection) { //(11d)
 	console.LogInfo("username: " + userConnection.Property("name"));
 	console.LogInfo("player amount: " + playerAmount);
-        
+
 	players.push(userConnection.Property("name"));
 
 	playerAmount++;
@@ -206,7 +213,7 @@ function ServerHandleUserConnected(userID, userConnection) { //(11d)
 	var pa = playerAreas[playerAreas.length - 1];
 	var areaComp = pa.Component("PlayerArea");
 	pa.player = userConnection.Property("name");
-	areaComp.playerID = userConnection.Property("name");
+	areaComp.SetAttribute("playerID", userConnection.Property("name"));
 }
 
 // Player disconnected
@@ -239,16 +246,17 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 		ballt.rot = zeroVec;
 		ball.placeable.transform = ballt;
 
-		var parent = ent.parent;
+		// console.LogInfo(ent.placeable.parentRef.ref);
+		var parent = scene.EntityById(ent.placeable.parentRef.ref);
 		var areaComp = parent.Component("PlayerArea");
-		areaComp.playerBalls = areaComp.playerBalls - 1;
+		areaComp.SetAttribute("playerBalls", areaComp.GetAttribute("playerBalls") - 1);
 
-		if (areaComp.playerBalls <= 0) {
+		if (areaComp.GetAttribute("playerBalls") <= 0) {
 			console.LogInfo("a player is out of balls");
 
 			// Remove the player but don't disconnect
 
-			var playerID = areaComp.playerID;
+			var playerID = areaComp.GetAttribute("playerID");
 
 			playerAmount--;
 			spectatorAmount++;
