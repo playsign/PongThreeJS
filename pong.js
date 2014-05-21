@@ -17,6 +17,7 @@
 var PongApp = {};
 
 PongApp.start = function(serverHost, serverPort) {
+
     if (!serverHost)
         serverHost = "localhost";
     if (!serverPort)
@@ -32,10 +33,19 @@ PongApp.start = function(serverHost, serverPort) {
     this.tundraClient.connect("ws://" + serverHost + ":" + serverPort,
                              loginData);
 
+    var redirectPlugin = TundraSDK.plugin("AssetRedirectPlugin");
+    redirectPlugin.registerAssetTypeSwap(".mesh", ".json", "ThreeJsonMesh");
+    redirectPlugin.setupDefaultStorage();
+
     this.threeScene = this.tundraClient.renderer.scene;
     this.tundraClient.onConnected(null, this.handleConnected.bind(this));    
     this.tundraClient.scene.onEntityCreated(
         null, this.handleEntityCreated.bind(this));
+
+    this.monkeyPatchJsonLoading();
+};
+
+PongApp.monkeyPatchJsonLoading = function() {
 };
 
 PongApp.handleConnected = function() {
@@ -267,7 +277,7 @@ PongApp.handleEntityAction = function(action) {
 
     // Someone lost the game
     else if (action.name === "gameover") {
-	this.gameOver(action.paramters[1], action.parameters[2]);
+	this.gameOver(action.parameters[1], action.parameters[2]);
     }
 };
 
@@ -308,6 +318,8 @@ PongApp.getEntities = function() {
             this.areasExpected[entityID] = true;
             console.log("missing playerArea: index " + i + " had entityID " + entityID);       
             console.log("putting on waiting list");
+        } else {
+            this.playerAreaEntityAppeared(entity);
         }
     }
 
@@ -331,8 +343,7 @@ PongApp.handleEntityCreated = function(entity) {
     var x = this.areasExpected;
     if (!x[entity.id])
         return;
-    x[entity.id] = false;
-    
+    x[entity.id] = false;    
 };
 
 PongApp.start();
