@@ -52,7 +52,7 @@ PongApp.handleConnected = function() {
     //app.viewer.meshReadySig.add(function(meshComp, threeMesh) {
     //     if (meshComp.parentEntity.placeable !== undefined) {
     //         if (meshComp.parentEntity.parent) {
-    //          var entity = meshComp.parentEntity.parent;
+    //          var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
     //          threeMesh.material = new THREE.MeshLambertMaterial({
     //                 color: entity.dynamiccomponent.color
     //          });
