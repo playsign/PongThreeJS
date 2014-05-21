@@ -34,6 +34,8 @@ PongApp.start = function(serverHost, serverPort) {
 
     this.threeScene = this.tundraClient.renderer.scene;
     this.tundraClient.onConnected(null, this.handleConnected.bind(this));    
+    this.tundraClient.scene.onEntityCreated(
+        null, this.handleEntityCreated.bind(this));
 };
 
 PongApp.handleConnected = function() {
@@ -44,6 +46,7 @@ PongApp.handleConnected = function() {
     this.reservedPlayerArea = undefined;
     this.reservedBorderLeft = undefined;
     this.playerAreaWidth = 100;
+    this.areasExpected = {};
 
     console.log("Connected, username: " + this.tundraClient.loginProperties.name);
 
@@ -70,20 +73,7 @@ PongApp.handleConnected = function() {
 };
 
 PongApp.handleDisconnected = function() {
-    // DESTROY SCENE OBJECTS
-    var removables = [];
-    var i = 0;
-    for (i = 0; i < this.viewer.scene.children.length; i++) {
-	if (this.viewer.scene.children[i] instanceof THREE.Object3D) {
-	    removables.push(this.viewer.scene.children[i]);
-	}
-    }
-
-    for (i = 0; i < removables.length; i++) {
-	if (!(removables[i] instanceof THREE.PointLight || removables[i] instanceof THREE.DirectionalLight || removables[i] instanceof THREE.PerspectiveCamera || removables[i] instanceof THREE.OrthographicCamera)) {
-	    removables[i].parent.remove(removables[i]);
-	}
-    }
+    // WT2 handles three scene disposal
 
     // Reset entity references
     this.serverGameCtrl = undefined;
@@ -267,18 +257,17 @@ PongApp.setCameraPosition = function(playerAmount) {
 };
 
 
-PongApp.handleEntityAction = function(scope, param2, param3, param4) {
-    console.log("onActionTriggered");
-    debugger; // fix param names
+PongApp.handleEntityAction = function(action) {
+    console.log("got entityAction " + action.name);
 
-    if (param2 === "sceneGenerated") {
+    if (action.name === "sceneGenerated") {
 	// The scene is (re)generated
 	this.getEntities();
     }
 
     // Someone lost the game
-    else if (param2 === "gameover") {
-	this.gameOver(param3[1], param3[2]);
+    else if (action.name === "gameover") {
+	this.gameOver(action.paramters[1], action.parameters[2]);
     }
 };
 
@@ -309,24 +298,17 @@ PongApp.getEntities = function() {
     this.reservedPlayerArea = undefined;
 
     // Find a player area that matches with the player
-    this.serverGameCtrl = this.dataConnection.scene.entityByName("GameController"); //(4)
+    this.serverGameCtrl = this.tundraClient.scene.entityByName("GameController"); //(4)
 
     var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
     for (var i = 0; i < this.serverGameCtrl.dynamicComponent.playerAreas.length; i++) {
         var entityID = this.serverGameCtrl.dynamicComponent.playerAreas[i];
-        var entity = this.dataConnection.scene.entityById(entityID);
+        var entity = this.tundraClient.scene.entityById(entityID);        
         if (!entity) {
-            throw "entity not found";
+            this.areasExpected[entityID] = true;
+            console.log("missing playerArea: index " + i + " had entityID " + entityID);       
+            console.log("putting on waiting list");
         }
-        if (entity.dynamicComponent.playerID == this.dataConnection.loginData.name) {
-            // Set player area entity references
-            var racketRef = entity.dynamicComponent.racketRef; //(5)
-            var borderLeftRef = entity.dynamicComponent.borderLeftRef;
-            this.reservedRacket = this.dataConnection.scene.entityById(racketRef); //(6)
-            this.reservedBorderLeft = this.dataConnection.scene.entityById(borderLeftRef);
-
-	    break;
-	}
     }
 
     if (this.reservedPlayerArea !== undefined) {
@@ -334,6 +316,24 @@ PongApp.getEntities = function() {
     }
 };
 
+PongApp.playearAreaEntityAppeared = function(areaEnt) {
+    var tclient = this.tudraClient, dc = areaEnt.dynamicComponent;
+    if (dc && dc.playerID === tclient.loginProperties.name) {
+        // Set player area areaEnt references
+        var racketRef = dc.racketRef; //(5)
+        var borderLeftRef = dc.borderLeftRef;
+        this.reservedRacket = tclient.scene.entityById(racketRef); //(6)
+        this.reservedBorderLeft = tclient.scene.entityById(borderLeftRef);
+    }
+};
+
+PongApp.handleEntityCreated = function(entity) {
+    var x = this.areasExpected;
+    if (!x[entity.id])
+        return;
+    x[entity.id] = false;
+    
+};
 
 PongApp.start();
 
