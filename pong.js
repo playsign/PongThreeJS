@@ -400,55 +400,9 @@ PongApp.gotPlayerArea = function(areaEnt) {
     }
 };
 
-// PongApp.handleEntityCreated = function(entity) {    
-//     var x = this.areasExpected;
-//     if (!x[entity.id]) {
-//         console.log("blah " + entity.id, !!this.tundraClient.scene.entityById(entity.id));
-//         return;
-//     }
-//     console.log("got area eid=" + entity.id + " as expected");
-//     x[entity.id] = false;    
-//     this.playerAreaEntityAppeared(entity);
-// };
-
-
 // debug helpers;
 function d_cam() { return PongApp.getThreeCamera(); }
 function d_ball() { return PongApp.threeScene.getObjectByName("Sphere"); }
 function d_cube() { return PongApp.threeScene.getObjectByName("testcube"); }
 
 PongApp.start();
-
-// function cubetest() {
-//     var diy = true;
-//     console.log("cubetest");
-//     var cube, scene;
-//     if (diy) {
-//         var geometry = new THREE.CubeGeometry(100, 100, 100);
-//         var material = new THREE.MeshNormalMaterial();
-//         cube = new THREE.Mesh(geometry, material);
-//         cube.overdraw = true;
-//         cube.name = "testcube";
-//         scene = new THREE.Scene();
-//     } else {
-//         cube = PongApp.cube.clone();
-//         scene = PongApp.threeScene;
-//     }
-//         scene.add(cube);
-//     cube.position.set(0, 0, 0);
-//     console.log("inserted test cube in scene");
-
-//     var renderer = new THREE.WebGLRenderer();
-    
-//     //var renderer = PongApp.tundraClient.renderer.renderer;
-//     renderer.setSize(500, 500);
-//     var canvasdiv = document.getElementById("webtundra-container-custom");
-//     console.log(canvasdiv.id);
-//     canvasdiv.appendChild(renderer.domElement);
-//     var camera = new THREE.PerspectiveCamera(45, 1, 1, 1000);
-//     camera.position.z = 500;
-//     cube.rotation.x += 1;
-//     renderer.render(scene, camera);
-// }
-
-// window.setTimeout(cubetest, 1000);
