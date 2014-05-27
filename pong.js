@@ -41,14 +41,17 @@ PongApp.start = function(serverHost, serverPort) {
     this.threeScene = this.tundraClient.renderer.scene;
     this.threeRenderer = this.tundraClient.renderer.renderer;
     this.tundraClient.onConnected(null, this.handleConnected.bind(this));    
-    this.tundraClient.scene.onEntityCreated(
-        null, this.handleEntityCreated.bind(this));
+    // this.tundraClient.scene.onEntityCreated(
+    //     null, this.handleEntityCreated.bind(this));
+
+
+    //var camera = new THREE.PerspectiveCamera(45, 1, 1, 1000);
 
     this.logicInit();
 };
 
-
-PongApp.setupCamera = function() {
+PongApp.getThreeCamera = function() {
+    return this.tundraClient.renderer.camera;
 };
 
 PongApp.handleConnected = function() {
@@ -59,8 +62,7 @@ PongApp.handleConnected = function() {
     this.reservedPlayerArea = undefined;
     this.reservedBorderLeft = undefined;
     this.playerAreaWidth = 100;
-    this.areasExpected = {};
-    this.freecamera.cameraEntity.placeable.setPosition(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
+    // this.freecamera.cameraEntity.placeable.setPosition(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
     console.log("Connected, username: " + this.tundraClient.loginProperties.name);
 
     // Set mesh material colors
@@ -83,6 +85,43 @@ PongApp.handleConnected = function() {
     
     this.tundraClient.onDisconnected(
         null, this.handleDisconnected.bind(this));
+
+    // this.makeCube(this.threeScene); // test to debug blank screen and such        
+
+
+    if (false) {
+        var fun = function() {
+        //var renderer = new THREE.WebGLRenderer();
+        //renderer.setSize(500, 500);
+        //document.body.appendChild(renderer.domElement);
+        var camera = new THREE.PerspectiveCamera(45, 1, 1, 1000);
+        camera.position.z = 500;
+        var scene = new THREE.Scene();
+        this.makeCube(scene); // test to debug blank screen and such        
+        camera.lookAt(this.cube);
+        //this.tundraClient.renderer.renderer = renderer;
+        this.tundraClient.renderer.camera = camera;
+            console.log("sss");
+        }.bind(this);
+        window.setTimeout(fun, 1000);
+    }
+};
+
+PongApp.makeCube = function(scene) {
+    var scene = scene || this.threeScene;
+    var geometry = new THREE.CubeGeometry(100, 100, 100);
+    var material = new THREE.MeshNormalMaterial();
+    var cube = new THREE.Mesh(geometry, material);
+    cube.overdraw = true;
+    this.cube = cube;
+    cube.name = "testcube";
+    scene.add(cube);
+    cube.position.set(0, 0, 0);
+    console.log("inserted test cube in scene");
+};
+
+PongApp.getThreeBall = function() {
+    return this.threeScene.getObjectByName("Sphere");
 };
 
 PongApp.handleDisconnected = function() {
@@ -107,45 +146,48 @@ PongApp.logicInit = function() {
     var NEAR = -20000;
     var FAR = 20000;
 
-    // Start freecam app
-    var thisIsThis = this;
-    $.getScript("js/freecamera.js")
-        .done(function( script, textStatus ) {
-            thisIsThis.freecamera = new FreeCameraApplication();
-            thisIsThis.camera = thisIsThis.tundraClient.renderer.camera;
-        })
-        .fail(function(jqxhr, settings, exception) {
-            console.error("Failed to load FreeCamera application:", exception);
-        }              
-    );
+    // // Start freecam app
+    // var thisIsThis = this;
+    // $.getScript("js/freecamera.js")
+    //     .done(function( script, textStatus ) {
+    //         thisIsThis.freecamera = new FreeCameraApplication();
+    //         thisIsThis.camera = thisIsThis.tundraClient.renderer.camera;
+    //     })
+    //     .fail(function(jqxhr, settings, exception) {
+    //         console.error("Failed to load FreeCamera application:", exception);
+    //     }              
+    // );
 
     // // override camera
-    // this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
+    this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
     this.cameraPos = new THREE.Vector3(0, 300, 100);
-    // this.camera.position = this.cameraPos.clone();
-    // this.camera.lookAt(this.threeScene.position);
+    this.camera.position = this.cameraPos.clone();
+    this.camera.lookAt(this.threeScene.position);
+
+    this.tundraClient.renderer.camera = this.camera;
 
     // Background color
-    // this.threeRenderer.setClearColor( 0x000000, 0 );
+    this.threeRenderer.setClearColor( 0x000000, 0 );
 
     // Custom resize function because THREEx.windowResize doesn't support orthographic camera
     $(window).on('resize', function() {
         // notify the renderer of the size change
-        app.viewer.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.threeRenderer.setSize(window.innerWidth, window.innerHeight);
 
-        if (app.serverGameCtrl) {
-            app.setCameraPosition(app.serverGameCtrl.dynamicComponent.playerAreas.length);
+        if (this.serverGameCtrl) {
+            this.setCameraPosition(this.serverGameCtrl.dynamicComponent.playerAreas.length);
         }
-    });
+    }.bind(this));
 
-    // // LIGHTS
-    // // override point light
-    // this.viewer.pointLight.position.set(-300, 300, -300);
+    // LIGHTS
 
-    // // White directional light at half intensity shining from the top.
-    // this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    // this.directionalLight.position.set(300, 300, 300);
-    // this.viewer.scene.add(this.directionalLight);
+    this.pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    this.pointLight.position.set(-300, 300, -300);
+
+    // White directional light at half intensity shining from the top.
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    this.directionalLight.position.set(300, 300, 300);
+    this.threeScene.add(this.directionalLight);
 
     // DIRECTOR (gui)
     this.gameDirector = new Director();
@@ -326,14 +368,18 @@ PongApp.getEntities = function() {
 
     var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
     for (var i = 0; i < this.serverGameCtrl.dynamicComponent.playerAreas.length; i++) {
-        var entityID = this.serverGameCtrl.dynamicComponent.playerAreas[i];
+        var entityID = parseInt(this.serverGameCtrl.dynamicComponent.playerAreas[i]);
         var entity = this.tundraClient.scene.entityById(entityID);        
         if (!entity) {
+            debugger;
             this.areasExpected[entityID] = true;
             console.log("missing playerArea: index " + i + " had entityID " + entityID);       
-            console.log("putting on waiting list");
+            console.log("putting on waiting list", typeof entityID);
+
         } else {
-            this.playerAreaEntityAppeared(entity);
+            console.log("got area on time");
+            //this.playerAreaEntityAppeared(entity);
+            this.gotPlayerArea(entity);
         }
     }
 
@@ -342,9 +388,10 @@ PongApp.getEntities = function() {
     }
 };
 
-PongApp.playearAreaEntityAppeared = function(areaEnt) {
-    var tclient = this.tudraClient, dc = areaEnt.dynamicComponent;
+PongApp.gotPlayerArea = function(areaEnt) {
+    var tclient = this.tundraClient, dc = areaEnt.dynamicComponent;
     if (dc && dc.playerID === tclient.loginProperties.name) {
+        console.log("my playerArea found");
         // Set player area areaEnt references
         var racketRef = dc.racketRef; //(5)
         var borderLeftRef = dc.borderLeftRef;
@@ -353,12 +400,55 @@ PongApp.playearAreaEntityAppeared = function(areaEnt) {
     }
 };
 
-PongApp.handleEntityCreated = function(entity) {    
-    var x = this.areasExpected;
-    if (!x[entity.id])
-        return;
-    x[entity.id] = false;    
-};
+// PongApp.handleEntityCreated = function(entity) {    
+//     var x = this.areasExpected;
+//     if (!x[entity.id]) {
+//         console.log("blah " + entity.id, !!this.tundraClient.scene.entityById(entity.id));
+//         return;
+//     }
+//     console.log("got area eid=" + entity.id + " as expected");
+//     x[entity.id] = false;    
+//     this.playerAreaEntityAppeared(entity);
+// };
+
+
+// debug helpers;
+function d_cam() { return PongApp.getThreeCamera(); }
+function d_ball() { return PongApp.threeScene.getObjectByName("Sphere"); }
+function d_cube() { return PongApp.threeScene.getObjectByName("testcube"); }
 
 PongApp.start();
 
+// function cubetest() {
+//     var diy = true;
+//     console.log("cubetest");
+//     var cube, scene;
+//     if (diy) {
+//         var geometry = new THREE.CubeGeometry(100, 100, 100);
+//         var material = new THREE.MeshNormalMaterial();
+//         cube = new THREE.Mesh(geometry, material);
+//         cube.overdraw = true;
+//         cube.name = "testcube";
+//         scene = new THREE.Scene();
+//     } else {
+//         cube = PongApp.cube.clone();
+//         scene = PongApp.threeScene;
+//     }
+//         scene.add(cube);
+//     cube.position.set(0, 0, 0);
+//     console.log("inserted test cube in scene");
+
+//     var renderer = new THREE.WebGLRenderer();
+    
+//     //var renderer = PongApp.tundraClient.renderer.renderer;
+//     renderer.setSize(500, 500);
+//     var canvasdiv = document.getElementById("webtundra-container-custom");
+//     console.log(canvasdiv.id);
+//     canvasdiv.appendChild(renderer.domElement);
+//     var camera = new THREE.PerspectiveCamera(45, 1, 1, 1000);
+//     camera.position.z = 500;
+//     cube.rotation.x += 1;
+//     renderer.render(scene, camera);
+// }
+
+// window.setTimeout(cubetest, 1000);
