@@ -47,11 +47,26 @@ PongApp.start = function(serverHost, serverPort) {
 
     //var camera = new THREE.PerspectiveCamera(45, 1, 1, 1000);
 
+    // this.tundraClient.asset.onAssetCreated(
+    //     null, this.handleAssetCreated.bind(this));
+
     this.logicInit();
 };
 
 PongApp.getThreeCamera = function() {
     return this.tundraClient.renderer.camera;
+};
+
+PongApp.getThreeMeshForEntity = function(entity) {
+    var meshEc = entity.component("EC_Mesh") || raise("Entity has no EC_Mesh");
+    var threeMesh = meshEc.meshAsset.mesh || raise("EC_Mesh has no THREE.Mesh");
+    return threeMesh;
+};
+
+PongApp.getThreeNodeForEntity = function(entity) {
+    var placeableEc =  entity.component("EC_Placeable") || raise("Entity has no EC_Placeable");
+    var node = placeableEc.sceneNode || raise("EC_Placeable has no .sceneNode");
+    return node;
 };
 
 PongApp.handleConnected = function() {
@@ -86,25 +101,7 @@ PongApp.handleConnected = function() {
     this.tundraClient.onDisconnected(
         null, this.handleDisconnected.bind(this));
 
-    // this.makeCube(this.threeScene); // test to debug blank screen and such        
-
-
-    if (false) {
-        var fun = function() {
-        //var renderer = new THREE.WebGLRenderer();
-        //renderer.setSize(500, 500);
-        //document.body.appendChild(renderer.domElement);
-        var camera = new THREE.PerspectiveCamera(45, 1, 1, 1000);
-        camera.position.z = 500;
-        var scene = new THREE.Scene();
-        this.makeCube(scene); // test to debug blank screen and such        
-        camera.lookAt(this.cube);
-        //this.tundraClient.renderer.renderer = renderer;
-        this.tundraClient.renderer.camera = camera;
-            console.log("sss");
-        }.bind(this);
-        window.setTimeout(fun, 1000);
-    }
+    // this.makeCube(this.threeScene); // test to debug blank screen and such   
 };
 
 PongApp.makeCube = function(scene) {
@@ -255,7 +252,6 @@ PongApp.logicUpdate = function(dt) {
 
 // Set camera position and angle
 PongApp.setCameraPosition = function(playerAmount) {
-    console.log("setCameraPosition");
 
     playerAmount = Math.round(playerAmount);
 
@@ -302,14 +298,13 @@ PongApp.setCameraPosition = function(playerAmount) {
     this.camera.updateProjectionMatrix();
 
     // Get corresponding three objects
-    var borderThreeObject = this.viewer.o3dByEntityId[this.reservedBorderLeft.id];
-    var playerAreaThreeObject = this.viewer.o3dByEntityId[this.reservedPlayerArea.id];
-
+    var borderThreeObject = this.getThreeMeshForEntity(this.reservedBorderLeft);
+    var playerAreaThreeObject = this.getThreeNodeForEntity(this.reservedPlayerArea);
     playerAreaThreeObject.updateMatrixWorld();
     borderThreeObject.updateMatrixWorld();
 
     var worldPos = new THREE.Vector3();
-    worldPos.setFromMatrixPosition(borderThreeObject.matrixWorld);
+    worldPos.getPositionFromMatrix(borderThreeObject.matrixWorld);
 
     // Change camera position temporarily so we get a correct camera angle
     this.camera.position.x = worldPos.x;
@@ -322,6 +317,9 @@ PongApp.setCameraPosition = function(playerAmount) {
 
 };
 
+// PongApp.handleAssetCreated = function(asset) {
+//     console.log("got asset");
+// };
 
 PongApp.handleEntityAction = function(action) {
     console.log("got entityAction " + action.name);
@@ -358,8 +356,6 @@ PongApp.gameOver = function(playerID, placement) { //(9)
 };
 
 PongApp.getEntities = function() {
-    console.log("getEntities");
-
     this.reservedRacket = undefined;
     this.reservedPlayerArea = undefined;
 
@@ -374,17 +370,17 @@ PongApp.getEntities = function() {
             debugger;
             this.areasExpected[entityID] = true;
             console.log("missing playerArea: index " + i + " had entityID " + entityID);       
-            console.log("putting on waiting list", typeof entityID);
 
         } else {
-            console.log("got area on time");
             //this.playerAreaEntityAppeared(entity);
             this.gotPlayerArea(entity);
         }
     }
 
     if (this.reservedPlayerArea !== undefined) {
-	this.setCameraPosition(areaList.length);
+        // XXX figure out when three mesh asset appears in EC_Mesh
+	window.setTimeout(
+            this.setCameraPosition.bind(this, playerAmount), 1000)
     }
 };
 
@@ -395,10 +391,15 @@ PongApp.gotPlayerArea = function(areaEnt) {
         // Set player area areaEnt references
         var racketRef = dc.racketRef; //(5)
         var borderLeftRef = dc.borderLeftRef;
-        this.reservedRacket = tclient.scene.entityById(racketRef); //(6)
-        this.reservedBorderLeft = tclient.scene.entityById(borderLeftRef);
+        this.reservedRacket = tclient.scene.entityById(racketRef) || raise("missing entity"); //(6)
+        this.reservedBorderLeft = tclient.scene.entityById(borderLeftRef) || raise("missing entity");
+        this.reservedPlayerArea = areaEnt || raise("missing area entity");
     }
 };
+
+function raise(e) {
+    throw e;
+}
 
 // debug helpers;
 function d_cam() { return PongApp.getThreeCamera(); }
