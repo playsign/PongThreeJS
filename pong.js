@@ -97,9 +97,9 @@ PongApp.handleConnected = function() {
     // Custom app specific properties
     this.serverGameCtrl = undefined;
     this.racketSpeed = 80;
-    this.reservedRacket = undefined;
-    this.reservedPlayerArea = undefined;
-    this.reservedBorderLeft = undefined;
+    this.ourRacket = undefined;
+    this.ourPlayerArea = undefined;
+    this.ourBorderLeft = undefined;
     this.playerAreaWidth = 100;
     // this.freecamera.cameraEntity.placeable.setPosition(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
     console.log("Connected, username: " + this.tundraClient.loginProperties.name);
@@ -129,14 +129,14 @@ PongApp.handleConnected = function() {
 };
 
 PongApp.setRacketColor = function() {
-    if (!this.reservedRacket) {
-        console.log("unable set racket color, reservedRacket is unset");
+    if (!this.ourRacket) {
+        console.log("unable set racket color, ourRacket is unset");
         return;
     }
-    var threeMesh = this.getThreeMeshForEntity(this.reservedRacket).children[0];
+    var threeMesh = this.getThreeMeshForEntity(this.ourRacket).children[0];
 
     threeMesh.material = new THREE.MeshLambertMaterial({
-        color: this.reservedPlayerArea.dynamicComponent.color
+        color: this.ourPlayerArea.dynamicComponent.color
     });
 };
 
@@ -160,9 +160,9 @@ PongApp.getThreeBall = function() {
 PongApp.handleDisconnected = function() {
     // Reset entity references
     this.serverGameCtrl = undefined;
-    this.reservedRacket = undefined;
-    this.reservedPlayerArea = undefined;
-    this.reservedBorderLeft = undefined;
+    this.ourRacket = undefined;
+    this.ourPlayerArea = undefined;
+    this.ourBorderLeft = undefined;
 };
 
 PongApp.disconnect = function() {
@@ -240,14 +240,14 @@ PongApp.handleFrameUpdate = function(dt) {
     var inputActive = (kb.pressed["left"] || kb.pressed["right"] ||
                        kb.pressed["a"] || kb.pressed["d"] ||
                        this.touchController.swiping);
-    if (this.reservedRacket !== undefined &&
-        this.reservedPlayerArea.placeable !== undefined &&
+    if (this.ourRacket !== undefined &&
+        this.ourPlayerArea.placeable !== undefined &&
         inputActive) {
         
         // Get racket's direction vector
 
         // Radian
-        var rotation = (this.reservedPlayerArea.placeable.transform.rot.y + 90) * (Math.PI / 180);
+        var rotation = (this.ourPlayerArea.placeable.transform.rot.y + 90) * (Math.PI / 180);
 
         var racketForward = new THREE.Vector3();
 
@@ -276,18 +276,18 @@ PongApp.handleFrameUpdate = function(dt) {
         }
 
         // Set a new velocity for the entity
-        this.reservedRacket.rigidBody.linearVelocity = racketForward; //(14)
+        this.ourRacket.rigidBody.linearVelocity = racketForward; //(14)
         // console.log(racketForward);
 
         // Inform the server about the change
         // .. except client -> server sync is not implemented anymore in WT2
         // this.dataConnection.syncManager.sendChanges(); //(3)
         
-        this.reservedRacket.exec(
+        this.ourRacket.exec(
             "server", "updateRacketLinearVelocity",
             [racketForward.x, racketForward.y, racketForward.z]);
         
-        console.log("exec'd updateRacketLinearVelocity on entity id=" + this.reservedRacket.id);
+        console.log("exec'd updateRacketLinearVelocity on entity id=" + this.ourRacket.id);
     }
 
     // Players info
@@ -344,8 +344,8 @@ PongApp.setCameraPosition = function(playerAmount) {
     this.camera.updateProjectionMatrix();
 
     // Get corresponding three objects
-    var borderThreeObject = this.getThreeMeshForEntity(this.reservedBorderLeft);
-    var playerAreaThreeObject = this.getThreeNodeForEntity(this.reservedPlayerArea);
+    var borderThreeObject = this.getThreeMeshForEntity(this.ourBorderLeft);
+    var playerAreaThreeObject = this.getThreeNodeForEntity(this.ourPlayerArea);
     playerAreaThreeObject.updateMatrixWorld();
     borderThreeObject.updateMatrixWorld();
 
@@ -403,8 +403,8 @@ PongApp.gameOver = function(playerID, placement) { //(9)
 
 PongApp.serverSceneInitialized = function() {
     this.hideHack();
-    this.reservedRacket = undefined;
-    this.reservedPlayerArea = undefined;
+    this.ourRacket = undefined;
+    this.ourPlayerArea = undefined;
 
     // Find a player area that matches with the player
     this.serverGameCtrl = this.tundraClient.scene.entityByName("GameController"); //(4)
@@ -424,7 +424,7 @@ PongApp.serverSceneInitialized = function() {
         }
     }
 
-    if (this.reservedPlayerArea !== undefined) {
+    if (this.ourPlayerArea !== undefined) {
         // XXX figure out when three mesh asset appears in EC_Mesh
 	window.setTimeout(
             this.setCameraPosition.bind(this, playerAmount), 1000);
@@ -440,9 +440,9 @@ PongApp.gotPlayerArea = function(areaEnt) {
         // Set player area areaEnt references
         var racketRef = dc.racketRef; //(5)
         var borderLeftRef = dc.borderLeftRef;
-        this.reservedRacket = tclient.scene.entityById(racketRef) || raise("missing entity"); //(6)
-        this.reservedBorderLeft = tclient.scene.entityById(borderLeftRef) || raise("missing entity");
-        this.reservedPlayerArea = areaEnt || raise("missing area entity");
+        this.ourRacket = tclient.scene.entityById(racketRef) || raise("missing entity"); //(6)
+        this.ourBorderLeft = tclient.scene.entityById(borderLeftRef) || raise("missing entity");
+        this.ourPlayerArea = areaEnt || raise("missing area entity");
     }
 };
 
