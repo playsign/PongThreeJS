@@ -17,7 +17,7 @@
 var PongApp = {};
 
 PongApp.start = function(serverHost, serverPort) {
-
+    // entry point for app
     if (!serverHost)
         serverHost = "localhost";
     if (!serverPort)
@@ -28,15 +28,27 @@ PongApp.start = function(serverHost, serverPort) {
         container     : "#webtundra-container-custom",
         renderSystem  : ThreeJsRenderer
     };
-    this.areasExpected = {};
     this.tundraClient = new window.TundraClient(cparams);
 
     // DIRECTOR (gui)
     this.gameDirector = new Director();
     this.gameDirector.setScreen(DirectorScreens.controls);
     //this.showHelp();
-    window.setTimeout(function(){this.hideHack();}.bind(this), 100);
+    // window.setTimeout(function(){this.hideHack();}.bind(this), 100);
     $("#onlineButton").show();
+
+    var redirectPlugin = TundraSDK.plugin("AssetRedirectPlugin");
+    redirectPlugin.registerAssetTypeSwap(".mesh", ".json", "ThreeJsonMesh");
+    redirectPlugin.setupDefaultStorage();
+
+    this.threeScene = this.tundraClient.renderer.scene;
+    this.threeRenderer = this.tundraClient.renderer.renderer;
+    this.tundraClient.onConnected(null, this.handleConnected.bind(this));    
+
+    this.tundraClient.frame.onUpdate(
+        null, this.handleFrameUpdate.bind(this));    
+
+    this.gameLogicInit();
 };
 
 PongApp.hideHack = function() {
@@ -56,25 +68,6 @@ PongApp.connect = function() {
     this.tundraClient.connect("ws://" + this.serverHost + ":" + this.serverPort,
                              loginData);
 
-    var redirectPlugin = TundraSDK.plugin("AssetRedirectPlugin");
-    redirectPlugin.registerAssetTypeSwap(".mesh", ".json", "ThreeJsonMesh");
-    redirectPlugin.setupDefaultStorage();
-
-    // this.keyboard = new THREEx.KeyboardState;
-    this.threeScene = this.tundraClient.renderer.scene;
-    this.threeRenderer = this.tundraClient.renderer.renderer;
-    this.tundraClient.onConnected(null, this.handleConnected.bind(this));    
-
-    this.tundraClient.frame.onUpdate(
-        null, this.handleFrameUpdate.bind(this));    
-
-    // this.tundraClient.scene.onEntityCreated(
-    //     null, this.handleEntityCreated.bind(this));
-
-    // this.tundraClient.asset.onAssetCreated(
-    //     null, this.handleAssetCreated.bind(this));
-
-    this.gameLogicInit();
 };
 
 PongApp.getThreeCamera = function() {
@@ -82,6 +75,7 @@ PongApp.getThreeCamera = function() {
 };
 
 PongApp.getThreeMeshForEntity = function(entity) {
+    console.log("eid " + entity.id);
     var meshEc = entity.component("EC_Mesh") || raise("Entity has no EC_Mesh");
     var threeMesh = meshEc.meshAsset.mesh || raise("EC_Mesh has no THREE.Mesh");
     return threeMesh;
@@ -101,56 +95,25 @@ PongApp.handleConnected = function() {
     this.ourPlayerArea = undefined;
     this.ourBorderLeft = undefined;
     this.playerAreaWidth = 100;
-    // this.freecamera.cameraEntity.placeable.setPosition(this.cameraPos.x, this.cameraPos.y, this.cameraPos.z);
     console.log("Connected, username: " + this.tundraClient.loginProperties.name);
-
-    // Set mesh material colors
-    // TBD: reimplement for WT2
-    //app.viewer.meshReadySig.add(function(meshComp, threeMesh) {
-    //     if (meshComp.parentEntity.placeable !== undefined) {
-    //         if (meshComp.parentEntity.parent) {
-    //          var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
-    //          threeMesh.material = new THREE.MeshLambertMaterial({
-    //                 color: entity.dynamiccomponent.color
-    //          });
-    //         } else {
-    //          console.log("this entity doesn't have a parent");
-    //         }
-    //     }
-    // });        
     
     this.tundraClient.scene.onEntityAction(
         null, this.handleEntityAction.bind(this)); // (8)
     
     this.tundraClient.onDisconnected(
         null, this.handleDisconnected.bind(this));
-
-    // this.makeCube(this.threeScene); // test to debug blank screen and such   
 };
 
 PongApp.setRacketColor = function() {
-    if (!this.ourRacket) {
+    if (!this.ourBorderLeft) {
         console.log("unable set racket color, ourRacket is unset");
         return;
     }
-    var threeMesh = this.getThreeMeshForEntity(this.ourRacket).children[0];
+    var threeMesh = this.getThreeMeshForEntity(this.ourBorderLeft).children[0];
 
     threeMesh.material = new THREE.MeshLambertMaterial({
         color: this.ourPlayerArea.dynamicComponent.color
     });
-};
-
-PongApp.makeCube = function(scene) {
-    var scene = scene || this.threeScene;
-    var geometry = new THREE.CubeGeometry(100, 100, 100);
-    var material = new THREE.MeshNormalMaterial();
-    var cube = new THREE.Mesh(geometry, material);
-    cube.overdraw = true;
-    this.cube = cube;
-    cube.name = "testcube";
-    scene.add(cube);
-    cube.position.set(0, 0, 0);
-    console.log("inserted test cube in scene");
 };
 
 PongApp.getThreeBall = function() {
@@ -181,18 +144,6 @@ PongApp.gameLogicInit = function() {
     var SCREEN_HEIGHT = window.innerHeight;
     var NEAR = -20000;
     var FAR = 20000;
-
-    // // Start freecam app
-    // var thisIsThis = this;
-    // $.getScript("js/freecamera.js")
-    //     .done(function( script, textStatus ) {
-    //         thisIsThis.freecamera = new FreeCameraApplication();
-    //         thisIsThis.camera = thisIsThis.tundraClient.renderer.camera;
-    //     })
-    //     .fail(function(jqxhr, settings, exception) {
-    //         console.error("Failed to load FreeCamera application:", exception);
-    //     }              
-    // );
 
     // // override camera
     this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
@@ -237,8 +188,8 @@ PongApp.handleFrameUpdate = function(dt) {
    
     // RACKET CONTROL
     //(2)
-    var inputActive = (kb.pressed["left"] || kb.pressed["right"] ||
-                       kb.pressed["a"] || kb.pressed["d"] ||
+    var inputActive = (kb.pressed.left || kb.pressed.right ||
+                       kb.pressed.a || kb.pressed.d ||
                        this.touchController.swiping);
     if (this.ourRacket !== undefined &&
         this.ourPlayerArea.placeable !== undefined &&
@@ -271,23 +222,18 @@ PongApp.handleFrameUpdate = function(dt) {
         }
 
         // Read keyboard
-        if (kb.pressed["left"] || kb.pressed["a"]) {
+        if (kb.pressed.left || kb.pressed.a) {
             racketForward.multiplyScalar(-1);
         }
 
         // Set a new velocity for the entity
         this.ourRacket.rigidBody.linearVelocity = racketForward; //(14)
-        // console.log(racketForward);
 
         // Inform the server about the change
-        // .. except client -> server sync is not implemented anymore in WT2
-        // this.dataConnection.syncManager.sendChanges(); //(3)
-        
         this.ourRacket.exec(
             "server", "updateRacketLinearVelocity",
             [racketForward.x, racketForward.y, racketForward.z]);
         
-        console.log("exec'd updateRacketLinearVelocity on entity id=" + this.ourRacket.id);
     }
 
     // Players info
@@ -363,10 +309,6 @@ PongApp.setCameraPosition = function(playerAmount) {
 
 };
 
-// PongApp.handleAssetCreated = function(asset) {
-//     console.log("got asset");
-// };
-
 PongApp.handleEntityAction = function(action) {
     console.log("got entityAction " + action.name);
 
@@ -409,17 +351,15 @@ PongApp.serverSceneInitialized = function() {
     // Find a player area that matches with the player
     this.serverGameCtrl = this.tundraClient.scene.entityByName("GameController"); //(4)
 
-    var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
-    for (var i = 0; i < this.serverGameCtrl.dynamicComponent.playerAreas.length; i++) {
-        var entityID = parseInt(this.serverGameCtrl.dynamicComponent.playerAreas[i]);
+    var serverDc = this.serverGameCtrl.dynamicComponent;
+    var playerCount = serverDc.playerAreas.length;
+    for (var i = 0; i < playerCount; i++) {
+        var entityID = parseInt(serverDc.playerAreas[i], 10);
         var entity = this.tundraClient.scene.entityById(entityID);        
         if (!entity) {
-            debugger;
-            this.areasExpected[entityID] = true;
             console.log("missing playerArea: index " + i + " had entityID " + entityID);       
 
         } else {
-            //this.playerAreaEntityAppeared(entity);
             this.gotPlayerArea(entity);
         }
     }
@@ -427,7 +367,7 @@ PongApp.serverSceneInitialized = function() {
     if (this.ourPlayerArea !== undefined) {
         // XXX figure out when three mesh asset appears in EC_Mesh
 	window.setTimeout(
-            this.setCameraPosition.bind(this, playerAmount), 1000);
+            this.setCameraPosition.bind(this, playerCount), 1000);
 	window.setTimeout(
             this.setRacketColor.bind(this), 1000);
     }
