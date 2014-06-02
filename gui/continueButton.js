@@ -18,8 +18,8 @@ $(function() {
 	$("#continueButton")
 		.button({})
 		.click(function() {
-		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.game);
-	})
+		PongApp.gameDirector.setScreen(DirectorScreens.game);
+	});
 
 	$(window).on('resize', function() {
 		updateContinueButton();

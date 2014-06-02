@@ -1,3 +1,4 @@
+// -*- js-indent-level: 8 -*-
 // For conditions of distribution and use, see copyright notice in LICENSE
 /*
  *	GameController
@@ -185,12 +186,22 @@ function loadPart(partfile) { //(12)
 	var parentEntity = ents[0];
 
 	var children = parentEntity.placeable.Children();
+        var racketEntity = children[1];
 
 	// Save entity references for later use
 	var attrs = parentEntity.dynamiccomponent;
 	attrs.SetAttribute("racketRef", children[1].id);
-	attrs.SetAttribute("borderLeftRef", children[2].id);
+	attrs.SetAttribute("borderLeftRef", children[2].id);    
 
+        var lvCallback = function(lvx, lvy, lvz) {
+                var vel = racketEntity.rigidBody.linearVelocity;
+                vel.x = lvx; vel.y = lvy; vel.z = lvz;
+                racketEntity.rigidBody.linearVelocity = vel;
+        };
+        racketEntity.Action(
+            "updateRacketLinearVelocity").Triggered.connect(lvCallback);
+        console.LogInfo("installed urlv action handler on entity " + parentEntity.id);
+        
 	return parentEntity;
 }
 
@@ -200,6 +211,10 @@ function ServerHandleUserConnected(userID, userConnection) { //(11d)
 	console.LogInfo("username: " + userConnection.Property("name"));
 	console.LogInfo("player amount: " + playerAmount);
 
+        if (!players) {
+                print("players array has become undefined");
+                return;
+        }
 	players.push(userConnection.Property("name"));
 
 	playerAmount++;
@@ -280,3 +295,8 @@ function update(dt) {
 }
 
 frame.Updated.connect(update);
+
+function OnScriptDestroyed()
+{
+        frame.Updated.disconnect(update);
+}

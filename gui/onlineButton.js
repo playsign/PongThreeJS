@@ -26,9 +26,9 @@ $(function() {
 	})
 		.click(function() {
 		// if not already connected
-		app.sceneCtrl.showHelp();
-		if (app.connected == false) {
-			app.connect(app.host, app.port); //(16)
+		PongApp.showHelp();
+		if (!PongApp.tundraClient.isConnected()) {
+			PongApp.connect(); //(16)
 		}
 	})
 

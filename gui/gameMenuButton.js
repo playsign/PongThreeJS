@@ -19,8 +19,8 @@ $(function() {
 	$("#gameMenuButton")
 		.button({})
 		.click(function() {
-		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.gameMenu);
-	})
+		PongApp.gameDirector.setScreen(DirectorScreens.gameMenu);
+	});
 
 	$(window).on('resize', function() {
 		updateGameMenuButton();

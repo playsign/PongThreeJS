@@ -18,11 +18,10 @@ $(function() {
 	$("#menuButton")
 		.button({})
 		.click(function() {
-		app.dataConnection.client.disconnect();
+		    PongApp.disconnect();
+		    PongApp.gameDirector.setScreen(DirectorScreens.menu);
 
-		app.sceneCtrl.gameDirector.setScreen(DirectorScreens.menu);
-
-	})
+	});
 
 	$(window).on('resize', function() {
 		updateMenuButton();

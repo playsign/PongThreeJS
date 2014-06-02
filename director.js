@@ -31,9 +31,9 @@ Director.prototype.setScreen = function(newScreen) {
 		$("#menuButton").hide();
 		$("#playersInfo").hide();
 
-
+                console.log("all hidden");
 		this.currentScreen = newScreen;
-
+                console.log("set screen " + newScreen);
 		switch (this.currentScreen) {
 			case 0: // MENU
 				// *show title*

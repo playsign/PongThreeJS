@@ -24,8 +24,8 @@ $(function() {
 		label: "OK"
 	})
 		.click(function() {
-		app.sceneCtrl.gameDirector.doNextScreen();
-	})
+		PongApp.nextScreen();
+	});
 	// .hide()
 
 	$(window).on('resize', function() {
