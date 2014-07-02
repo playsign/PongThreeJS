@@ -269,9 +269,12 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 function update(dt) {
 	var rigidbody = ball.rigidbody;
 	var velvec = rigidbody.GetLinearVelocity();
-	var curdir = velvec.Normalized();
-	velvec = curdir.Mul(ballSpeed);
-	rigidbody.SetLinearVelocity(velvec);
+        
+	if (!velvec.IsZero(0.00001)) {
+		var curdir = velvec.Normalized();
+		velvec = curdir.Mul(ballSpeed);
+		rigidbody.SetLinearVelocity(velvec);
+	}
 }
 
 frame.Updated.connect(update);
