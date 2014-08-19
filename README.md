@@ -22,6 +22,8 @@ Set the IP of the server to the client side conf in webTundraModel.js and open P
 PongThreeJS is an online multiplayer pong game. This game is part of FI-WARE (http://www.fi-ware.eu/).  It's designed to be used as a use case for fi-ware mifi platform dev.
 You can try the game here: https://dl.dropboxusercontent.com/u/60485425/Playsign/GitHub/PongThreeJS/Pong.html
 
+Live demo server for multi-user play is now tested on the fi-ware testbed: http://130.206.81.111/pong/Pong.html
+
 * **Features**
   - ThreeJS 3D javascript library http://threejs.org/
   - Ammo.js / Bullet physics (http://bulletphysics.org/ https://github.com/kripken/ammo.js/)
