@@ -20,7 +20,7 @@ var app;
 
 function init() {
 	app = new PongApp();
-	app.host = "localhost"; // Address of the Tundra server
+	app.host = "130.206.81.111"; // Address of the Tundra server
 	app.port = 2345; // and port of the server
 
 	function getRandomInt(min, max) {
