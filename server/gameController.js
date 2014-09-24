@@ -22,17 +22,19 @@ if (server.IsRunning()) {
 	}
 }
 
-// CAMERA
+// CAMERA - not there on headless server
 var cam = scene.GetEntityByName("FreeLookCamera");
-cam.farPlane = 50000;
-var camPosModifier = 110;
-var minCameraPosY = 300;
-var camPos = cam.placeable.transform;
-camPos.pos.x = 0;
-camPos.pos.y = minCameraPosY;
-camPos.pos.z = 0;
-camPos.rot.x = -90;
-cam.placeable.transform = camPos;
+if (cam) {
+	cam.farPlane = 50000;
+	var camPosModifier = 110;
+	var minCameraPosY = 300;
+	var camPos = cam.placeable.transform;
+	camPos.pos.x = 0;
+	camPos.pos.y = minCameraPosY;
+	camPos.pos.z = 0;
+	camPos.rot.x = -90;
+	cam.placeable.transform = camPos;
+}
 
 // PLAYERS
 var playerAmount = 0;
@@ -129,8 +131,10 @@ function generateScene() {
 	areaListComp.areaList = areaListAttr;
 
 	// Camera position
-	camPos.pos.y = Math.max(playerAmount * camPosModifier, minCameraPosY);
-	cam.placeable.transform = camPos;
+	if (cam) {        
+		camPos.pos.y = Math.max(playerAmount * camPosModifier, minCameraPosY);
+		cam.placeable.transform = camPos;
+	}
 
 	// Notify clients that the scene is now genereted
 	gameController.Exec(4, "sceneGenerated", "sceneGenerated", this.playerAmount);
@@ -241,7 +245,8 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 
 		var parent = ent.parent;
 		var areaComp = parent.Component("PlayerArea");
-		areaComp.playerBalls = areaComp.playerBalls - 1;
+		//disabled for demo / test server, to just keep on running
+		//areaComp.playerBalls = areaComp.playerBalls - 1;
 
 		if (areaComp.playerBalls <= 0) {
 			console.LogInfo("a player is out of balls");
