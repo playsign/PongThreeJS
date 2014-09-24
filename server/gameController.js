@@ -241,7 +241,8 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 
 		var parent = ent.parent;
 		var areaComp = parent.Component("PlayerArea");
-		areaComp.playerBalls = areaComp.playerBalls - 1;
+		//disabled for demo / test server, to just keep on running
+		//areaComp.playerBalls = areaComp.playerBalls - 1;
 
 		if (areaComp.playerBalls <= 0) {
 			console.LogInfo("a player is out of balls");
