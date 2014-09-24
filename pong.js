@@ -113,8 +113,8 @@ PongApp.prototype.logicInit = function() {
 
 	// override camera
 	this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
-	this.cameraPos = new THREE.Vector3(0, 300, 100);
-	this.camera.position = this.cameraPos.clone();
+	this.camY = 300; //used also in the dynamic cam setting code later
+	this.camera.position.set(0, this.camY, 100);
 	this.camera.lookAt(this.viewer.scene.position);
 	this.viewer.camera = this.camera;
 
@@ -263,13 +263,11 @@ PongApp.prototype.setCameraPosition = function(playerAmount) {
 	worldPos.setFromMatrixPosition(borderThreeObject.matrixWorld);
 
 	// Change camera position temporarily so we get a correct camera angle
-	this.camera.position.x = worldPos.x;
-	this.camera.position.y = this.cameraPos.y;
-	this.camera.position.z = worldPos.z;
+	this.camera.position.set(worldPos.x, this.camY, worldPos.z);
 	this.camera.lookAt(playerAreaThreeObject.position);
 
 	// Move camera back to the center
-	this.camera.position = new THREE.Vector3(0, 10, 0);
+	this.camera.position.set(0, 10, 0);
 
 };
 
