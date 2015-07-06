@@ -37,9 +37,11 @@ PongApp.start = function(serverHost, serverPort) {
     // window.setTimeout(function(){this.hideHack();}.bind(this), 100);
     $("#onlineButton").show();
 
+/*
     var redirectPlugin = TundraSDK.plugin("AssetRedirectPlugin");
     redirectPlugin.registerAssetTypeSwap(".mesh", ".json", "ThreeJsonMesh");
     redirectPlugin.setupDefaultStorage();
+*/
 
     this.threeScene = this.tundraClient.renderer.scene;
     this.threeRenderer = this.tundraClient.renderer.renderer;
@@ -148,7 +150,7 @@ PongApp.gameLogicInit = function() {
     // // override camera
     this.camera = new THREE.OrthographicCamera(-SCREEN_WIDTH / 2, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -SCREEN_HEIGHT / 2, NEAR, FAR); //(1)
     this.cameraPos = new THREE.Vector3(0, 300, 100);
-    this.camera.position = this.cameraPos.clone();
+    this.camera.position.copy(this.cameraPos);
     this.camera.lookAt(this.threeScene.position);
 
     this.tundraClient.renderer.camera = this.camera;
