@@ -168,15 +168,21 @@ function resetBall() {
 }
 
 // Path to the scene txml (playerArea.txml)
-
+/* apparently not needed anymore -- to be removed in that case.
 function pathForAsset(assetref) {
-	return asset.GetAsset(assetref).DiskSource();
-}
+	var assetvar = asset.GetAsset(assetref);
+	if (assetvar) {
+		return assetvar.DiskSource();
+	} else {
+		console.LogInfo("pathForAsset: No asset for assetref " + assetref);
+	}
+} */
 
 // Load the scene txml (playerArea.txml)
 
 function loadPart(partfile) { //(12)
-	var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
+	//var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
+	var ents = scene.LoadSceneXML(partfile, false, false, 2); //, changetype);
 
 	for (var i = 0; i < ents.length; i++) {
 		entities.push(ents[i]);

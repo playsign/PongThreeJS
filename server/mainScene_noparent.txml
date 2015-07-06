@@ -27,7 +27,7 @@
    <attribute value="1.000000" type="real" id="mass" name="Mass"/>
    <attribute value="2" type="int" id="shapeType" name="Shape type"/>
    <attribute value="10.000000 10.000000 10.000000" type="float3" id="size" name="Size"/>
-   <attribute value="local://Sphere.mesh" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
+   <attribute value="Sphere.mesh" type="AssetReference" id="collisionMeshRef" name="Collision mesh ref"/>
    <attribute value="0.500000" type="real" id="friction" name="Friction"/>
    <attribute value="1.000000" type="real" id="restitution" name="Restitution"/>
    <attribute value="0.000000" type="real" id="linearDamping" name="Linear damping"/>
