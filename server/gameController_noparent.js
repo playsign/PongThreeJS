@@ -207,11 +207,11 @@ function loadPart(partfile) { //(12)
         var lvCallback = function(lvx, lvy, lvz) {
 		//console.LogInfo("entity " + racketEntity + " racket move callback: " + lvx + ", " + lvy + ", " + lvz);
 
-                var vel = racketEntity.rigidBody.GetLinearVelocity(); //linearVelocity;
+                var vel = racketEntity.rigidBody.linearVelocity;
 		//console.LogInfo("before racket move: " + vel); // + ", " + lvy + ", " + lvz);
 
                 vel.x = lvx; vel.y = lvy; vel.z = lvz;
-                racketEntity.rigidBody.SetLinearVelocity(vel); //linearVelocity = vel;
+                racketEntity.rigidBody.linearVelocity = vel;
         };
         racketEntity.Action(
             "updateRacketLinearVelocity").Triggered.connect(lvCallback);
