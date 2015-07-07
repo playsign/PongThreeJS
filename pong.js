@@ -62,6 +62,8 @@ PongApp.hideHack = function() {
 };
 
 PongApp.connect = function() {
+    Tundra.asset.setHttpProxyResolver(undefined);
+    
     console.log("connecting");
     var loginData = {
 	"name": "PongPlayer_" + (Date.now() + Math.random()).toFixed(5)
@@ -423,4 +425,5 @@ PongApp.nextScreen = function() {
     this.gameDirector.doNextScreen();
 };
 
-PongApp.start();
+//PongApp.start();
+PongApp.start("192.168.0.11");
