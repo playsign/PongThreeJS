@@ -269,6 +269,7 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 		var attrs = parent.dynamiccomponent;
 		attrs.SetAttribute("playerBalls", attrs.GetAttribute("playerBalls") - 1);
 
+/* disable 'death' check while porting / devving / testing now
 		if (attrs.GetAttribute("playerBalls") <= 0) {
 			console.LogInfo("a player is out of balls");
 
@@ -289,6 +290,7 @@ function handleBallCollision(ent, pos, normal, distance, impulse, newCollision) 
 
 			generateScene();
 		}
+*/
 	}
 }
 
