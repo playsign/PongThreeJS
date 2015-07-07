@@ -109,11 +109,11 @@ PongApp.handleConnected = function() {
 };
 
 PongApp.setRacketColor = function() {
-    if (!this.ourBorderLeft) {
+    if (!this.ourRacket) {
         console.log("unable set racket color, ourRacket is unset");
         return;
     }
-    var threeMesh = this.getThreeMeshForEntity(this.ourBorderLeft).children[0];
+    var threeMesh = this.getThreeMeshForEntity(this.ourRacket);
 
     threeMesh.material = new THREE.MeshLambertMaterial({
         color: this.ourPlayerArea.dynamicComponent.color
