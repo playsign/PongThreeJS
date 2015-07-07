@@ -184,25 +184,34 @@ function loadPart(partfile) { //(12)
 	//var ents = scene.LoadSceneXML(pathForAsset(partfile), false, false, 2); //, changetype);
 	var ents = scene.LoadSceneXML(partfile, false, false, 2); //, changetype);
 
+	var racketEntity, borderLeftEntity;
 	for (var i = 0; i < ents.length; i++) {
-		entities.push(ents[i]);
+		var ent = ents[i];
+		entities.push(ent);
+		if (ent.name == "borderLeft") {
+			borderLeftEntity = ent;
+		}
+		if (ent.name == "racket") {
+			racketEntity = ent;
+		}
 	}
 
-	// Set the racket ref in the parent entity
+	// Set the racket(?) ref in the parent entity
 	var parentEntity = ents[0];
-
-	var children = parentEntity.placeable.Children();
-        var racketEntity = children[1];
 
 	// Save entity references for later use
 	var attrs = parentEntity.dynamiccomponent;
-	attrs.SetAttribute("racketRef", children[1].id);
-	attrs.SetAttribute("borderLeftRef", children[2].id);    
+	attrs.SetAttribute("racketRef", racketEntity.id);
+	attrs.SetAttribute("borderLeftRef", borderLeftEntity.id);
 
         var lvCallback = function(lvx, lvy, lvz) {
-                var vel = racketEntity.rigidBody.linearVelocity;
+		//console.LogInfo("entity " + racketEntity + " racket move callback: " + lvx + ", " + lvy + ", " + lvz);
+
+                var vel = racketEntity.rigidBody.GetLinearVelocity(); //linearVelocity;
+		//console.LogInfo("before racket move: " + vel); // + ", " + lvy + ", " + lvz);
+
                 vel.x = lvx; vel.y = lvy; vel.z = lvz;
-                racketEntity.rigidBody.linearVelocity = vel;
+                racketEntity.rigidBody.SetLinearVelocity(vel); //linearVelocity = vel;
         };
         racketEntity.Action(
             "updateRacketLinearVelocity").Triggered.connect(lvCallback);

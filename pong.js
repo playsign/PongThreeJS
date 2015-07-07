@@ -34,7 +34,7 @@ PongApp.start = function(serverHost, serverPort) {
     this.gameDirector = new Director();
     this.gameDirector.setScreen(DirectorScreens.controls);
     //this.showHelp();
-    // window.setTimeout(function(){this.hideHack();}.bind(this), 100);
+    window.setTimeout(function(){this.hideHack();}.bind(this), 3000);
     $("#onlineButton").show();
 
 /*
@@ -188,7 +188,6 @@ PongApp.handleFrameUpdate = function(dt) {
     if (!this.tundraClient.isConnected())
         return;
 
-
    
     // RACKET CONTROL
     //(2)
@@ -231,11 +230,12 @@ PongApp.handleFrameUpdate = function(dt) {
         }
 
         // Set a new velocity for the entity
-        this.ourRacket.rigidBody.linearVelocity = racketForward; //(14)
+        // XXX either this or the entity action -- not both:
+	// this.ourRacket.rigidBody.linearVelocity = racketForward; //(14)
 
         // Inform the server about the change
         this.ourRacket.exec(
-            "server", "updateRacketLinearVelocity",
+            EntityAction.Server, "updateRacketLinearVelocity",
             [racketForward.x, racketForward.y, racketForward.z]);
         
     }
@@ -303,14 +303,11 @@ PongApp.setCameraPosition = function(playerAmount) {
     worldPos.getPositionFromMatrix(borderThreeObject.matrixWorld);
 
     // Change camera position temporarily so we get a correct camera angle
-    this.camera.position.x = worldPos.x;
-    this.camera.position.y = this.cameraPos.y;
-    this.camera.position.z = worldPos.z;
+    this.camera.position.set(worldPos.x, this.cameraPos.y, worldPos.z);
     this.camera.lookAt(playerAreaThreeObject.position);
 
     // Move camera back to the center
-    this.camera.position = new THREE.Vector3(0, 10, 0);
-
+    this.camera.position.set(0, 10, 0);
 };
 
 PongApp.handleEntityAction = function(action) {
