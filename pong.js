@@ -82,6 +82,10 @@ PongApp.getThreeMeshForEntity = function(entity) {
     console.log("eid " + entity.id);
     var meshEc = entity.component("EC_Mesh") || raise("Entity has no EC_Mesh");
     var threeMesh = meshEc.meshAsset.mesh || raise("EC_Mesh has no THREE.Mesh");
+    //has bit strange duplicate now but above is now just for that null check / raise thing
+    //this seems possible too but the above probably better (just misses the .children thing? :
+    threeMesh = entity.mesh.getSceneNode().children[0]; //scenenode for placeable, mesh can have offset
+
     return threeMesh;
 };
 
