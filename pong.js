@@ -462,13 +462,16 @@ PongApp.refreshPlayersInfo = function(playerAmount) {
 
     $("#playersInfo").empty();
     for (var i = 0; i < playerAmount; i++) {
-	var entityID = this.serverGameCtrl.dynamicComponent.playerAreas[i];
+	var entityID = parseInt(this.serverGameCtrl.dynamicComponent.playerAreas[i]);
 	var entity = this.tundraClient.scene.entityById(entityID);
 
 	if (entity) {
 	    $("#playersInfo").append("<font color = " + entity.dynamicComponent.color + ">Player" + (i + 1) + ": " + entity.dynamicComponent.playerBalls + "</font><br>");
 	}
     }
+
+    //XXX HACK
+    $("#playersInfo")[0].style.display = 'inline'
 };
 
 PongApp.showHelp = function() {
