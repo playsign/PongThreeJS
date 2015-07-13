@@ -114,66 +114,27 @@ PongApp.handleConnected = function() {
     
     this.tundraClient.onDisconnected(
         null, this.handleDisconnected.bind(this));
-
-    // Set mesh material colors
-    //any simple way for this in dev2 / webrocket core?
-    //app.viewer.meshReadySig.add(
-    window.setTimeout(PongApp.setAllPlayerColors, 5000);
 };
-
-PongApp.setAllPlayerColors = function() {
-    //with custom comps: enitiesWithComponent("PlayerArea"); BTW: check IComponent for apps
-    var dc_ents = Tundra.scene.entitiesWithComponent("DynamicComponent");
-    $.each(dc_ents, function(idx, ent) {
-	if (ent.name == "PlayerArea") {
-	    PongApp.setPlayerColor(ent);
-	}
-    });
-}
-
-//for calling when the mesh component is ready, digs up the tree to get colour param:
-/*
-PongApp.setPlayerColor = function(meshComp, threeMesh) {
-    parentScene.entityById(1)
-    var parentPlayerAreaID = meshComp.parentEntity.placeable.parentRef;
-    var entity = meshComp.parentEntity.parentScene.entities[parentPlayerAreaID];
-    
-    if (meshComp.parentEntity.placeable !== undefined) {
-	if (meshComp.parentEntity.parent) {
-	    var entity = meshComp.parentEntity.parent;
-	    threeMesh.material = new THREE.MeshLambertMaterial({
-		color: entity.componentByType("PlayerArea").color
-	    });
-	} else {
-	    console.log("this entity doesn't have a parent");
-	}
-    }
-});
-*/
 
 PongApp.setPlayerColor = function(playerAreaEntity) {
     var dc = playerAreaEntity.dynamicComponent;
     var racketEntity = playerAreaEntity.parentScene.entityById(dc.racketRef);
 
-    var threeMesh = PongApp.getThreeMeshForEntity(racketEntity);
+    var meshEc = racketEntity.mesh;
+
+    //if the mesh is not in scene yet, call this same func again when it is
+    if (meshEc.getSceneNode() === null) {
+	meshEc.onMeshLoaded(playerAreaEntity, function() {
+	    PongApp.setPlayerColor(this);
+	});
+	return;
+    }
+
+    var threeMesh = meshEc.getSceneNode().children[0];
     threeMesh.material = new THREE.MeshLambertMaterial({
         color: dc.color
     });    
 }
-
-/*
-PongApp.setRacketColor = function() {
-    if (!this.ourRacket) {
-        console.log("unable set racket color, ourRacket is unset");
-        return;
-    }
-    var threeMesh = this.getThreeMeshForEntity(this.ourRacket);
-
-    threeMesh.material = new THREE.MeshLambertMaterial({
-        color: this.ourPlayerArea.dynamicComponent.color
-    });
-};
-*/
 
 PongApp.getThreeBall = function() {
     return this.threeScene.getObjectByName("Sphere");
@@ -420,14 +381,10 @@ PongApp.serverSceneInitialized = function() {
         }
     }
 
-    window.setTimeout(PongApp.setAllPlayerColors, 5000);
-
     if (this.ourPlayerArea !== undefined) {
         // XXX figure out when three mesh asset appears in EC_Mesh
 	window.setTimeout(
             this.setCameraPosition.bind(this, playerCount), 1000);
-	//window.setTimeout(
-        //    this.setRacketColor.bind(this), 1000);
     }
 };
 
@@ -442,6 +399,7 @@ PongApp.gotPlayerArea = function(areaEnt) {
         this.ourBorderLeft = tclient.scene.entityById(borderLeftRef) || raise("missing entity");
         this.ourPlayerArea = areaEnt || raise("missing area entity");
     }
+    PongApp.setPlayerColor(areaEnt);
 };
 
 function raise(e) {
