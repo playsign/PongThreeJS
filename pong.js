@@ -262,8 +262,22 @@ PongApp.handleFrameUpdate = function(dt) {
     }
 };
 
+
+//var cameraSet = false;
 // Set camera position and angle
 PongApp.setCameraPosition = function(playerAmount) {
+    //check scene object availability first
+    //-- hook to callbacks if they are not there yet
+    try {
+	var borderThreeObject = this.getThreeMeshForEntity(this.ourBorderLeft);
+	var playerAreaThreeObject = this.getThreeNodeForEntity(this.ourPlayerArea);
+    } catch (e) {
+	console.log("setCameraPosition not ready yet");
+	window.setTimeout(this.setCameraPosition.bind(this, playerAmount), 1000);
+	return;
+    }
+
+    console.log("setCameraPosition ready to go");
 
     playerAmount = Math.round(playerAmount);
 
@@ -309,9 +323,6 @@ PongApp.setCameraPosition = function(playerAmount) {
 
     this.camera.updateProjectionMatrix();
 
-    // Get corresponding three objects
-    var borderThreeObject = this.getThreeMeshForEntity(this.ourBorderLeft);
-    var playerAreaThreeObject = this.getThreeNodeForEntity(this.ourPlayerArea);
     playerAreaThreeObject.updateMatrixWorld();
     borderThreeObject.updateMatrixWorld();
 
@@ -369,8 +380,8 @@ PongApp.serverSceneInitialized = function() {
     this.serverGameCtrl = this.tundraClient.scene.entityByName("GameController"); //(4)
 
     var serverDc = this.serverGameCtrl.dynamicComponent;
-    var playerCount = serverDc.playerAreas.length;
-    for (var i = 0; i < playerCount; i++) {
+    var playerAmount = serverDc.playerAreas.length;
+    for (var i = 0; i < playerAmount; i++) {
         var entityID = parseInt(serverDc.playerAreas[i], 10);
         var entity = this.tundraClient.scene.entityById(entityID);        
         if (!entity) {
@@ -381,11 +392,7 @@ PongApp.serverSceneInitialized = function() {
         }
     }
 
-    if (this.ourPlayerArea !== undefined) {
-        // XXX figure out when three mesh asset appears in EC_Mesh
-	window.setTimeout(
-            this.setCameraPosition.bind(this, playerCount), 1000);
-    }
+    this.setCameraPosition(playerAmount);
 };
 
 PongApp.gotPlayerArea = function(areaEnt) {
