@@ -263,22 +263,23 @@ PongApp.handleFrameUpdate = function(dt) {
 };
 
 
-//var cameraSet = false;
 // Set camera position and angle
-PongApp.setCameraPosition = function(playerAmount) {
+PongApp.setCameraPosition = function() {
     //check scene object availability first
     //-- hook to callbacks if they are not there yet
     try {
 	var borderThreeObject = this.getThreeMeshForEntity(this.ourBorderLeft);
 	var playerAreaThreeObject = this.getThreeNodeForEntity(this.ourPlayerArea);
     } catch (e) {
-	console.log("setCameraPosition not ready yet");
-	window.setTimeout(this.setCameraPosition.bind(this, playerAmount), 1000);
+	console.log("setCameraPosition not ready yet: " + e);
+	//onTransfersCompleted triggers sometimes before the scene is ready
+	//.. found no other way for this to work reliably :/
+	window.setTimeout(this.setCameraPosition.bind(this), 100);
 	return;
     }
-
     console.log("setCameraPosition ready to go");
 
+    var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
     playerAmount = Math.round(playerAmount);
 
     // Angle in radians
@@ -385,14 +386,11 @@ PongApp.serverSceneInitialized = function() {
         var entityID = parseInt(serverDc.playerAreas[i], 10);
         var entity = this.tundraClient.scene.entityById(entityID);        
         if (!entity) {
-            console.log("missing playerArea: index " + i + " had entityID " + entityID);       
-
+            console.log("missing playerArea: index " + i + " had entityID " + entityID);
         } else {
             this.gotPlayerArea(entity);
         }
     }
-
-    this.setCameraPosition(playerAmount);
 };
 
 PongApp.gotPlayerArea = function(areaEnt) {
@@ -405,6 +403,10 @@ PongApp.gotPlayerArea = function(areaEnt) {
         this.ourRacket = tclient.scene.entityById(racketRef) || raise("missing entity"); //(6)
         this.ourBorderLeft = tclient.scene.entityById(borderLeftRef) || raise("missing entity");
         this.ourPlayerArea = areaEnt || raise("missing area entity");
+
+	Tundra.asset.onTransfersCompleted().done(function() {
+	    this.setCameraPosition();
+	}.bind(this));
     }
     PongApp.setPlayerColor(areaEnt);
 };
