@@ -81,7 +81,15 @@ PongApp.getThreeCamera = function() {
 PongApp.getThreeMeshForEntity = function(entity) {
     console.log("eid " + entity.id);
     var meshEc = entity.component("EC_Mesh") || raise("Entity has no EC_Mesh");
-    var threeMesh = meshEc.meshAsset.mesh || raise("EC_Mesh has no THREE.Mesh");
+    
+    //asset is sometimes null now. does the scenenode biz still actually work?
+    //var threeMesh = meshEc.meshAsset.mesh || raise("EC_Mesh has no THREE.Mesh");
+    //apparently not. we need either proper signal or repeated calling for this..
+    
+    //has bit strange duplicate now but above is now just for that null check / raise thing
+    //this seems possible too but the above probably better (just misses the .children thing? :
+    var threeMesh = entity.mesh.getSceneNode().children[0]; //scenenode for placeable, mesh can have offset
+
     return threeMesh;
 };
 
@@ -108,17 +116,25 @@ PongApp.handleConnected = function() {
         null, this.handleDisconnected.bind(this));
 };
 
-PongApp.setRacketColor = function() {
-    if (!this.ourRacket) {
-        console.log("unable set racket color, ourRacket is unset");
-        return;
-    }
-    var threeMesh = this.getThreeMeshForEntity(this.ourRacket);
+PongApp.setPlayerColor = function(playerAreaEntity) {
+    var dc = playerAreaEntity.dynamicComponent;
+    var racketEntity = playerAreaEntity.parentScene.entityById(dc.racketRef);
 
+    var meshEc = racketEntity.mesh;
+
+    //if the mesh is not in scene yet, call this same func again when it is
+    if (meshEc.getSceneNode() === null) {
+	meshEc.onMeshLoaded(playerAreaEntity, function() {
+	    PongApp.setPlayerColor(this);
+	});
+	return;
+    }
+
+    var threeMesh = meshEc.getSceneNode().children[0];
     threeMesh.material = new THREE.MeshLambertMaterial({
-        color: this.ourPlayerArea.dynamicComponent.color
-    });
-};
+        color: dc.color
+    });    
+}
 
 PongApp.getThreeBall = function() {
     return this.threeScene.getObjectByName("Sphere");
@@ -246,9 +262,24 @@ PongApp.handleFrameUpdate = function(dt) {
     }
 };
 
-// Set camera position and angle
-PongApp.setCameraPosition = function(playerAmount) {
 
+// Set camera position and angle
+PongApp.setCameraPosition = function() {
+    //check scene object availability first
+    //-- hook to callbacks if they are not there yet
+    try {
+	var borderThreeObject = this.getThreeMeshForEntity(this.ourBorderLeft);
+	var playerAreaThreeObject = this.getThreeNodeForEntity(this.ourPlayerArea);
+    } catch (e) {
+	console.log("setCameraPosition not ready yet: " + e);
+	//onTransfersCompleted triggers sometimes before the scene is ready
+	//.. found no other way for this to work reliably :/
+	window.setTimeout(this.setCameraPosition.bind(this), 100);
+	return;
+    }
+    console.log("setCameraPosition ready to go");
+
+    var playerAmount = this.serverGameCtrl.dynamicComponent.playerAreas.length;
     playerAmount = Math.round(playerAmount);
 
     // Angle in radians
@@ -293,9 +324,6 @@ PongApp.setCameraPosition = function(playerAmount) {
 
     this.camera.updateProjectionMatrix();
 
-    // Get corresponding three objects
-    var borderThreeObject = this.getThreeMeshForEntity(this.ourBorderLeft);
-    var playerAreaThreeObject = this.getThreeNodeForEntity(this.ourPlayerArea);
     playerAreaThreeObject.updateMatrixWorld();
     borderThreeObject.updateMatrixWorld();
 
@@ -353,24 +381,15 @@ PongApp.serverSceneInitialized = function() {
     this.serverGameCtrl = this.tundraClient.scene.entityByName("GameController"); //(4)
 
     var serverDc = this.serverGameCtrl.dynamicComponent;
-    var playerCount = serverDc.playerAreas.length;
-    for (var i = 0; i < playerCount; i++) {
+    var playerAmount = serverDc.playerAreas.length;
+    for (var i = 0; i < playerAmount; i++) {
         var entityID = parseInt(serverDc.playerAreas[i], 10);
         var entity = this.tundraClient.scene.entityById(entityID);        
         if (!entity) {
-            console.log("missing playerArea: index " + i + " had entityID " + entityID);       
-
+            console.log("missing playerArea: index " + i + " had entityID " + entityID);
         } else {
             this.gotPlayerArea(entity);
         }
-    }
-
-    if (this.ourPlayerArea !== undefined) {
-        // XXX figure out when three mesh asset appears in EC_Mesh
-	window.setTimeout(
-            this.setCameraPosition.bind(this, playerCount), 1000);
-	window.setTimeout(
-            this.setRacketColor.bind(this), 1000);
     }
 };
 
@@ -384,7 +403,12 @@ PongApp.gotPlayerArea = function(areaEnt) {
         this.ourRacket = tclient.scene.entityById(racketRef) || raise("missing entity"); //(6)
         this.ourBorderLeft = tclient.scene.entityById(borderLeftRef) || raise("missing entity");
         this.ourPlayerArea = areaEnt || raise("missing area entity");
+
+	Tundra.asset.onTransfersCompleted().done(function() {
+	    this.setCameraPosition();
+	}.bind(this));
     }
+    PongApp.setPlayerColor(areaEnt);
 };
 
 function raise(e) {
@@ -405,13 +429,16 @@ PongApp.refreshPlayersInfo = function(playerAmount) {
 
     $("#playersInfo").empty();
     for (var i = 0; i < playerAmount; i++) {
-	var entityID = this.serverGameCtrl.dynamicComponent.playerAreas[i];
+	var entityID = parseInt(this.serverGameCtrl.dynamicComponent.playerAreas[i]);
 	var entity = this.tundraClient.scene.entityById(entityID);
 
 	if (entity) {
 	    $("#playersInfo").append("<font color = " + entity.dynamicComponent.color + ">Player" + (i + 1) + ": " + entity.dynamicComponent.playerBalls + "</font><br>");
 	}
     }
+
+    //XXX HACK
+    $("#playersInfo")[0].style.display = 'inline'
 };
 
 PongApp.showHelp = function() {
